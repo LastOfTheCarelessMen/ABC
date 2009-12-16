@@ -63,5 +63,26 @@ plan *;
     is $match<ABC::note><note_length>, "2/3", '"G,2/3" has note length 2/3';
 }
 
+{
+    my $match = "z2/3" ~~ m/ <ABC::rest> /;
+    isa_ok $match, Match, '"z2/3" is a rest';
+    is $match<ABC::rest><rest_type>, "z", '"z2/3" has base rest z';
+    is $match<ABC::rest><note_length>, "2/3", '"z2/3" has note length 2/3';
+}
+
+{
+    my $match = "y/3" ~~ m/ <ABC::rest> /;
+    isa_ok $match, Match, '"y/3" is a rest';
+    is $match<ABC::rest><rest_type>, "y", '"y/3" has base rest y';
+    is $match<ABC::rest><note_length>, "/3", '"y/3" has note length 2/3';
+}
+
+{
+    my $match = "x" ~~ m/ <ABC::rest> /;
+    isa_ok $match, Match, '"x" is a rest';
+    is $match<ABC::rest><rest_type>, "x", '"x" has base rest x';
+    is $match<ABC::rest><note_length>, "", '"x" has no note length';
+}
+
 
 done_testing;

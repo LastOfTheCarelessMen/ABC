@@ -15,6 +15,9 @@ grammar ABC
     regex tie { '-' }
     regex note_length { [\d* ['/' \d*]? ] | '/' }
     regex note { <pitch> <note_length>? <tie>? }
+    
+    regex rest_type { <[x..z]> }
+    regex rest { <rest_type> <note_length>? }
 }
 
 class ABCHeader
