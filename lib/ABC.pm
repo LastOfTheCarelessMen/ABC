@@ -21,7 +21,10 @@ grammar ABC
     
     regex gracing { '+' <alpha>+ '+' }
     
-    regex element { <note> | <rest> | <gracing> }
+    regex broken_rhythm_bracket { ['<'+ | '>'+] }
+    regex broken_rhythm { <note> <gracing>* <broken_rhythm_bracket> <gracing>* <note> }
+    
+    regex element { <note> | <broken_rhythm> | <rest> | <gracing> }
     
 }
 

@@ -85,12 +85,6 @@ plan *;
 }
 
 {
-    my $match = "+trill+" ~~ m/ <ABC::gracing> /;
-    isa_ok $match, Match, '"+trill+" is a gracing';
-    is $match<ABC::gracing>, "+trill+", '"+trill+" is +trill+';
-}
-
-{
     my $match = "+trill+" ~~ m/ <ABC::element> /;
     isa_ok $match, Match, '"+trill+" is an element';
     is $match<ABC::element><gracing>, "+trill+", '"+trill+" gracing is +trill+';
@@ -111,5 +105,21 @@ plan *;
     is $match<ABC::element><note><pitch><accidental>, "_", '"_D,5/4" is flat';
     is $match<ABC::element><note><note_length>, "5/4", '"_D,5/4" has note length 5/4';
 }
+
+{
+    my $match = "A>^C'" ~~ m/ <ABC::broken_rhythm> /;
+    isa_ok $match, Match, '"A>^C" is a broken rhythm';
+    say $match.perl;
+    is $match<ABC::broken_rhythm><note>[0]<pitch><basenote>, "A", 'first note is A';
+    is $match<ABC::broken_rhythm><note>[0]<pitch><octave>, "", 'first note has no octave';
+    is $match<ABC::broken_rhythm><note>[0]<pitch><accidental>, "", 'first note has no accidental';
+    is $match<ABC::broken_rhythm><note>[0]<note_length>, "", 'first note has no length';
+    is $match<ABC::broken_rhythm><broken_rhythm_bracket>, ">", 'angle is >';
+    is $match<ABC::broken_rhythm><note>[1]<pitch><basenote>, "C", 'second note is C';
+    is $match<ABC::broken_rhythm><note>[1]<pitch><octave>, "'", 'second note has octave tick';
+    is $match<ABC::broken_rhythm><note>[1]<pitch><accidental>, "^", 'second note is sharp';
+    is $match<ABC::broken_rhythm><note>[1]<note_length>, "", 'second note has no length';
+}
+
 
 done_testing;
