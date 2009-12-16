@@ -12,9 +12,12 @@ g>ecg ec e/f/g/e/ | d/c/B/A/ Gd BG B/c/d/B/ |
 g/f/e/d/ c/d/e/f/ gc e/f/g/e/ | dB/A/ gB +trill+A2 +trill+e2 :|»;
 
 regex abc_header_field { ^^ \w ':' \N* $$ }
-regex abc_header { <abc_header_field>+ }
+regex abc_header { [<abc_header_field> \n]+ }
 
-if $abc ~~ m/ <abc_header_field> /
+if $abc ~~ m/ <abc_header> /
 {
-    say $<abc_header_field>;
+    for $<abc_header><abc_header_field> -> $line
+    {
+        say "header: $line";
+    }
 }
