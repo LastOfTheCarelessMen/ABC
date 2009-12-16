@@ -11,29 +11,32 @@ A/B/c/A/ c>d e>deg | dB/A/ gB +trill+A2 +trill+e2 ::
 g>ecg ec e/f/g/e/ | d/c/B/A/ Gd BG B/c/d/B/ | 
 g/f/e/d/ c/d/e/f/ gc e/f/g/e/ | dB/A/ gB +trill+A2 +trill+e2 :|»;
 
-regex abc_header_field_name { \w }
-regex abc_header_field_data { \N* }
-regex abc_header_field { ^^ <abc_header_field_name> ':' \s* <abc_header_field_data> $$ }
-regex abc_header { [<abc_header_field> \n]+ }
-
-regex abc_basenote { <[a..g]+[A..G]> }
-regex abc_octave { \'+ | \,+ }
-regex abc_accidental { '^' | '^^' | '_' | '__' | '=' }
-regex abc_pitch { <abc_accidental>? <abc_basenote> <abc_octave>? }
-
-regex abc_tie { '-' }
-regex abc_note_length { [\d* ['/' \d*] ] | '/' }
-regex abc_note { <abc_pitch> <abc_note_length>? <abc_tie>? }
-
-if $abc ~~ m/ <abc_header> /
+grammar ABC
 {
-    for $<abc_header><abc_header_field> -> $line
+    regex header_field_name { \w }
+    regex header_field_data { \N* }
+    regex header_field { ^^ <header_field_name> ':' \s* <header_field_data> $$ }
+    regex header { [<header_field> \n]+ }
+
+    regex basenote { <[a..g]+[A..G]> }
+    regex octave { \'+ | \,+ }
+    regex accidental { '^' | '^^' | '_' | '__' | '=' }
+    regex pitch { <accidental>? <basenote> <octave>? }
+
+    regex tie { '-' }
+    regex note_length { [\d* ['/' \d*] ] | '/' }
+    regex note { <pitch> <note_length>? <tie>? }
+}
+
+if $abc ~~ m/ <ABC::header> /
+{
+    for $<ABC::header><header_field> -> $line
     {
-        say "header: {$line<abc_header_field_name>}: {$line<abc_header_field_data>}";
+        say "header: {$line<header_field_name>}: {$line<header_field_data>}";
     }
 }
 
-if "^^A/3" ~~ m/ <abc_note> /
+if "^^A/3" ~~ m/ <ABC::note> /
 {
-    say $<abc_note>.perl;
+    say $<ABC::note>.perl;
 }
