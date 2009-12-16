@@ -54,7 +54,14 @@ plan *;
     is $match<ABC::note><note_length>, "/", '"__f/" has note length /';
 }
 
-
+{
+    my $match = "G,2/3" ~~ m/ <ABC::note> /;
+    isa_ok $match, Match, '"G,2/3" is a note';
+    is $match<ABC::note><pitch><basenote>, "G", '"G,2/3" has base note G';
+    is $match<ABC::note><pitch><octave>, ",", '"G,2/3" has octave ","';
+    is $match<ABC::note><pitch><accidental>, "", '"G,2/3" has no accidental';
+    is $match<ABC::note><note_length>, "2/3", '"G,2/3" has note length 2/3';
+}
 
 
 done_testing;
