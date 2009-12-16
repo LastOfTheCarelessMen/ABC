@@ -11,7 +11,7 @@ A/B/c/A/ c>d e>deg | dB/A/ gB +trill+A2 +trill+e2 ::
 g>ecg ec e/f/g/e/ | d/c/B/A/ Gd BG B/c/d/B/ | 
 g/f/e/d/ c/d/e/f/ gc e/f/g/e/ | dB/A/ gB +trill+A2 +trill+e2 :|»;
 
-regex abc_header_field { ^^ \w ':' .* $$ }
+regex abc_header_field { ^^ \w ':' \N* $$ }
 regex abc_header { <abc_header_field>+ }
 
 if $abc ~~ m/ <abc_header_field> /
