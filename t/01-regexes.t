@@ -84,5 +84,32 @@ plan *;
     is $match<ABC::rest><note_length>, "", '"x" has no note length';
 }
 
+{
+    my $match = "+trill+" ~~ m/ <ABC::gracing> /;
+    isa_ok $match, Match, '"+trill+" is a gracing';
+    is $match<ABC::gracing>, "+trill+", '"+trill+" is +trill+';
+}
+
+{
+    my $match = "+trill+" ~~ m/ <ABC::element> /;
+    isa_ok $match, Match, '"+trill+" is an element';
+    is $match<ABC::element><gracing>, "+trill+", '"+trill+" gracing is +trill+';
+}
+
+{
+    my $match = "z/" ~~ m/ <ABC::element> /;
+    isa_ok $match, Match, '"z/" is an element';
+    is $match<ABC::element><rest><rest_type>, "z", '"z/" has base rest z';
+    is $match<ABC::element><rest><note_length>, "/", '"z/" has length "/"';
+}
+
+{
+    my $match = "_D,5/4" ~~ m/ <ABC::element> /;
+    isa_ok $match, Match, '"_D,5/4" is an element';
+    is $match<ABC::element><note><pitch><basenote>, "D", '"_D,5/4" has base note D';
+    is $match<ABC::element><note><pitch><octave>, ",", '"_D,5/4" has octave ","';
+    is $match<ABC::element><note><pitch><accidental>, "_", '"_D,5/4" is flat';
+    is $match<ABC::element><note><note_length>, "5/4", '"_D,5/4" has note length 5/4';
+}
 
 done_testing;

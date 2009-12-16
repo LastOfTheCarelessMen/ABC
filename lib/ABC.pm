@@ -18,6 +18,11 @@ grammar ABC
     
     regex rest_type { <[x..z]> }
     regex rest { <rest_type> <note_length>? }
+    
+    regex gracing { '+' <alpha>+ '+' }
+    
+    regex element { <note> | <rest> | <gracing> }
+    
 }
 
 class ABCHeader
