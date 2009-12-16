@@ -36,6 +36,25 @@ plan *;
     is $match<ABC::pitch><accidental>, "=", '"=d,,," has accidental "="';
 }
 
+{
+    my $match = "^^e2" ~~ m/ <ABC::note> /;
+    isa_ok $match, Match, '"^^e2" is a note';
+    is $match<ABC::note><pitch><basenote>, "e", '"^^e2" has base note e';
+    is $match<ABC::note><pitch><octave>, "", '"^^e2" has octave ""';
+    is $match<ABC::note><pitch><accidental>, "^^", '"^^e2" has accidental "^^"';
+    is $match<ABC::note><note_length>, "2", '"^^e2" has note length 2';
+}
+
+{
+    my $match = "__f'/" ~~ m/ <ABC::note> /;
+    isa_ok $match, Match, '"__f/" is a note';
+    is $match<ABC::note><pitch><basenote>, "f", '"__f/" has base note f';
+    is $match<ABC::note><pitch><octave>, "'", '"__f/" has octave tick';
+    is $match<ABC::note><pitch><accidental>, "__", '"__f/" has accidental "__"';
+    is $match<ABC::note><note_length>, "/", '"__f/" has note length /';
+}
+
+
 
 
 done_testing;

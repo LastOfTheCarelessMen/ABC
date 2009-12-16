@@ -13,7 +13,7 @@ grammar ABC
     regex pitch { <accidental>? <basenote> <octave>? }
 
     regex tie { '-' }
-    regex note_length { [\d* ['/' \d*] ] | '/' }
+    regex note_length { [\d* ['/' \d*]? ] | '/' }
     regex note { <pitch> <note_length>? <tie>? }
 }
 
