@@ -121,15 +121,15 @@ plan *;
 }
 
 {
-    my $match = "d'<<<+accent+_B" ~~ m/ <ABC::broken_rhythm> /;
-    isa_ok $match, Match, '"d<<<+accent+_B" is a broken rhythm';
+    my $match = "d'+p+<<<+accent+_B" ~~ m/ <ABC::broken_rhythm> /;
+    isa_ok $match, Match, '"d+p+<<<+accent+_B" is a broken rhythm';
     is $match<ABC::broken_rhythm><note>[0]<pitch><basenote>, "d", 'first note is d';
     is $match<ABC::broken_rhythm><note>[0]<pitch><octave>, "'", 'first note has an octave tick';
     is $match<ABC::broken_rhythm><note>[0]<pitch><accidental>, "", 'first note has no accidental';
     is $match<ABC::broken_rhythm><note>[0]<note_length>, "", 'first note has no length';
+    is $match<ABC::broken_rhythm><gracing>[0], "+p+", 'first gracing is +p+';
     is $match<ABC::broken_rhythm><broken_rhythm_bracket>, "<<<", 'angle is <<<';
-    # how to know first gracing pattern versus second?
-    is $match<ABC::broken_rhythm><gracing>[0], "+accent+", 'second gracing is +accent+';
+    is $match<ABC::broken_rhythm><g2>[0], "+accent+", 'second gracing is +accent+';
     is $match<ABC::broken_rhythm><note>[1]<pitch><basenote>, "B", 'second note is B';
     is $match<ABC::broken_rhythm><note>[1]<pitch><octave>, "", 'second note has no octave';
     is $match<ABC::broken_rhythm><note>[1]<pitch><accidental>, "_", 'second note is flat';
