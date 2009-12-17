@@ -127,13 +127,19 @@ plan *;
     is $match<ABC::broken_rhythm><note>[0]<pitch><octave>, "'", 'first note has an octave tick';
     is $match<ABC::broken_rhythm><note>[0]<pitch><accidental>, "", 'first note has no accidental';
     is $match<ABC::broken_rhythm><note>[0]<note_length>, "", 'first note has no length';
-    is $match<ABC::broken_rhythm><gracing>[0], "+p+", 'first gracing is +p+';
+    is $match<ABC::broken_rhythm><g1>[0], "+p+", 'first gracing is +p+';
     is $match<ABC::broken_rhythm><broken_rhythm_bracket>, "<<<", 'angle is <<<';
     is $match<ABC::broken_rhythm><g2>[0], "+accent+", 'second gracing is +accent+';
     is $match<ABC::broken_rhythm><note>[1]<pitch><basenote>, "B", 'second note is B';
     is $match<ABC::broken_rhythm><note>[1]<pitch><octave>, "", 'second note has no octave';
     is $match<ABC::broken_rhythm><note>[1]<pitch><accidental>, "_", 'second note is flat';
     is $match<ABC::broken_rhythm><note>[1]<note_length>, "", 'second note has no length';
+}
+
+{
+    my $match = "g>ecg ec e/f/g/e/ | d/c/B/A/ Gd BG B/c/d/B/ |" ~~ m/ <ABC::line_of_music> /;
+    isa_ok $match, Match, 'line of music recognized';
+    say $match<ABC::line_of_music>.perl;
 }
 
 done_testing;
