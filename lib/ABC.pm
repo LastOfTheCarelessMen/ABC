@@ -26,7 +26,7 @@ grammar ABC
     
     regex element { <note> | <broken_rhythm> | <rest> | <gracing> }
     
-    regex barline { '|' | ':|' | '|:' | ':|:' | '::' }
+    regex barline { ':|:' | '|:' | '|' | ':|' | '::' }
     
     regex line_of_music { <barline> | [<barline>? <element>+ [<barline> <element>+]* <barline>?] }
 }

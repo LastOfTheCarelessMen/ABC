@@ -123,17 +123,27 @@ plan *;
 {
     my $match = "d'+p+<<<+accent+_B" ~~ m/ <ABC::broken_rhythm> /;
     isa_ok $match, Match, '"d+p+<<<+accent+_B" is a broken rhythm';
-    is $match<ABC::broken_rhythm><note>[0]<pitch><basenote>, "d", 'first note is d';
-    is $match<ABC::broken_rhythm><note>[0]<pitch><octave>, "'", 'first note has an octave tick';
-    is $match<ABC::broken_rhythm><note>[0]<pitch><accidental>, "", 'first note has no accidental';
-    is $match<ABC::broken_rhythm><note>[0]<note_length>, "", 'first note has no length';
-    is $match<ABC::broken_rhythm><g1>[0], "+p+", 'first gracing is +p+';
-    is $match<ABC::broken_rhythm><broken_rhythm_bracket>, "<<<", 'angle is <<<';
-    is $match<ABC::broken_rhythm><g2>[0], "+accent+", 'second gracing is +accent+';
-    is $match<ABC::broken_rhythm><note>[1]<pitch><basenote>, "B", 'second note is B';
-    is $match<ABC::broken_rhythm><note>[1]<pitch><octave>, "", 'second note has no octave';
-    is $match<ABC::broken_rhythm><note>[1]<pitch><accidental>, "_", 'second note is flat';
-    is $match<ABC::broken_rhythm><note>[1]<note_length>, "", 'second note has no length';
+    given $match<ABC::broken_rhythm>
+    {
+        is .<note>[0]<pitch><basenote>, "d", 'first note is d';
+        is .<note>[0]<pitch><octave>, "'", 'first note has an octave tick';
+        is .<note>[0]<pitch><accidental>, "", 'first note has no accidental';
+        is .<note>[0]<note_length>, "", 'first note has no length';
+        is .<g1>[0], "+p+", 'first gracing is +p+';
+        is .<broken_rhythm_bracket>, "<<<", 'angle is <<<';
+        is .<g2>[0], "+accent+", 'second gracing is +accent+';
+        is .<note>[1]<pitch><basenote>, "B", 'second note is B';
+        is .<note>[1]<pitch><octave>, "", 'second note has no octave';
+        is .<note>[1]<pitch><accidental>, "_", 'second note is flat';
+        is .<note>[1]<note_length>, "", 'second note has no length';
+    }
+}
+
+for ':|:', '|:', '|', ':|', '::'  
+{
+    my $match = $_ ~~ m/ <ABC::barline> /;
+    isa_ok $match, Match, "barline $_ recognized";
+    is $match<ABC::barline>, $_, "barline $_ is correct";
 }
 
 {
