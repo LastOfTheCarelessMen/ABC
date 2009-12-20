@@ -167,7 +167,20 @@ for ':|:', '|:', '|', ':|', '::'
     my $match = $line ~~ m/ <ABC::line_of_music> /;
     isa_ok $match, Match, 'line of music recognized';
     is $match<ABC::line_of_music>, $line, "Entire line was matched";
-    say $match<ABC::line_of_music>.perl;
+    is $match<ABC::line_of_music><bar>[0], "g>ecg ec e/f/g/e/ |", "First bar is correct";
+    is $match<ABC::line_of_music><bar>[1], " d/c/B/A/ Gd BG B/c/d/B/ |", "Second bar is correct";
+    # say $match<ABC::line_of_music>.perl;
+}
+
+{
+    my $line = "|A/B/c/A/ c>d e>deg | dB/A/ gB +trill+A2 +trill+e2 ::";
+    my $match = $line ~~ m/ <ABC::line_of_music> /;
+    isa_ok $match, Match, 'line of music recognized';
+    is $match<ABC::line_of_music>, $line, "Entire line was matched";
+    is $match<ABC::line_of_music><bar>[0], "A/B/c/A/ c>d e>deg |", "First bar is correct";
+    is $match<ABC::line_of_music><bar>[1], " dB/A/ gB +trill+A2 +trill+e2 ::", "Second bar is correct";
+    is $match<ABC::line_of_music><barline>, "|", "Initial barline matched";
+    # say $match<ABC::line_of_music>.perl;
 }
 
 done_testing;

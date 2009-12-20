@@ -32,7 +32,7 @@ grammar ABC
     
     regex bar { <element>+ <barline>? }
         
-    regex line_of_music { <barline> $$ | <barline>? <element>+ $$ }
+    regex line_of_music { <barline>? <bar>+ }
 }
 
 class ABCHeader
