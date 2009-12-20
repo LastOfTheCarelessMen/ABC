@@ -183,4 +183,15 @@ for ':|:', '|:', '|', ':|', '::'
     # say $match<ABC::line_of_music>.perl;
 }
 
+{
+    my $music = q«A/B/c/A/ +trill+c>d e>deg | GG +trill+B>c d/B/A/G/ B/c/d/B/ |
+    A/B/c/A/ c>d e>deg | dB/A/ gB +trill+A2 +trill+e2 ::
+    g>ecg ec e/f/g/e/ | d/c/B/A/ Gd BG B/c/d/B/ | 
+    g/f/e/d/ c/d/e/f/ gc e/f/g/e/ | dB/A/ gB +trill+A2 +trill+e2 :|»;
+    my $match = $music ~~ m/ <ABC::music> /;
+    isa_ok $match, Match, 'music recognized';
+    is $match<ABC::music><line_of_music>.elems, 4, "Four lines matched";
+    say $match<ABC::music>;
+}
+
 done_testing;

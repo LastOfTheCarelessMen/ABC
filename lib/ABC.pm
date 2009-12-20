@@ -21,7 +21,7 @@ grammar ABC
     
     regex gracing { '+' <alpha>+ '+' }
     
-    regex spacing { \s+ }
+    regex spacing { \h+ }
     
     regex broken_rhythm_bracket { ['<'+ | '>'+] }
     regex broken_rhythm { <note> <g1=gracing>* <broken_rhythm_bracket> <g2=gracing>* <note> }
@@ -33,6 +33,8 @@ grammar ABC
     regex bar { <element>+ <barline>? }
         
     regex line_of_music { <barline>? <bar>+ }
+    
+    regex music { [<line_of_music> \s*\n?]+ }
 }
 
 class ABCHeader
