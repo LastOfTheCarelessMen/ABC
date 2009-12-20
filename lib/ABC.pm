@@ -24,11 +24,13 @@ grammar ABC
     regex broken_rhythm_bracket { ['<'+ | '>'+] }
     regex broken_rhythm { <note> <g1=gracing>* <broken_rhythm_bracket> <g2=gracing>* <note> }
     
-    regex element { <note> | <broken_rhythm> | <rest> | <gracing> }
+    regex element { <broken_rhythm> | <note> | <rest> | <gracing> }
     
     regex barline { ':|:' | '|:' | '|' | ':|' | '::' }
     
-    regex line_of_music { <barline> | [<barline>? <element>+ [<barline> <element>+]* <barline>?] }
+    regex bar { <element>+ <barline>? }
+        
+    regex line_of_music { <barline> $$ | <barline>? <element>+ $$ }
 }
 
 class ABCHeader

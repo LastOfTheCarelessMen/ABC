@@ -147,9 +147,24 @@ for ':|:', '|:', '|', ':|', '::'
 }
 
 {
-    my $match = "g>ecg ec e/f/g/e/ | d/c/B/A/ Gd BG B/c/d/B/ |" ~~ m/ <ABC::line_of_music> /;
-    isa_ok $match, Match, 'line of music recognized';
-    say $match<ABC::line_of_music>.perl;
+    my $match = "g>ecgece/f/g/e/|" ~~ m/ <ABC::bar> /;
+    isa_ok $match, Match, 'bar recognized';
+    is $match<ABC::bar>, "g>ecgece/f/g/e/|", "Entire bar was matched";
+    is $match<ABC::bar><element>.map(~*), "g>e c g e c e/ f/ g/ e/", "Each element was matched";
+    is $match<ABC::bar><barline>, "|", "Barline was matched";
 }
+
+# {
+#     my $match = "g>ecg ec e/f/g/e/ |" ~~ m/ <ABC::bar> /;
+#     isa_ok $match, Match, 'bar recognized';
+#     say $match<ABC::bar>.perl;
+#     say $match<ABC::bar>;
+# }
+
+# {
+#     my $match = "g>ecg ec e/f/g/e/ | d/c/B/A/ Gd BG B/c/d/B/ |" ~~ m/ <ABC::line_of_music> /;
+#     isa_ok $match, Match, 'line of music recognized';
+#     say $match<ABC::line_of_music>.perl;
+# }
 
 done_testing;
