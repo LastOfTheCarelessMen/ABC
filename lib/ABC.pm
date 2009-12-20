@@ -5,7 +5,7 @@ grammar ABC
     regex header_field_name { \w }
     regex header_field_data { \N* }
     regex header_field { ^^ <header_field_name> ':' \s* <header_field_data> $$ }
-    regex header { [<header_field> \n]+ }
+    regex header { [<header_field> \v]+ }
 
     regex basenote { <[a..g]+[A..G]> }
     regex octave { \'+ | \,+ }
@@ -34,7 +34,9 @@ grammar ABC
         
     regex line_of_music { <barline>? <bar>+ }
     
-    regex music { [<line_of_music> \s*\n?]+ }
+    regex music { [<line_of_music> \s*\v?]+ }
+    
+    regex tune { <header> <music> }
 }
 
 class ABCHeader

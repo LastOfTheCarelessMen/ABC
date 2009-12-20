@@ -191,7 +191,43 @@ for ':|:', '|:', '|', ':|', '::'
     my $match = $music ~~ m/ <ABC::music> /;
     isa_ok $match, Match, 'music recognized';
     is $match<ABC::music><line_of_music>.elems, 4, "Four lines matched";
-    say $match<ABC::music>;
+}
+
+{
+    my $music = q«X:64
+T:Cuckold Come Out o' the Amrey
+S:Northumbrian Minstrelsy
+M:4/4
+L:1/8
+K:D
+»;
+    my $match = $music ~~ m/ <ABC::header> /;
+    isa_ok $match, Match, 'header recognized';
+    is $match<ABC::header><header_field>.elems, 6, "Six fields matched";
+    is $match<ABC::header><header_field>.map(*.<header_field_name>), "X T S M L K", "Got the right field names";
+}
+
+{
+    my $music = q«X:64
+T:Cuckold Come Out o' the Amrey
+S:Northumbrian Minstrelsy
+M:4/4
+L:1/8
+K:D
+A/B/c/A/ +trill+c>d e>deg | GG +trill+B>c d/B/A/G/ B/c/d/B/ |
+A/B/c/A/ c>d e>deg | dB/A/ gB +trill+A2 +trill+e2 ::
+g>ecg ec e/f/g/e/ | d/c/B/A/ Gd BG B/c/d/B/ | 
+g/f/e/d/ c/d/e/f/ gc e/f/g/e/ | dB/A/ gB +trill+A2 +trill+e2 :|
+»;
+    my $match = $music ~~ m/ <ABC::tune> /;
+    isa_ok $match, Match, 'tune recognized';
+    given $match<ABC::tune><header>
+    {
+        is .<header_field>.elems, 6, "Six fields matched";
+        is .<header_field>.map(*.<header_field_name>), "X T S M L K", "Got the right field names";
+    }
+    is $match<ABC::tune><music><line_of_music>.elems, 4, "Four lines matched";
+    say $match;
 }
 
 done_testing;
