@@ -21,10 +21,12 @@ grammar ABC
     
     regex gracing { '+' <alpha>+ '+' }
     
+    regex spacing { \s+ }
+    
     regex broken_rhythm_bracket { ['<'+ | '>'+] }
     regex broken_rhythm { <note> <g1=gracing>* <broken_rhythm_bracket> <g2=gracing>* <note> }
     
-    regex element { <broken_rhythm> | <note> | <rest> | <gracing> }
+    regex element { <broken_rhythm> | <note> | <rest> | <gracing> | <spacing> }
     
     regex barline { ':|:' | '|:' | '|' | ':|' | '::' }
     
