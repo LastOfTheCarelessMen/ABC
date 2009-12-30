@@ -39,6 +39,14 @@ grammar ABC
     regex tune { <header> <music> }
 }
 
+sub header_hash($header_match)
+{
+    gather for $header_match<header_field>
+    {
+        take $_.<header_field_name>.Str => $_.<header_field_data>.Str;
+    }
+}
+
 sub key_signature($key_signature_name)
 {
     my %keys = (
