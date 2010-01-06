@@ -3,34 +3,31 @@ use v6;
 BEGIN { push @*INC, "lib" }
 use ABC;
 
-my $abc = q«X:64
-T:Cuckold Come Out o' the Amrey
-S:Northumbrian Minstrelsy
-M:4/4
-L:1/8
-K:D
-A/B/c/A/ +trill+c>d e>deg | GG +trill+B>c d/B/A/G/ B/c/d/B/ |
-A/B/c/A/ c>d e>deg | dB/A/ gB +trill+A2 +trill+e2 ::
-g>ecg ec e/=f/g/e/ | d/c/B/A/ Gd BG B/c/d/B/ | 
-g/f/e/d/ c/d/e/f/ gc e/f/g/e/ | dB/A/ gB +trill+A2 +trill+e2 :|»;
+regex between { \v+ }
+regex file { \s* <ABC::tune> ** <between> }
 
-my $match = $abc ~~ m/ <ABC::tune> /;
+my $abcs = $*IN.lines.join("\n");
+my @matches = $abcs.comb(m/ <ABC::tune> /, :match);
 
-die "Tune not matched\n" unless $match ~~ Match;
-
-my @notes = gather for $match<ABC::tune><music><line_of_music> -> $line
-{
-    for $line<bar> -> $bar
-    {
-        for $bar<element>
-        {
-            when .<broken_rhythm> { take .<broken_rhythm><note>[0]; take .<broken_rhythm><note>[1]; }
-            when .<note>          { take .<note>; }
-        }
-    }
+for @matches {
+    my %header = header_hash(.<ABC::tune><header>);
+    say %header<T>;
 }
 
-my %header = header_hash($match<ABC::tune><header>);
-my %key_signature = key_signature(%header<K>);
-
-@notes.map({say .<pitch> ~ " => " ~ apply_key_signature(%key_signature, .<pitch>)});
+# 
+# my @notes = gather for $match<ABC::tune><music><line_of_music> -> $line
+# {
+#     for $line<bar> -> $bar
+#     {
+#         for $bar<element>
+#         {
+#             when .<broken_rhythm> { take .<broken_rhythm><note>[0]; take .<broken_rhythm><note>[1]; }
+#             when .<note>          { take .<note>; }
+#         }
+#     }
+# }
+# 
+# my %header = header_hash($match<ABC::tune><header>);
+# my %key_signature = key_signature(%header<K>);
+# 
+# @notes.map({say .<pitch> ~ " => " ~ apply_key_signature(%key_signature, .<pitch>)});
