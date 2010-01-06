@@ -30,23 +30,6 @@ my @notes = gather for $match<ABC::tune><music><line_of_music> -> $line
     }
 }
 
-sub apply_key_signature(%key_signature, $pitch)
-{
-    my $resulting_note = "";
-    if $pitch<accidental>
-    {
-        $resulting_note ~= $pitch<accidental>.Str;
-    }
-    else
-    {
-        $resulting_note ~= %key_signature{$pitch<basenote>.uc} 
-                if (%key_signature.exists($pitch<basenote>.uc));
-    }
-    $resulting_note ~= $pitch<basenote>;
-    $resulting_note ~= $pitch<octave> if $pitch<octave>;
-    return $resulting_note;
-}
-
 my %header = header_hash($match<ABC::tune><header>);
 my %key_signature = key_signature(%header<K>);
 

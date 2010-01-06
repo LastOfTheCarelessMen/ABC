@@ -99,6 +99,23 @@ sub key_signature($key_signature_name)
     return %hash;
 }
 
+sub apply_key_signature(%key_signature, $pitch)
+{
+    my $resulting_note = "";
+    if $pitch<accidental>
+    {
+        $resulting_note ~= $pitch<accidental>.Str;
+    }
+    else
+    {
+        $resulting_note ~= %key_signature{$pitch<basenote>.uc} 
+                if (%key_signature.exists($pitch<basenote>.uc));
+    }
+    $resulting_note ~= $pitch<basenote>.Str;
+    $resulting_note ~= $pitch<octave>.Str if $pitch<octave>;
+    return $resulting_note;
+}
+
 class ABCHeader
 {
     
