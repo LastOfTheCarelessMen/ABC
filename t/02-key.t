@@ -61,4 +61,18 @@ plan *;
     is %key<B>, "^", "B is sharp";
 }
 
+{
+    my %key = key_signature("C#m");
+    is apply_key_signature(%key, ("f" ~~ m/ <ABC::pitch> /).<ABC::pitch>), "^f", "f => ^f";
+    is apply_key_signature(%key, ("C" ~~ m/ <ABC::pitch> /).<ABC::pitch>), "^C", "C => ^C";
+    is apply_key_signature(%key, ("G" ~~ m/ <ABC::pitch> /).<ABC::pitch>), "^G", "G => ^G";
+    is apply_key_signature(%key, ("d" ~~ m/ <ABC::pitch> /).<ABC::pitch>), "^d", "d => ^d";
+    is apply_key_signature(%key, ("_f" ~~ m/ <ABC::pitch> /).<ABC::pitch>), "_f", "_f => _f";
+    is apply_key_signature(%key, ("=C" ~~ m/ <ABC::pitch> /).<ABC::pitch>), "=C", "=C => =C";
+    is apply_key_signature(%key, ("^G" ~~ m/ <ABC::pitch> /).<ABC::pitch>), "^G", "^G => ^G";
+    is apply_key_signature(%key, ("^^d" ~~ m/ <ABC::pitch> /).<ABC::pitch>), "^^d", "^^d => ^^d";
+    is apply_key_signature(%key, ("b'" ~~ m/ <ABC::pitch> /).<ABC::pitch>), "b'", "b' => b'";
+}
+
+
 done_testing;
