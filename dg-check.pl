@@ -3,7 +3,17 @@ use v6;
 BEGIN { push @*INC, "lib" }
 use ABC;
 
-my @matches = $*IN.lines.join("\n").comb(m/ <ABC::tune> /, :match);
+my @matches = $*IN.slurp.comb(m/ <ABC::tune> /, :match);
+
+my %dg_notes = {
+    'g' => 1,
+    'a' => 1,
+    'b' => 1,
+    'c' => 1,
+    'd' => 1,
+    'e' => 1,
+    '^f' => 1
+}
 
 for @matches {
     my %header = header_hash(.<ABC::tune><header>);
@@ -21,8 +31,8 @@ for @matches {
         }
     }
 
-    my %header = header_hash(.<ABC::tune><header>);
     my %key_signature = key_signature(%header<K>);
 
-    @notes.map({say .<pitch> ~ " => " ~ apply_key_signature(%key_signature, .<pitch>)});
+    my @trouble = @notes.map({apply_key_signature(%key_signature, .<pitch>)}).grep({!%dg_notes.exists(lc($_))});
+    say @trouble.perl;
 }
