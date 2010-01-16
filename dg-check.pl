@@ -25,8 +25,8 @@ for @matches {
         {
             for $bar<element>
             {
-                when .<broken_rhythm> { take .<broken_rhythm><note>[0]; take .<broken_rhythm><note>[1]; }
-                when .<note>          { take .<note>; }
+                when .<broken_rhythm> { take .<broken_rhythm><stem>[0]<note>; take .<broken_rhythm><stem>[1]<note>; }
+                when .<stem>          { take .<stem><note>; }
             }
         }
     }
