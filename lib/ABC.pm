@@ -19,7 +19,13 @@ grammar ABC
     regex rest_type { <[x..z]> }
     regex rest { <rest_type> <note_length>? }
     
-    regex gracing { '+' <alpha>+ '+' }
+    regex grace_note { <pitch> <note_length>? } # as note, but without tie
+    regex grace_note_stem { <grace_note> | [ '[' <grace_note>+ ']' ]  }
+    regex acciaccatura { '/' }
+    regex grace_notes { '{' <acciaccatura>? <grace_note_stem>+ '}' }
+    
+    regex long_gracing { '+' <alpha>+ '+' }
+    regex gracing { '.' | '~' | <long_gracing> }
     
     regex spacing { \h+ }
     

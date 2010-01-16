@@ -91,6 +91,12 @@ plan *;
 }
 
 {
+    my $match = "~" ~~ m/ <ABC::element> /;
+    isa_ok $match, Match, '"~" is an element';
+    is $match<ABC::element><gracing>, "~", '"~" gracing is ~';
+}
+
+{
     my $match = "z/" ~~ m/ <ABC::element> /;
     isa_ok $match, Match, '"z/" is an element';
     is $match<ABC::element><rest><rest_type>, "z", '"z/" has base rest z';
