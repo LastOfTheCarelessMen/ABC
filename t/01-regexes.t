@@ -106,24 +106,24 @@ plan *;
 {
     my $match = "_D,5/4" ~~ m/ <ABC::element> /;
     isa_ok $match, Match, '"_D,5/4" is an element';
-    is $match<ABC::element><note><pitch><basenote>, "D", '"_D,5/4" has base note D';
-    is $match<ABC::element><note><pitch><octave>, ",", '"_D,5/4" has octave ","';
-    is $match<ABC::element><note><pitch><accidental>, "_", '"_D,5/4" is flat';
-    is $match<ABC::element><note><note_length>, "5/4", '"_D,5/4" has note length 5/4';
+    is $match<ABC::element><stem><note><pitch><basenote>, "D", '"_D,5/4" has base note D';
+    is $match<ABC::element><stem><note><pitch><octave>, ",", '"_D,5/4" has octave ","';
+    is $match<ABC::element><stem><note><pitch><accidental>, "_", '"_D,5/4" is flat';
+    is $match<ABC::element><stem><note><note_length>, "5/4", '"_D,5/4" has note length 5/4';
 }
 
 {
     my $match = "A>^C'" ~~ m/ <ABC::broken_rhythm> /;
     isa_ok $match, Match, '"A>^C" is a broken rhythm';
-    is $match<ABC::broken_rhythm><note>[0]<pitch><basenote>, "A", 'first note is A';
-    is $match<ABC::broken_rhythm><note>[0]<pitch><octave>, "", 'first note has no octave';
-    is $match<ABC::broken_rhythm><note>[0]<pitch><accidental>, "", 'first note has no accidental';
-    is $match<ABC::broken_rhythm><note>[0]<note_length>, "", 'first note has no length';
+    is $match<ABC::broken_rhythm><stem>[0]<note><pitch><basenote>, "A", 'first note is A';
+    is $match<ABC::broken_rhythm><stem>[0]<note><pitch><octave>, "", 'first note has no octave';
+    is $match<ABC::broken_rhythm><stem>[0]<note><pitch><accidental>, "", 'first note has no accidental';
+    is $match<ABC::broken_rhythm><stem>[0]<note><note_length>, "", 'first note has no length';
     is $match<ABC::broken_rhythm><broken_rhythm_bracket>, ">", 'angle is >';
-    is $match<ABC::broken_rhythm><note>[1]<pitch><basenote>, "C", 'second note is C';
-    is $match<ABC::broken_rhythm><note>[1]<pitch><octave>, "'", 'second note has octave tick';
-    is $match<ABC::broken_rhythm><note>[1]<pitch><accidental>, "^", 'second note is sharp';
-    is $match<ABC::broken_rhythm><note>[1]<note_length>, "", 'second note has no length';
+    is $match<ABC::broken_rhythm><stem>[1]<note><pitch><basenote>, "C", 'second note is C';
+    is $match<ABC::broken_rhythm><stem>[1]<note><pitch><octave>, "'", 'second note has octave tick';
+    is $match<ABC::broken_rhythm><stem>[1]<note><pitch><accidental>, "^", 'second note is sharp';
+    is $match<ABC::broken_rhythm><stem>[1]<note><note_length>, "", 'second note has no length';
 }
 
 {
@@ -131,17 +131,17 @@ plan *;
     isa_ok $match, Match, '"d+p+<<<+accent+_B" is a broken rhythm';
     given $match<ABC::broken_rhythm>
     {
-        is .<note>[0]<pitch><basenote>, "d", 'first note is d';
-        is .<note>[0]<pitch><octave>, "'", 'first note has an octave tick';
-        is .<note>[0]<pitch><accidental>, "", 'first note has no accidental';
-        is .<note>[0]<note_length>, "", 'first note has no length';
+        is .<stem>[0]<note><pitch><basenote>, "d", 'first note is d';
+        is .<stem>[0]<note><pitch><octave>, "'", 'first note has an octave tick';
+        is .<stem>[0]<note><pitch><accidental>, "", 'first note has no accidental';
+        is .<stem>[0]<note><note_length>, "", 'first note has no length';
         is .<g1>[0], "+p+", 'first gracing is +p+';
         is .<broken_rhythm_bracket>, "<<<", 'angle is <<<';
         is .<g2>[0], "+accent+", 'second gracing is +accent+';
-        is .<note>[1]<pitch><basenote>, "B", 'second note is B';
-        is .<note>[1]<pitch><octave>, "", 'second note has no octave';
-        is .<note>[1]<pitch><accidental>, "_", 'second note is flat';
-        is .<note>[1]<note_length>, "", 'second note has no length';
+        is .<stem>[1]<note><pitch><basenote>, "B", 'second note is B';
+        is .<stem>[1]<note><pitch><octave>, "", 'second note has no octave';
+        is .<stem>[1]<note><pitch><accidental>, "_", 'second note is flat';
+        is .<stem>[1]<note><note_length>, "", 'second note has no length';
     }
 }
 

@@ -15,6 +15,7 @@ grammar ABC
     regex tie { '-' }
     regex note_length { [\d* ['/' \d*]? ] | '/' }
     regex note { <pitch> <note_length>? <tie>? }
+    regex stem { <note> | [ '[' <note>+ ']' ]  }
     
     regex rest_type { <[x..z]> }
     regex rest { <rest_type> <note_length>? }
@@ -30,14 +31,14 @@ grammar ABC
     regex spacing { \h+ }
     
     regex broken_rhythm_bracket { ['<'+ | '>'+] }
-    regex broken_rhythm { <note> <g1=gracing>* <broken_rhythm_bracket> <g2=gracing>* <note> }
+    regex broken_rhythm { <stem> <g1=gracing>* <broken_rhythm_bracket> <g2=gracing>* <stem> }
     
     regex nth_repeat_num { <digit>+ [[',' | '-'] <digit>+]* }
     regex nth_repeat_text { '"' .*? '"' }
     regex nth_repeat { '[' [ <nth_repeat_num> | <nth_repeat_text> ] }
     regex end_nth_repeat { ']' }
     
-    regex element { <broken_rhythm> | <note> | <rest> | <gracing> | <grace_notes> 
+    regex element { <broken_rhythm> | <stem> | <rest> | <gracing> | <grace_notes> 
                     | <nth_repeat> | <end_nth_repeat> | <spacing> }
     
     regex barline { ':|:' | '|:' | '|' | ':|' | '::' }
