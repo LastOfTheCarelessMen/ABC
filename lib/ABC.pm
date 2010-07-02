@@ -80,7 +80,8 @@ sub key_signature($key_signature_name)
         'Cb' => -7
     );
     
-    my $match = $key_signature_name ~~ m/ <ABC::basenote> ('#' | 'b')? \h* (\w*) /;
+    # <[a..g]+[A..G]> should be <ABC::basenote
+    my $match = $key_signature_name ~~ m/ <[a..g]+[A..G]> ('#' | 'b')? \h* (\w*) /;
     die "Illegal key signature\n" unless $match ~~ Match;
     my $lookup = [~] $match<ABC::basenote>.uc, $match[0];
     my $sharps = %keys{$lookup};
