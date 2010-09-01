@@ -145,105 +145,104 @@ plan *;
     }
 }
 
-# for ':|:', '|:', '|', ':|', '::'  
-# {
-#     my $match = $_ ~~ m/ <ABC::barline> /;
-#     isa_ok $match, Match, "barline $_ recognized";
-#     is $match<ABC::barline>, $_, "barline $_ is correct";
-# }
-# 
-# {
-#     my $match = "g>ecgece/f/g/e/|" ~~ m/ <ABC::bar> /;
-#     isa_ok $match, Match, 'bar recognized';
-#     is $match<ABC::bar>, "g>ecgece/f/g/e/|", "Entire bar was matched";
-#     is $match<ABC::bar><element>.map(~*), "g>e c g e c e/ f/ g/ e/", "Each element was matched";
-#     is $match<ABC::bar><barline>, "|", "Barline was matched";
-# }
-# 
-# {
-#     my $match = "g>ecg ec e/f/g/e/ |" ~~ m/ <ABC::bar> /;
-#     isa_ok $match, Match, 'bar recognized';
-#     is $match<ABC::bar>, "g>ecg ec e/f/g/e/ |", "Entire bar was matched";
-#     is $match<ABC::bar><element>.map(~*), "g>e c g   e c   e/ f/ g/ e/  ", "Each element was matched";
-#     is $match<ABC::bar><barline>, "|", "Barline was matched";
-# }
-# 
-# {
-#     my $line = "g>ecg ec e/f/g/e/ | d/c/B/A/ Gd BG B/c/d/B/ |";
-#     my $match = $line ~~ m/ <ABC::line_of_music> /;
-#     isa_ok $match, Match, 'line of music recognized';
-#     is $match<ABC::line_of_music>, $line, "Entire line was matched";
-#     is $match<ABC::line_of_music><bar>[0], "g>ecg ec e/f/g/e/ |", "First bar is correct";
-#     is $match<ABC::line_of_music><bar>[1], " d/c/B/A/ Gd BG B/c/d/B/ |", "Second bar is correct";
-#     # say $match<ABC::line_of_music>.perl;
-# }
-# 
-# {
-#     my $line = "|A/B/c/A/ c>d e>deg | dB/A/ gB +trill+A2 +trill+e2 ::";
-#     my $match = $line ~~ m/ <ABC::line_of_music> /;
-#     isa_ok $match, Match, 'line of music recognized';
-#     is $match<ABC::line_of_music>, $line, "Entire line was matched";
-#     is $match<ABC::line_of_music><bar>[0], "A/B/c/A/ c>d e>deg |", "First bar is correct";
-#     is $match<ABC::line_of_music><bar>[1], " dB/A/ gB +trill+A2 +trill+e2 ::", "Second bar is correct";
-#     is $match<ABC::line_of_music><barline>, "|", "Initial barline matched";
-#     # say $match<ABC::line_of_music>.perl;
-# }
-# 
-# {
-#     my $line = 'g>ecg ec e/f/g/e/ |[2-3 d/c/B/A/ {Gd} BG B/c/d/B/ |';
-#     my $match = $line ~~ m/ <ABC::line_of_music> /;
-#     isa_ok $match, Match, 'line of music recognized';
-#     is $match<ABC::line_of_music>, $line, "Entire line was matched";
-#     is $match<ABC::line_of_music><bar>[0], "g>ecg ec e/f/g/e/ |", "First bar is correct";
-#     is $match<ABC::line_of_music><bar>[1], '[2-3 d/c/B/A/ {Gd} BG B/c/d/B/ |', "Second bar is correct";
-#     # say $match<ABC::line_of_music>.perl;
-# }
-# 
-# {
-#     my $music = q«A/B/c/A/ +trill+c>d e>deg | GG +trill+B>c d/B/A/G/ B/c/d/B/ |
-#     A/B/c/A/ c>d e>deg | dB/A/ gB +trill+A2 +trill+e2 ::
-#     g>ecg ec e/f/g/e/ | d/c/B/A/ Gd BG B/c/d/B/ | 
-#     g/f/e/d/ c/d/e/f/ gc e/f/g/e/ | dB/A/ gB +trill+A2 +trill+e2 :|»;
-#     my $match = $music ~~ m/ <ABC::music> /;
-#     isa_ok $match, Match, 'music recognized';
-#     is $match<ABC::music><line_of_music>.elems, 4, "Four lines matched";
-# }
-# 
-# {
-#     my $music = q«X:64
-# T:Cuckold Come Out o' the Amrey
-# S:Northumbrian Minstrelsy
-# M:4/4
-# L:1/8
-# K:D
-# »;
-#     my $match = $music ~~ m/ <ABC::header> /;
-#     isa_ok $match, Match, 'header recognized';
-#     is $match<ABC::header><header_field>.elems, 6, "Six fields matched";
-#     is $match<ABC::header><header_field>.map(*.<header_field_name>), "X T S M L K", "Got the right field names";
-# }
-# 
-# {
-#     my $music = q«X:64
-# T:Cuckold Come Out o' the Amrey
-# S:Northumbrian Minstrelsy
-# M:4/4
-# L:1/8
-# K:D
-# A/B/c/A/ +trill+c>d e>deg | GG +trill+B>c d/B/A/G/ B/c/d/B/ |
-# A/B/c/A/ c>d e>deg | dB/A/ gB +trill+A2 +trill+e2 ::
-# g>ecg ec e/f/g/e/ | d/c/B/A/ Gd BG B/c/d/B/ | 
-# g/f/e/d/ c/d/e/f/ gc e/f/g/e/ | dB/A/ gB +trill+A2 +trill+e2 :|
-# »;
-#     my $match = $music ~~ m/ <ABC::tune> /;
-#     isa_ok $match, Match, 'tune recognized';
-#     given $match<ABC::tune><header>
-#     {
-#         is .<header_field>.elems, 6, "Six fields matched";
-#         is .<header_field>.map(*.<header_field_name>), "X T S M L K", "Got the right field names";
-#     }
-#     is $match<ABC::tune><music><line_of_music>.elems, 4, "Four lines matched";
-#     say $match;
-# }
+for ':|:', '|:', '|', ':|', '::'  
+{
+    my $match = ABC.parse($_, :rule<barline>);
+    isa_ok $match, Match, "barline $_ recognized";
+    is $match, $_, "barline $_ is correct";
+}
+
+{
+    my $match = ABC.parse("g>ecgece/f/g/e/|", :rule<bar>);
+    isa_ok $match, Match, 'bar recognized';
+    is $match, "g>ecgece/f/g/e/|", "Entire bar was matched";
+    is $match<element>.map(~*), "g>e c g e c e/ f/ g/ e/", "Each element was matched";
+    is $match<barline>, "|", "Barline was matched";
+}
+
+{
+    my $match = ABC.parse("g>ecg ec e/f/g/e/ |", :rule<bar>);
+    isa_ok $match, Match, 'bar recognized';
+    is $match, "g>ecg ec e/f/g/e/ |", "Entire bar was matched";
+    is $match<element>.map(~*), "g>e c g   e c   e/ f/ g/ e/  ", "Each element was matched";
+    is $match<barline>, "|", "Barline was matched";
+}
+
+{
+    my $line = "g>ecg ec e/f/g/e/ | d/c/B/A/ Gd BG B/c/d/B/ |";
+    my $match = ABC.parse($line, :rule<line_of_music>);
+    isa_ok $match, Match, 'line of music recognized';
+    is $match, $line, "Entire line was matched";
+    is $match<bar>[0], "g>ecg ec e/f/g/e/ |", "First bar is correct";
+    is $match<bar>[1], " d/c/B/A/ Gd BG B/c/d/B/ |", "Second bar is correct";
+    # say $match<ABC::line_of_music>.perl;
+}
+
+{
+    my $line = "|A/B/c/A/ c>d e>deg | dB/A/ gB +trill+A2 +trill+e2 ::";
+    my $match = ABC.parse($line, :rule<line_of_music>);
+    isa_ok $match, Match, 'line of music recognized';
+    is $match, $line, "Entire line was matched";
+    is $match<bar>[0], "A/B/c/A/ c>d e>deg |", "First bar is correct";
+    is $match<bar>[1], " dB/A/ gB +trill+A2 +trill+e2 ::", "Second bar is correct";
+    is $match<barline>, "|", "Initial barline matched";
+    # say $match<ABC::line_of_music>.perl;
+}
+
+{
+    my $line = 'g>ecg ec e/f/g/e/ |[2-3 d/c/B/A/ {Gd} BG B/c/d/B/ |';
+    my $match = ABC.parse($line, :rule<line_of_music>);
+    isa_ok $match, Match, 'line of music recognized';
+    is $match, $line, "Entire line was matched";
+    is $match<bar>[0], "g>ecg ec e/f/g/e/ |", "First bar is correct";
+    is $match<bar>[1], '[2-3 d/c/B/A/ {Gd} BG B/c/d/B/ |', "Second bar is correct";
+    # say $match<ABC::line_of_music>.perl;
+}
+
+{
+    my $music = q«A/B/c/A/ +trill+c>d e>deg | GG +trill+B>c d/B/A/G/ B/c/d/B/ |
+    A/B/c/A/ c>d e>deg | dB/A/ gB +trill+A2 +trill+e2 ::
+    g>ecg ec e/f/g/e/ | d/c/B/A/ Gd BG B/c/d/B/ | 
+    g/f/e/d/ c/d/e/f/ gc e/f/g/e/ | dB/A/ gB +trill+A2 +trill+e2 :|»;
+    my $match = ABC.parse($music, :rule<music>);
+    isa_ok $match, Match, 'music recognized';
+    is $match<line_of_music>.elems, 4, "Four lines matched";
+}
+
+{
+    my $music = q«X:64
+T:Cuckold Come Out o' the Amrey
+S:Northumbrian Minstrelsy
+M:4/4
+L:1/8
+K:D
+»;
+    my $match = ABC.parse($music, :rule<header>);
+    isa_ok $match, Match, 'header recognized';
+    is $match<header_field>.elems, 6, "Six fields matched";
+    is $match<header_field>.flat.map({ .<header_field_name> }), "X T S M L K", "Got the right field names";
+}
+
+{
+    my $music = q«X:64
+T:Cuckold Come Out o' the Amrey
+S:Northumbrian Minstrelsy
+M:4/4
+L:1/8
+K:D
+A/B/c/A/ +trill+c>d e>deg | GG +trill+B>c d/B/A/G/ B/c/d/B/ |
+A/B/c/A/ c>d e>deg | dB/A/ gB +trill+A2 +trill+e2 ::
+g>ecg ec e/f/g/e/ | d/c/B/A/ Gd BG B/c/d/B/ | 
+g/f/e/d/ c/d/e/f/ gc e/f/g/e/ | dB/A/ gB +trill+A2 +trill+e2 :|
+»;
+    my $match = ABC.parse($music, :rule<tune>);
+    isa_ok $match, Match, 'tune recognized';
+    given $match<header>
+    {
+        is .<header_field>.elems, 6, "Six fields matched";
+        is .<header_field>.flat.map({ .<header_field_name> }), "X T S M L K", "Got the right field names";
+    }
+    is $match<music><line_of_music>.elems, 4, "Four lines matched";
+}
 
 done_testing;
