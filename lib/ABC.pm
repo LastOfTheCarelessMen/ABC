@@ -51,6 +51,8 @@ grammar ABC
     
     regex tune { <header> <music> }
     
+    regex tune_file { \s* [<tune> \s*]+ }
+    
     regex key_sig { <basenote> ('#' | 'b')? \h* (\w*) }
     
     our sub key_signature($key_signature_name)
