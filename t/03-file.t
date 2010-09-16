@@ -1,11 +1,11 @@
 use v6;
 use Test;
-use ABC;
+use ABC::Grammar;
 
 plan *;
 
 {
-    my $match = ABC.parse(slurp("samples.abc"), :rule<tune_file>);
+    my $match = ABC::Grammar.parse(slurp("samples.abc"), :rule<tune_file>);
     isa_ok $match, Match, 'samples.abc is a valid tune file';
     is @( $match<tune> ).elems, 3, "Three tunes were found";
 

@@ -1,6 +1,6 @@
 use v6;
 
-grammar ABC
+grammar ABC::Grammar
 {
     regex header_field_name { \w }
     regex header_field_data { \N* }
@@ -14,13 +14,13 @@ grammar ABC
 
     regex tie { '-' }
     regex note_length { [\d* ['/' \d*]? ] | '/' }
-    regex note { <pitch> <note_length>? <tie>? }
-    regex stem { <note> | [ '[' <note>+ ']' ]  }
+    regex mnote { <pitch> <note_length>? <tie>? }
+    regex stem { <mnote> | [ '[' <mnote>+ ']' ]  }
     
     regex rest_type { <[x..z]> }
     regex rest { <rest_type> <note_length>? }
     
-    regex grace_note { <pitch> <note_length>? } # as note, but without tie
+    regex grace_note { <pitch> <note_length>? } # as mnote, but without tie
     regex grace_note_stem { <grace_note> | [ '[' <grace_note>+ ']' ]  }
     regex acciaccatura { '/' }
     regex grace_notes { '{' <acciaccatura>? <grace_note_stem>+ '}' }
@@ -79,7 +79,7 @@ grammar ABC
 
         # <[a..g]+[A..G]> should be <ABC::basenote
         
-        my $match = ABC.parse($key_signature_name, :rule<key_sig>);
+        my $match = ABC::Grammar.parse($key_signature_name, :rule<key_sig>);
         # say :$match.perl;
         die "Illegal key signature\n" unless $match ~~ Match;
         my $lookup = [~] $match<basenote>.uc, $match[0];

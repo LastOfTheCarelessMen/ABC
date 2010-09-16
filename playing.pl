@@ -24,8 +24,8 @@ my @notes = gather for $match<ABC::tune><music><line_of_music> -> $line
     {
         for $bar<element>
         {
-            when .<broken_rhythm> { take .<broken_rhythm><note>[0]; take .<broken_rhythm><note>[1]; }
-            when .<note>          { take .<note>; }
+            when .<broken_rhythm> { take .<broken_rhythm><mnote>[0]; take .<broken_rhythm><mnote>[1]; }
+            when .<mnote>          { take .<mnote>; }
         }
     }
 }
