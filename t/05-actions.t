@@ -17,7 +17,9 @@ K:D
     my $match = ABC::Grammar.parse($music, :rule<header>, :actions(ABC::Actions.new));
     isa_ok $match, Match, 'tune recognized';
     isa_ok $match.ast, ABC::Header, '$match.ast is an ABC::Header';
-    $match.ast.get("T").perl.say;
+    is $match.ast.get("T").elems, 1, "One T field found";
+    is $match.ast.get("T")[0].value, "Cuckold Come Out o' the Amrey", "And it's correct";
+    ok $match.ast.is-valid, "ABC::Header is valid";
 }
 
 done_testing;
