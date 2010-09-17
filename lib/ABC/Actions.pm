@@ -12,4 +12,21 @@ class ABC::Actions {
         }
         make $header;
     }
+    
+    method element($/) {
+        my $type;
+        for <broken_rhythm stem rest gracing grace_notes nth_repeat end_nth_repeat spacing> {
+            $type = $_ if $/{$_};
+        }
+        make $type => ~$/{$type};
+    }
+    
+    method barline($/) { 
+        make "barline" => ~$/;
+    }
+    
+    method bar($/) {
+        make [ @( $<element> )>>.ast, $<barline>>>.ast ];
+    }
+    
 }

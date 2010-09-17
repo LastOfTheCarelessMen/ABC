@@ -22,4 +22,29 @@ K:D
     ok $match.ast.is-valid, "ABC::Header is valid";
 }
 
+{
+    my $match = ABC::Grammar.parse("e3", :rule<element>, :actions(ABC::Actions.new));
+    isa_ok $match, Match, 'element recognized';
+    isa_ok $match.ast, Pair, '$match.ast is a Pair';
+    is $match.ast.key, "stem", "Stem found";
+    is $match.ast.value, "e3", "Value e3";
+}
+
+{
+    my $match = ABC::Grammar.parse("G2g gdc|", :rule<bar>, :actions(ABC::Actions.new));
+    isa_ok $match, Match, 'element recognized';
+    isa_ok $match.ast.elems, 7, '$match.ast has seven elements';
+    is $match.ast[3].key, "stem", "Fourth is stem";
+    is $match.ast[*-1].key, "barline", "Last is barline";
+}
+
+{
+    my $match = ABC::Grammar.parse("G2g gdc", :rule<bar>, :actions(ABC::Actions.new));
+    isa_ok $match, Match, 'element recognized';
+    isa_ok $match.ast.elems, 6, '$match.ast has seven elements';
+    is $match.ast[3].key, "stem", "Fourth is stem";
+    is $match.ast[*-1].key, "stem", "Last is stem";
+}
+
+
 done_testing;
