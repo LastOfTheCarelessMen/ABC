@@ -33,7 +33,7 @@ K:D
 {
     my $match = ABC::Grammar.parse("G2g gdc|", :rule<bar>, :actions(ABC::Actions.new));
     isa_ok $match, Match, 'element recognized';
-    isa_ok $match.ast.elems, 7, '$match.ast has seven elements';
+    is $match.ast.elems, 7, '$match.ast has seven elements';
     is $match.ast[3].key, "stem", "Fourth is stem";
     is $match.ast[*-1].key, "barline", "Last is barline";
 }
@@ -41,9 +41,25 @@ K:D
 {
     my $match = ABC::Grammar.parse("G2g gdc", :rule<bar>, :actions(ABC::Actions.new));
     isa_ok $match, Match, 'element recognized';
-    isa_ok $match.ast.elems, 6, '$match.ast has seven elements';
+    is $match.ast.elems, 6, '$match.ast has six elements';
     is $match.ast[3].key, "stem", "Fourth is stem";
     is $match.ast[*-1].key, "stem", "Last is stem";
+}
+
+{
+    my $music = q«BAB G2G|G2g gdc|BAB G2G|=F2f fcA|
+BAB G2G|G2g gdB|c2a B2g|A2=f fcA:|
+»;
+
+    my $match = ABC::Grammar.parse($music, :rule<music>, :actions(ABC::Actions.new));
+    isa_ok $match, Match, 'element recognized';
+#     say $match.ast.perl;
+    is $match.ast.elems, 57, '$match.ast has 57 elements';
+    # say $match.ast.elems;
+    # say $match.ast[28].WHAT;
+    # say $match.ast[28].perl;
+    is $match.ast[28].key, "endline", "29th is endline";
+    is $match.ast[*-1].key, "endline", "Last is endline";
 }
 
 

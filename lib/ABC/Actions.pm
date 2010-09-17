@@ -26,7 +26,30 @@ class ABC::Actions {
     }
     
     method bar($/) {
-        make [ @( $<element> )>>.ast, $<barline>>>.ast ];
+        my @bar = @( $<element> )>>.ast;
+        @bar.push($<barline>>>.ast);
+        make @bar;
     }
     
+    method line_of_music($/) {
+        my @line = $<barline>>>.ast;
+        my @bars = @( $<bar> )>>.ast;
+        for @bars -> $bar {
+            for $bar.list {
+                @line.push($_);
+            }
+        }
+        @line.push("endline" => "");
+        make @line;
+    }
+    
+    method music($/) {
+        my @music;
+        for @( $<line_of_music> )>>.ast -> $line {
+            for $line.list {
+                @music.push($_);
+            }
+        }
+        make @music;
+    }
 }
