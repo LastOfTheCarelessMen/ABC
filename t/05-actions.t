@@ -1,6 +1,7 @@
 use v6;
 use Test;
 use ABC::Header;
+use ABC::Tune;
 use ABC::Grammar;
 use ABC::Actions;
 
@@ -60,6 +61,26 @@ BAB G2G|G2g gdB|c2a B2g|A2=f fcA:|
     # say $match.ast[28].perl;
     is $match.ast[28].key, "endline", "29th is endline";
     is $match.ast[*-1].key, "endline", "Last is endline";
+}
+
+{
+    my $music = q«X:044
+T:Elsie Marley
+B:Robin Williamson, "Fiddle Tunes" (New York 1976)
+N:"printed by Robert Petrie in 1796 and is
+N:"described by him as a 'bumpkin'."
+Z:Nigel Gatherer
+M:6/8
+L:1/8
+K:G
+BAB G2G|G2g gdc|BAB G2G|=F2f fcA|
+BAB G2G|G2g gdB|c2a B2g|A2=f fcA:|
+»;
+
+    my $match = ABC::Grammar.parse($music, :rule<tune>, :actions(ABC::Actions.new));
+    isa_ok $match, Match, 'tune recognized';
+    isa_ok $match.ast, ABC::Tune, 'and ABC::Tune created';
+    ok $match.ast.header.is-valid, "ABC::Tune's header is valid";
 }
 
 

@@ -52,4 +52,8 @@ class ABC::Actions {
         }
         make @music;
     }
+    
+    method tune($/) {
+        make ABC::Tune.new($<header>.ast, $<music>.ast);
+    }
 }
