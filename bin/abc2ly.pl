@@ -48,7 +48,7 @@ sub StemToLilypond(Context $context, $stem) {
     print " { %note-map{$pitch} }{ %cheat-length-map{$length} } ";
 }
    
-sub BodyToLilypond(Context $context, @elements) {
+sub SectionToLilypond(Context $context, @elements) {
     say "\{";
     
     for @elements -> $element {
@@ -60,6 +60,61 @@ sub BodyToLilypond(Context $context, @elements) {
     
     say "\}";
 }
+
+sub Duration(Context $context, $element) {
+    given $element.key {
+        when "stem" {
+            my $match = ABC::Grammar.parse($element.value, :rule<mnote>); # bad in at least two ways....
+            given ~$match<note_length> {
+                when "/" { return 1/2; }
+                when "" { return 1; }
+                return +$_;
+            }
+        }
+        
+        # should do broken_rhythms and rests as well!
+    }
+    
+    0;
+}
+
+sub BodyToLilypond(Context $context, @elements) {
+    say "\{";
+
+    my $start-of-section = 0;
+    my $duration-in-section = 0;
+    for @elements.keys -> $i {
+        if $i > $start-of-section 
+           && @elements[$i].key eq "barline" 
+           && @elements[$i].value ne "|" {
+            if $duration-in-section % 8 != 0 {
+                print "\\partial 8*{ $duration-in-section % 8 } ";
+            }
+            
+            if @elements[$i].value eq ':|:' | ':|' | '::' {
+                print "\\repeat volta 2 "; # 2 is abitrarily chosen here!
+            }
+            SectionToLilypond($context, @elements[$start-of-section ..^ $i]);
+            $start-of-section = $i + 1;
+            $duration-in-section = 0;
+        }
+        $duration-in-section += Duration($context, @elements[$i]);
+    }
+    
+    if $start-of-section + 1 < @elements.elems {
+        if $duration-in-section % 8 != 0 {
+            print "\\partial 8*{ $duration-in-section % 8 } ";
+        }
+        
+        if @elements[*-1].value eq ':|:' | ':|' | '::' {
+            print "\\repeat volta 2 "; # 2 is abitrarily chosen here!
+        }
+        SectionToLilypond($context, @elements[$start-of-section ..^ +@elements]);
+    }
+
+    say "\}";
+}
+
 
 my $match = ABC::Grammar.parse($*IN.slurp, :rule<tune_file>, :actions(ABC::Actions.new));
 
