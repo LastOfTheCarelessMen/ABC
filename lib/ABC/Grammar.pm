@@ -33,6 +33,11 @@ grammar ABC::Grammar
     regex broken_rhythm_bracket { ['<'+ | '>'+] }
     regex broken_rhythm { <stem> <g1=gracing>* <broken_rhythm_bracket> <g2=gracing>* <stem> }
     
+    # next line should work, but is NYI in Rakudo
+    # regex tuple { '('(<digit>+) [<gracing>* <stem>] ** { $0 } }
+    # next block makes the most common case work
+    regex tuple { '(3' [<gracing>* <stem>] ** 3 }
+    
     regex nth_repeat_num { <digit>+ [[',' | '-'] <digit>+]* }
     regex nth_repeat_text { '"' .*? '"' }
     regex nth_repeat { '[' [ <nth_repeat_num> | <nth_repeat_text> ] }

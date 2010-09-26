@@ -145,6 +145,25 @@ plan *;
     }
 }
 
+{
+    my $match = ABC::Grammar.parse("(3abcd", :rule<tuple>);
+    isa_ok $match, Match, '"(3abc" is a tuple';
+    is ~$match, "(3abc", '"(3abc" was the portion matched';
+    is +@( $match<stem> ), 3, 'Three notes matched';
+    is $match<stem>[0], "a", 'first note is a';
+    is $match<stem>[1], "b", 'second note is b';
+    is $match<stem>[2], "c", 'third note is c';
+}
+
+# (3 is the only case that works currently.  :(
+# {
+#     my $match = ABC::Grammar.parse("(2abcd", :rule<tuple>);
+#     isa_ok $match, Match, '"(2ab" is a tuple';
+#     is ~$match, "(2ab", '"(2ab" was the portion matched';
+#     is $match<stem>[0], "a", 'first note is a';
+#     is $match<stem>[1], "b", 'second note is b';
+# }
+
 for ':|:', '|:', '|', ':|', '::'  
 {
     my $match = ABC::Grammar.parse($_, :rule<barline>);

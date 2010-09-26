@@ -32,7 +32,24 @@ my %note-map = ( 'C' => "c'",
                  'a' => "a''",
                  'b' => "b''"
    );
-   
+
+sub Duration(Context $context, $element) {
+   given $element.key {
+       when "stem" {
+           my $match = ABC::Grammar.parse($element.value, :rule<mnote>); # bad in at least two ways....
+           given ~$match<note_length> {
+               when "/" { return 1/2; }
+               when "" { return 1; }
+               return +$_;
+           }
+       }
+
+       # should do broken_rhythms and rests as well!
+   }
+
+   0;
+}
+
 my %cheat-length-map = ( '/' => "16",
                          "" => "8",
                          "1" => "8",
@@ -59,23 +76,6 @@ sub SectionToLilypond(Context $context, @elements) {
     }
     
     say "\}";
-}
-
-sub Duration(Context $context, $element) {
-    given $element.key {
-        when "stem" {
-            my $match = ABC::Grammar.parse($element.value, :rule<mnote>); # bad in at least two ways....
-            given ~$match<note_length> {
-                when "/" { return 1/2; }
-                when "" { return 1; }
-                return +$_;
-            }
-        }
-        
-        # should do broken_rhythms and rests as well!
-    }
-    
-    0;
 }
 
 sub BodyToLilypond(Context $context, @elements) {
