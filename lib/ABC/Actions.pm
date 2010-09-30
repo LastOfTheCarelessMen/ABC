@@ -1,5 +1,8 @@
 use v6;
 
+use ABC::Header;
+use ABC::Tune;
+
 class ABC::Actions {
     method header_field($/) {
         make ~$<header_field_name> => ~$<header_field_data>;

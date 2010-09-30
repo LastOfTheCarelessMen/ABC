@@ -13,7 +13,8 @@ grammar ABC::Grammar
     regex pitch { <accidental>? <basenote> <octave>? }
 
     regex tie { '-' }
-    regex note_length { [\d* ['/' \d*]? ] | '/' }
+    regex number { <digit>+ }
+    regex note_length { [<top=number>? ['/' <bottom=number>?]? ] | '/' }
     regex mnote { <pitch> <note_length>? <tie>? }
     regex stem { <mnote> | [ '[' <mnote>+ ']' ]  }
     
@@ -146,19 +147,3 @@ sub header_hash($header_match)
     }
 }
 
-class ABCHeader
-{
-    
-}
-
-class ABCBody
-{
-    
-}
-
-class ABCTune
-{
-    has $.header;
-    has $.body;
-    
-}
