@@ -20,23 +20,26 @@ class ABC::Actions {
     
     method note_length($/) {
         if $<note_length_denominator> {
-            make duration-from-parse($<top> ?? $<top>[0] !! "", $<note_length_denominator>[0]<bottom>[0]);
+            make duration-from-parse($<top>[0] // "", 
+                                     $<note_length_denominator>[0]<bottom>[0]);
         } else {
-            make duration-from-parse($<top> ?? $<top>[0] !! "");
+            make duration-from-parse($<top>[0] // "");
         }
     }
     
     method mnote($/) {
         make ABC::Note.new(~$<pitch>, 
-                           $<note_length> ?? $<note_length>[0].ast !! ABC::Duration.new(1), 
+                           $<note_length>.ast, 
                            $<tie> eq '-');
     }
     
-    # method stem($/) {
-    #     my $ast = ~$/;
-    #     
-    #     if $<mnote>
-    # }
+    method stem($/) {
+        if @( $<mnote> ) == 1 {
+            make $<mnote>[0].ast;
+        } else {
+            make ABC::Stem.new(@( $<mnote> )>>.ast);
+        }
+    }
     
     method element($/) {
         my $type;
@@ -45,9 +48,9 @@ class ABC::Actions {
         }
         
         my $ast = $type => ~$/{$type};
-        if $/{$type}.ast ~~ ABC::Duration {
-            $ast does ABC::Duration($/{$type}.ast.ticks);
-        }
+        # if $/{$type}.ast ~~ ABC::Duration {
+        #     $ast does ABC::Duration($/{$type}.ast.ticks);
+        # }
         make $ast;
     }
     

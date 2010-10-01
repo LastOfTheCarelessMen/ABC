@@ -16,7 +16,7 @@ grammar ABC::Grammar
     regex number { <digit>+ }
     regex note_length_denominator { '/' <bottom=number>? }
     regex note_length { <top=number>? <note_length_denominator>? }
-    regex mnote { <pitch> <note_length>? <tie>? }
+    regex mnote { <pitch> <note_length> <tie>? }
     regex stem { <mnote> | [ '[' <mnote>+ ']' ]  }
     
     regex rest_type { <[x..z]> }
