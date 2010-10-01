@@ -2,6 +2,8 @@ use v6;
 
 use ABC::Header;
 use ABC::Tune;
+use ABC::Duration;
+use ABC::Note;
 
 class ABC::Actions {
     method header_field($/) {
@@ -16,12 +18,37 @@ class ABC::Actions {
         make $header;
     }
     
+    method note_length($/) {
+        if $<note_length_denominator> {
+            make duration-from-parse($<top> ?? $<top>[0] !! "", $<note_length_denominator>[0]<bottom>[0]);
+        } else {
+            make duration-from-parse($<top> ?? $<top>[0] !! "");
+        }
+    }
+    
+    method mnote($/) {
+        make ABC::Note.new(~$<pitch>, 
+                           $<note_length> ?? $<note_length>[0].ast !! ABC::Duration.new(1), 
+                           $<tie> eq '-');
+    }
+    
+    # method stem($/) {
+    #     my $ast = ~$/;
+    #     
+    #     if $<mnote>
+    # }
+    
     method element($/) {
         my $type;
         for <broken_rhythm stem rest gracing grace_notes nth_repeat end_nth_repeat spacing> {
             $type = $_ if $/{$_};
         }
-        make $type => ~$/{$type};
+        
+        my $ast = $type => ~$/{$type};
+        if $/{$type}.ast ~~ ABC::Duration {
+            $ast does ABC::Duration($/{$type}.ast.ticks);
+        }
+        make $ast;
     }
     
     method barline($/) { 

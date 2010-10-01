@@ -4,8 +4,17 @@ use ABC::Header;
 use ABC::Tune;
 use ABC::Grammar;
 use ABC::Actions;
+use ABC::Note;
 
 plan *;
+
+{
+    my $match = ABC::Grammar.parse("e3", :rule<mnote>, :actions(ABC::Actions.new));
+    isa_ok $match, Match, 'element recognized';
+    isa_ok $match.ast, ABC::Note, '$match.ast is an ABC::Note';
+    is $match.ast.pitch, "e", "Pitch e";
+    is $match.ast.ticks, 3, "Duration 3 ticks";
+}
 
 {
     my $music = q«X:64
