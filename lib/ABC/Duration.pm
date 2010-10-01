@@ -15,9 +15,9 @@ role ABC::Duration {
         }
     }
     
-    our method Str() {
+    our method duration-to-str() {
         given $.ticks {
-            when 1 { "---"; } # for debugging, should be ""
+            when 1 { ""; }
             when 1/2 { "/"; }
             when Int { .Str; }
             when Rat { .perl; }

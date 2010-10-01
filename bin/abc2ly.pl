@@ -3,6 +3,8 @@ use ABC::Header;
 use ABC::Tune;
 use ABC::Grammar;
 use ABC::Actions;
+use ABC::Duration;
+use ABC::Note;
 
 class Context {
     
@@ -34,20 +36,7 @@ my %note-map = ( 'C' => "c'",
    );
 
 sub Duration(Context $context, $element) {
-   given $element.key {
-       when "stem" {
-           my $match = ABC::Grammar.parse($element.value, :rule<mnote>); # bad in at least two ways....
-           given ~$match<note_length> {
-               when "/" { return 1/2; }
-               when "" { return 1; }
-               return +$_;
-           }
-       }
-
-       # should do broken_rhythms and rests as well!
-   }
-
-   0;
+    $element.value ~~ ABC::Duration ?? $element.value.ticks !! 0;
 }
 
 my %cheat-length-map = ( '/' => "16",
@@ -58,11 +47,9 @@ my %cheat-length-map = ( '/' => "16",
     );
    
 sub StemToLilypond(Context $context, $stem) {
-    my $match = ABC::Grammar.parse($stem, :rule<mnote>); # bad in at least two ways....
-    my $pitch = ~$match<pitch>;
-    my $length = ~$match<note_length>;
-    
-    print " { %note-map{$pitch} }{ %cheat-length-map{$length} } ";
+    if $stem ~~ ABC::Note {
+        print " { %note-map{$stem.pitch} }{ %cheat-length-map{$stem.duration-to-str} } ";
+    }
 }
    
 sub SectionToLilypond(Context $context, @elements) {

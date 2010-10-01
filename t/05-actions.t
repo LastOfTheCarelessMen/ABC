@@ -26,6 +26,15 @@ plan *;
 }
 
 {
+    my $match = ABC::Grammar.parse("^e,/", :rule<mnote>, :actions(ABC::Actions.new));
+    isa_ok $match, Match, 'element recognized';
+    isa_ok $match.ast, ABC::Note, '$match.ast is an ABC::Note';
+    is $match.ast.pitch, "^e,", "Pitch ^e,";
+    is $match.ast.ticks, 1/2, "Duration 1/2 ticks";
+}
+
+
+{
     my $music = q«X:64
 T:Cuckold Come Out o' the Amrey
 S:Northumbrian Minstrelsy
