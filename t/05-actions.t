@@ -5,6 +5,7 @@ use ABC::Tune;
 use ABC::Grammar;
 use ABC::Actions;
 use ABC::Note;
+use ABC::Stem;
 
 plan *;
 
@@ -45,7 +46,7 @@ K:D
     isa_ok $match, Match, 'element recognized';
     isa_ok $match.ast, Pair, '$match.ast is a Pair';
     is $match.ast.key, "stem", "Stem found";
-    is $match.ast.value, "e3", "Value e3";
+    isa_ok $match.ast.value, ABC::Note, "Value is note";
 }
 
 {
@@ -104,7 +105,7 @@ BAB G2G|G2g gdB|c2a B2g|A2=f fcA:|
 {
     my $match = ABC::Grammar.parse(slurp("samples.abc"), :rule<tune_file>, :actions(ABC::Actions.new));
     isa_ok $match, Match, 'samples.abc is a valid tune file';
-    say $match.ast.perl;
+    # say $match.ast.perl;
     is @( $match<tune> ).elems, 3, "Three tunes were found";
     is @( $match.ast )[0].elems, 3, "Three tunes were found";
     isa_ok @( $match.ast )[0][0], ABC::Tune, "First is an ABC::Tune";

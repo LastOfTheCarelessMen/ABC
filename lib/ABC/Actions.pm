@@ -48,9 +48,9 @@ class ABC::Actions {
         }
         
         my $ast = $type => ~$/{$type};
-        # if $/{$type}.ast ~~ ABC::Duration {
-        #     $ast does ABC::Duration($/{$type}.ast.ticks);
-        # }
+        if $/{$type}.ast ~~ ABC::Duration {
+            $ast = $type => $/{$type}.ast;
+        }
         make $ast;
     }
     
