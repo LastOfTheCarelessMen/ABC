@@ -45,10 +45,14 @@ my %cheat-length-map = ( '/' => "16",
                          "2" => "4",
                          "3" => "4."
     );
+    
+sub DurationToLilypond(Context $context, ABC::Duration $duration) {
+    %cheat-length-map{$duration.duration-to-str};
+}
    
 sub StemToLilypond(Context $context, $stem) {
     if $stem ~~ ABC::Note {
-        print " { %note-map{$stem.pitch} }{ %cheat-length-map{$stem.duration-to-str} } ";
+        print " { %note-map{$stem.pitch} }{ DurationToLilypond($context, $stem) } ";
     }
 }
    
@@ -58,6 +62,7 @@ sub SectionToLilypond(Context $context, @elements) {
     for @elements -> $element {
         given $element.key {
             when "stem" { StemToLilypond($context, $element.value); }
+            when "rest" { print " r{ DurationToLilypond($context, $element.value) } " }
             when "barline" { say " |"; }
         }
     }
