@@ -3,7 +3,7 @@ use v6;
 use ABC::Duration;
 
 class ABC::Rest does ABC::Duration {
-    is $.type;
+    has $.type;
 
     method new($type, ABC::Duration $duration) {
         self.bless(*, :$type, :ticks($duration.ticks));

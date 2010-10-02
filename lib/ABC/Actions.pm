@@ -42,9 +42,9 @@ class ABC::Actions {
         }
     }
     
-    # method rest($/) {
-    #     make ABC::Rest.new(~$<rest_type>, $<note_length>.ast);
-    # }
+    method rest($/) {
+        make ABC::Rest.new(~$<rest_type>, $<note_length>.ast);
+    }
     
     method element($/) {
         my $type;
