@@ -4,6 +4,7 @@ use ABC::Header;
 use ABC::Tune;
 use ABC::Duration;
 use ABC::Note;
+use ABC::Rest;
 
 class ABC::Actions {
     method header_field($/) {
@@ -40,6 +41,10 @@ class ABC::Actions {
             make ABC::Stem.new(@( $<mnote> )>>.ast);
         }
     }
+    
+    # method rest($/) {
+    #     make ABC::Rest.new(~$<rest_type>, $<note_length>.ast);
+    # }
     
     method element($/) {
         my $type;

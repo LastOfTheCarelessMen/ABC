@@ -20,7 +20,7 @@ grammar ABC::Grammar
     regex stem { <mnote> | [ '[' <mnote>+ ']' ]  }
     
     regex rest_type { <[x..z]> }
-    regex rest { <rest_type> <note_length>? }
+    regex rest { <rest_type> <note_length> }
     
     regex grace_note { <pitch> <note_length>? } # as mnote, but without tie
     regex grace_note_stem { <grace_note> | [ '[' <grace_note>+ ']' ]  }

@@ -6,6 +6,7 @@ use ABC::Grammar;
 use ABC::Actions;
 use ABC::Note;
 use ABC::Stem;
+use ABC::Rest;
 
 plan *;
 
@@ -33,6 +34,13 @@ plan *;
     is $match.ast.ticks, 1/2, "Duration 1/2 ticks";
 }
 
+{
+    my $match = ABC::Grammar.parse("z/", :rule<rest>, :actions(ABC::Actions.new));
+    isa_ok $match, Match, 'rest recognized';
+    isa_ok $match.ast, ABC::Rest, '$match.ast is an ABC::Rest';
+    is $match.ast.type, "z", "Rest is z";
+    is $match.ast.ticks, 1/2, "Duration 1/2 ticks";
+}
 
 {
     my $music = q«X:64
