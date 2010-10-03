@@ -13,6 +13,9 @@ my %accidental-map = ( ''  => "",
                        '_'  => "es",
                        '__' => "eses" );
 
+my %octave-map = ( 0  => "'",
+                   1  => "''" );
+
 class Context {
     has %.key;
     
@@ -35,10 +38,10 @@ class Context {
         # say :$real-pitch.perl;
         my $match = ABC::Grammar.parse($real-pitch, :rule<pitch>);
         
-        my $octave = "";
+        my $octave = +((~$match<basenote>) ~~ 'a'..'z');
+        # SHOULD: factor in $match<octave> too
         
-        
-        $match<basenote>.lc ~ %accidental-map{~$match<accidental>} ~ $octave;
+        $match<basenote>.lc ~ %accidental-map{~$match<accidental>} ~ %octave-map{$octave};
     }
 }
 
@@ -50,22 +53,6 @@ sub HeaderToLilypond(ABC::Header $header) {
     
     say "}";
 }
-
-my %note-map = ( 'C' => "c'",
-                 'D' => "d'",
-                 'E' => "e'",
-                 'F' => "f'",
-                 'G' => "g'",
-                 'A' => "a'",
-                 'B' => "b'",
-                 'c' => "c''",
-                 'd' => "d''",
-                 'e' => "e''",
-                 'f' => "f''",
-                 'g' => "g''",
-                 'a' => "a''",
-                 'b' => "b''"
-   );
 
 sub Duration(Context $context, $element) {
     $element.value ~~ ABC::Duration ?? $element.value.ticks !! 0;
