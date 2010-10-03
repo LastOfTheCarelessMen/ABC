@@ -62,7 +62,7 @@ grammar ABC::Grammar
     
     regex key_sig { <basenote> ('#' | 'b')? \h* (\w*) }
     
-    our sub key_signature($key_signature_name)
+    our sub key_signature($key_signature_name) is export
     {
         my %keys = (
             'C' => 0,

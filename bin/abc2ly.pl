@@ -6,8 +6,40 @@ use ABC::Actions;
 use ABC::Duration;
 use ABC::Note;
 
+my %accidental-map = ( ''  => "",
+                       '='  => "",
+                       '^'  => "is",
+                       '^^' => "isis",
+                       '_'  => "es",
+                       '__' => "eses" );
+
 class Context {
+    has %.key;
     
+    method new(%key) {
+        self.bless(*, :%key)
+    }
+    
+    method get-real-pitch($nominal-pitch) {
+        my $match = ABC::Grammar.parse($nominal-pitch, :rule<pitch>);
+        if $match<accidental> {
+            $nominal-pitch;
+        } else {
+            ($.key{$match<basenote>.uc} // "") ~ $match<basenote> ~ $match<octave>;
+        }
+    }
+    
+    method get-Lilypond-pitch($abc-pitch) {
+        # say :$abc-pitch.perl;
+        my $real-pitch = self.get-real-pitch($abc-pitch);
+        # say :$real-pitch.perl;
+        my $match = ABC::Grammar.parse($real-pitch, :rule<pitch>);
+        
+        my $octave = "";
+        
+        
+        $match<basenote>.lc ~ %accidental-map{~$match<accidental>} ~ $octave;
+    }
 }
 
 sub HeaderToLilypond(ABC::Header $header) {
@@ -52,7 +84,7 @@ sub DurationToLilypond(Context $context, ABC::Duration $duration) {
    
 sub StemToLilypond(Context $context, $stem) {
     if $stem ~~ ABC::Note {
-        print " { %note-map{$stem.pitch} }{ DurationToLilypond($context, $stem) } ";
+        print " { $context.get-Lilypond-pitch($stem.pitch) }{ DurationToLilypond($context, $stem) } ";
     }
 }
    
@@ -70,8 +102,9 @@ sub SectionToLilypond(Context $context, @elements) {
     say "\}";
 }
 
-sub BodyToLilypond(Context $context, @elements) {
+sub BodyToLilypond(Context $context, $key, @elements) {
     say "\{";
+    say "\\key $key \\major";
 
     my $start-of-section = 0;
     my $duration-in-section = 0;
@@ -115,4 +148,8 @@ my $tune = @( $match.ast )[0][0];
 
 say '\\version "2.12.3"';
 HeaderToLilypond($tune.header);
-BodyToLilypond(Context.new, $tune.music);
+my $key = $tune.header.get("K")[0].value;
+
+BodyToLilypond(Context.new(key_signature($key)),
+               $key.comb(/./)[0].lc,
+               $tune.music);
