@@ -38,15 +38,16 @@ grammar ABC::Grammar
     # next line should work, but is NYI in Rakudo
     # regex tuple { '('(<digit>+) [<gracing>* <stem>] ** { $0 } }
     # next block makes the most common case work
-    regex tuple { '(3' [<gracing>* <stem>] ** 3 }
+    regex tuplet { '(3' [<gracing>* <stem>] ** 3 }
     
     regex nth_repeat_num { <digit>+ [[',' | '-'] <digit>+]* }
     regex nth_repeat_text { '"' .*? '"' }
     regex nth_repeat { '[' [ <nth_repeat_num> | <nth_repeat_text> ] }
     regex end_nth_repeat { ']' }
     
-    regex element { <broken_rhythm> | <stem> | <rest> | <gracing> | <grace_notes> 
-                    | <nth_repeat> | <end_nth_repeat> | <spacing> }
+    regex element { <broken_rhythm> | <stem> | <rest> | <tuplet>
+                    | <gracing> | <grace_notes> | <nth_repeat> | <end_nth_repeat>
+                    | <spacing> }
     
     regex barline { ':|:' | '|:' | '|' | ':|' | '::' }
     

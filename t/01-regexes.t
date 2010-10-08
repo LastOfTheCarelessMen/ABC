@@ -146,8 +146,8 @@ plan *;
 }
 
 {
-    my $match = ABC::Grammar.parse("(3abcd", :rule<tuple>);
-    isa_ok $match, Match, '"(3abc" is a tuple';
+    my $match = ABC::Grammar.parse("(3abcd", :rule<tuplet>);
+    isa_ok $match, Match, '"(3abc" is a tuplet';
     is ~$match, "(3abc", '"(3abc" was the portion matched';
     is +@( $match<stem> ), 3, 'Three notes matched';
     is $match<stem>[0], "a", 'first note is a';
