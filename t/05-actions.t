@@ -124,7 +124,7 @@ BAB G2G|G2g gdB|c2a B2g|A2=f fcA:|
     isa_ok $match, Match, 'samples.abc is a valid tune file';
     # say $match.ast.perl;
     is @( $match<tune> ).elems, 3, "Three tunes were found";
-    is @( $match.ast )[0].elems, 3, "Three tunes were found";
+    # is @( $match.ast )[0].elems, 3, "Three tunes were found";
     isa_ok @( $match.ast )[0][0], ABC::Tune, "First is an ABC::Tune";
 }
 done_testing;
