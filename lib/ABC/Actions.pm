@@ -5,6 +5,7 @@ use ABC::Tune;
 use ABC::Duration;
 use ABC::Note;
 use ABC::Rest;
+use ABC::Tuplet;
 
 class ABC::Actions {
     method header_field($/) {
@@ -44,6 +45,10 @@ class ABC::Actions {
     
     method rest($/) {
         make ABC::Rest.new(~$<rest_type>, $<note_length>.ast);
+    }
+    
+    method tuplet($/) { 
+        make ABC::Tuplet.new(3, @( $<stem> )>>.ast);
     }
     
     method element($/) {

@@ -7,6 +7,7 @@ use ABC::Actions;
 use ABC::Note;
 use ABC::Stem;
 use ABC::Rest;
+use ABC::Tuplet;
 
 plan *;
 
@@ -41,6 +42,18 @@ plan *;
     is $match.ast.type, "z", "Rest is z";
     is $match.ast.ticks, 1/2, "Duration 1/2 ticks";
 }
+
+{
+    my $match = ABC::Grammar.parse("(3abc", :rule<tuplet>, :actions(ABC::Actions.new));
+    isa_ok $match, Match, 'tuplet recognized';
+    isa_ok $match.ast, ABC::Tuplet, '$match.ast is an ABC::Tuplet';
+    is $match.ast.tuple, "3", "It's a triplet";
+    is $match.ast.ticks, 2, "Duration 2 ticks";
+    is +$match.ast.notes, 3, "Three internal note";
+    ok $match.ast.notes[0] ~~ ABC::Stem | ABC::Note, "First internal note is of the correct type";
+    is $match.ast.notes, "a b c", "Notes are correct";
+}
+
 
 {
     my $music = q«X:64
