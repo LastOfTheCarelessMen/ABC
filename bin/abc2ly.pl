@@ -69,30 +69,37 @@ sub DurationToLilypond(Context $context, ABC::Duration $duration) {
     %cheat-length-map{$duration.duration-to-str};
 }
    
-sub StemToLilypond(Context $context, $stem) {
+sub StemToLilypond(Context $context, $stem, $suffix = "") {
     if $stem ~~ ABC::Note {
-        print " { $context.get-Lilypond-pitch($stem.pitch) }{ DurationToLilypond($context, $stem) } ";
+        print " { $context.get-Lilypond-pitch($stem.pitch) }{ DurationToLilypond($context, $stem) }$suffix ";
     }
 }
    
 sub SectionToLilypond(Context $context, @elements) {
     say "\{";
     
+    my $suffix = "";
     for @elements -> $element {
         given $element.key {
-            when "stem" { StemToLilypond($context, $element.value); }
+            when "stem" { StemToLilypond($context, $element.value, $suffix); }
             when "rest" { print " r{ DurationToLilypond($context, $element.value) } " }
             when "barline" { say " |"; }
             when "tuplet" { 
                 print " \\times 2/3 \{"; 
                 for $element.value.notes -> $stem {
-                    # say :$stem.perl;
-                    # say $stem.WHAT;
                     StemToLilypond($context, $stem);
                 }
                 print " } ";  
             }
+            when "gracing" {
+                given $element.value {
+                    when "~" { $suffix ~= "\\turn"; next; }
+                    when "." { $suffix ~= "\\staccato"; next; }
+                }
+            }
         }
+
+        $suffix = "";
     }
     
     say "\}";
