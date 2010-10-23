@@ -18,9 +18,10 @@ my %octave-map = ( 0  => "'",
 
 class Context {
     has %.key;
+    has $.meter;
     
-    method new(%key) {
-        self.bless(*, :%key)
+    method new(%key, $meter) {
+        self.bless(*, :%key, :$meter);
     }
     
     method get-real-pitch($nominal-pitch) {
@@ -42,6 +43,10 @@ class Context {
         # SHOULD: factor in $match<octave> too
         
         $match<basenote>.lc ~ %accidental-map{~$match<accidental>} ~ %octave-map{$octave};
+    }
+    
+    method write-meter() {
+        print "\\time $.meter ";
     }
 }
 
@@ -108,6 +113,7 @@ sub SectionToLilypond(Context $context, @elements) {
 sub BodyToLilypond(Context $context, $key, @elements) {
     say "\{";
     say "\\key $key \\major";
+    $context.write-meter;
 
     my $start-of-section = 0;
     my $duration-in-section = 0;
@@ -152,7 +158,8 @@ my $tune = @( $match.ast )[0][0];
 say '\\version "2.12.3"';
 HeaderToLilypond($tune.header);
 my $key = $tune.header.get("K")[0].value;
+my $meter = $tune.header.get("M")[0].value;
 
-BodyToLilypond(Context.new(key_signature($key)),
+BodyToLilypond(Context.new(key_signature($key), $meter),
                $key.comb(/./)[0].lc,
                $tune.music);
