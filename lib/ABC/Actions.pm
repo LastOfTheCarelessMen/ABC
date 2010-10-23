@@ -47,17 +47,19 @@ class ABC::Actions {
         make ABC::Rest.new(~$<rest_type>, $<note_length>.ast);
     }
     
-    method tuplet($/) { 
+    method tuplet($/) {
         make ABC::Tuplet.new(3, @( $<stem> )>>.ast);
     }
     
     method element($/) {
         my $type;
-        for <broken_rhythm stem rest gracing grace_notes nth_repeat end_nth_repeat spacing> {
+        for <broken_rhythm stem rest gracing grace_notes nth_repeat end_nth_repeat spacing tuplet> {
             $type = $_ if $/{$_};
         }
         
         my $ast = $type => ~$/{$type};
+        # say :$ast.perl;
+        # say $/{$type}.ast.perl;
         if $/{$type}.ast ~~ ABC::Duration {
             $ast = $type => $/{$type}.ast;
         }

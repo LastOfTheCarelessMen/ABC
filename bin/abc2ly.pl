@@ -83,6 +83,15 @@ sub SectionToLilypond(Context $context, @elements) {
             when "stem" { StemToLilypond($context, $element.value); }
             when "rest" { print " r{ DurationToLilypond($context, $element.value) } " }
             when "barline" { say " |"; }
+            when "tuplet" { 
+                print " \\times 2/3 \{"; 
+                for $element.value.notes -> $stem {
+                    # say :$stem.perl;
+                    # say $stem.WHAT;
+                    StemToLilypond($context, $stem);
+                }
+                print " } ";  
+            }
         }
     }
     
