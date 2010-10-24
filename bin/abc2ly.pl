@@ -44,6 +44,17 @@ class Context {
         
         $match<basenote>.lc ~ %accidental-map{~$match<accidental>} ~ %octave-map{$octave};
     }
+
+    my %cheat-length-map = ( '/' => "16",
+                             "" => "8",
+                             "1" => "8",
+                             "2" => "4",
+                             "3" => "4."
+        );
+    
+    method get-Lilypond-duration(ABC::Duration $abc-duration) {
+        %cheat-length-map{$abc-duration.duration-to-str};
+    }
     
     method write-meter() {
         print "\\time $.meter ";
@@ -65,20 +76,14 @@ sub Duration(Context $context, $element) {
     $element.value ~~ ABC::Duration ?? $element.value.ticks !! 0;
 }
 
-my %cheat-length-map = ( '/' => "16",
-                         "" => "8",
-                         "1" => "8",
-                         "2" => "4",
-                         "3" => "4."
-    );
-    
-sub DurationToLilypond(Context $context, ABC::Duration $duration) {
-    %cheat-length-map{$duration.duration-to-str};
-}
+# sub DurationToLilypond(Context $context, ABC::Duration $duration) {
+#     %cheat-length-map{$duration.duration-to-str};
+# }
    
 sub StemToLilypond(Context $context, $stem, $suffix = "") {
     if $stem ~~ ABC::Note {
-        print " { $context.get-Lilypond-pitch($stem.pitch) }{ DurationToLilypond($context, $stem) }$suffix ";
+        print " { $context.get-Lilypond-pitch($stem.pitch) }";
+        print "{ $context.get-Lilypond-duration($stem) }$suffix ";
     }
 }
    
@@ -89,7 +94,7 @@ sub SectionToLilypond(Context $context, @elements) {
     for @elements -> $element {
         given $element.key {
             when "stem" { StemToLilypond($context, $element.value, $suffix); }
-            when "rest" { print " r{ DurationToLilypond($context, $element.value) } " }
+            when "rest" { print " r{ $context.get-Lilypond-duration($element.value) } " }
             when "barline" { say " |"; }
             when "tuplet" { 
                 print " \\times 2/3 \{"; 
