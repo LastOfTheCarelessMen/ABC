@@ -54,7 +54,9 @@ sub HeaderToLilypond(ABC::Header $header) {
     say "\\header \{";
     
     my @titles = $header.get("T")>>.value;
-    say "    title = \"{ @titles[0] }\"";
+    say "    piece = \"{ @titles[0] }\"";
+    my @composers = $header.get("C")>>.value;
+    say "    composer = \"{ @composers[0] }\"" if ?@composers;
     
     say "}";
 }
@@ -152,14 +154,19 @@ sub BodyToLilypond(Context $context, $key, @elements) {
 
 my $match = ABC::Grammar.parse($*IN.slurp, :rule<tune_file>, :actions(ABC::Actions.new));
 
-# just work with the first tune for now
-my $tune = @( $match.ast )[0][0];
-
 say '\\version "2.12.3"';
-HeaderToLilypond($tune.header);
-my $key = $tune.header.get("K")[0].value;
-my $meter = $tune.header.get("M")[0].value;
 
-BodyToLilypond(Context.new(key_signature($key), $meter),
-               $key.comb(/./)[0].lc,
-               $tune.music);
+for @( $match.ast ) -> $tune {
+    say "\\score \{";
+
+    my $key = $tune.header.get("K")[0].value;
+    my $meter = $tune.header.get("M")[0].value;
+
+    BodyToLilypond(Context.new(key_signature($key), $meter),
+                   $key.comb(/./)[0].lc,
+                   $tune.music);
+    HeaderToLilypond($tune.header);
+
+    say "}";    
+}
+
