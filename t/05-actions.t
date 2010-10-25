@@ -8,6 +8,7 @@ use ABC::Note;
 use ABC::Stem;
 use ABC::Rest;
 use ABC::Tuplet;
+use ABC::BrokenRhythm;
 
 plan *;
 
@@ -52,6 +53,32 @@ plan *;
     is +$match.ast.notes, 3, "Three internal note";
     ok $match.ast.notes[0] ~~ ABC::Stem | ABC::Note, "First internal note is of the correct type";
     is $match.ast.notes, "a b c", "Notes are correct";
+}
+
+{
+    my $match = ABC::Grammar.parse("a>~b", :rule<broken_rhythm>, :actions(ABC::Actions.new));
+    isa_ok $match, Match, 'broken rhythm recognized';
+    isa_ok $match.ast, ABC::BrokenRhythm, '$match.ast is an ABC::BrokenRhythm';
+    is $match.ast.ticks, 2, "total duration is two ticks";
+    isa_ok $match.ast.effective-stem1, ABC::Note, "effective-stem1 is a note";
+    is $match.ast.effective-stem1.pitch, "a", "first pitch is a";
+    is $match.ast.effective-stem1.ticks, 1.5, "first duration is 1 + 1/2";
+    isa_ok $match.ast.effective-stem2, ABC::Note, "effective-stem2 is a note";
+    is $match.ast.effective-stem2.pitch, "b", "first pitch is a";
+    is $match.ast.effective-stem2.ticks, .5, "second duration is 1/2";
+}
+
+{
+    my $match = ABC::Grammar.parse("a<<<b", :rule<broken_rhythm>, :actions(ABC::Actions.new));
+    isa_ok $match, Match, 'broken rhythm recognized';
+    isa_ok $match.ast, ABC::BrokenRhythm, '$match.ast is an ABC::BrokenRhythm';
+    is $match.ast.ticks, 2, "total duration is two ticks";
+    isa_ok $match.ast.effective-stem1, ABC::Note, "effective-stem1 is a note";
+    is $match.ast.effective-stem1.pitch, "a", "first pitch is a";
+    is $match.ast.effective-stem1.ticks, 1/8, "first duration is 1/8";
+    isa_ok $match.ast.effective-stem2, ABC::Note, "effective-stem2 is a note";
+    is $match.ast.effective-stem2.pitch, "b", "first pitch is a";
+    is $match.ast.effective-stem2.ticks, 15/8, "second duration is 1 + 7/8";
 }
 
 

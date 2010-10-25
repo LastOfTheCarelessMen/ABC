@@ -6,6 +6,8 @@ use ABC::Duration;
 use ABC::Note;
 use ABC::Rest;
 use ABC::Tuplet;
+use ABC::BrokenRhythm;
+
 
 class ABC::Actions {
     method header_field($/) {
@@ -49,6 +51,14 @@ class ABC::Actions {
     
     method tuplet($/) {
         make ABC::Tuplet.new(3, @( $<stem> )>>.ast);
+    }
+    
+    method broken_rhythm($/) {
+        make ABC::BrokenRhythm.new($<stem>[0].ast, 
+                                   ~$<g1>, 
+                                   ~$<broken_rhythm_bracket>, 
+                                   ~$<g2>,
+                                   $<stem>[1].ast);
     }
     
     method element($/) {

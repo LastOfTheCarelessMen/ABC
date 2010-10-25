@@ -72,14 +72,11 @@ sub HeaderToLilypond(ABC::Header $header) {
     say "}";
 }
 
+# MUST: this is context dependent too
 sub Duration(Context $context, $element) {
     $element.value ~~ ABC::Duration ?? $element.value.ticks !! 0;
 }
 
-# sub DurationToLilypond(Context $context, ABC::Duration $duration) {
-#     %cheat-length-map{$duration.duration-to-str};
-# }
-   
 sub StemToLilypond(Context $context, $stem, $suffix = "") {
     if $stem ~~ ABC::Note {
         print " { $context.get-Lilypond-pitch($stem.pitch) }";
