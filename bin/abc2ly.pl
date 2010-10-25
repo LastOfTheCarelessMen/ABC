@@ -48,6 +48,7 @@ class Context {
     my %cheat-length-map = ( '/' => "16",
                              "" => "8",
                              "1" => "8",
+                             "3/2" => "8.",
                              "2" => "4",
                              "3" => "4."
         );
@@ -99,6 +100,11 @@ sub SectionToLilypond(Context $context, @elements) {
                     StemToLilypond($context, $stem);
                 }
                 print " } ";  
+            }
+            when "broken_rhythm" {
+                StemToLilypond($context, $element.value.effective-stem1, $suffix);
+                # MUST: handle interior graciings
+                StemToLilypond($context, $element.value.effective-stem2);
             }
             when "gracing" {
                 given $element.value {
