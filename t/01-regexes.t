@@ -219,6 +219,26 @@ for ':|:', '|:', '|', ':|', '::'
 }
 
 {
+    my $match = ABC::Grammar.parse("[K:F]", :rule<inline_field>);
+    isa_ok $match, Match, 'inline field recognized';
+    is $match, "[K:F]", "Entire string was matched";
+    say :$match.perl;
+    is $match[0], "K", "Correct field name found";
+    is $match[1], "F", "Correct field value found";
+}
+
+{
+    my $line = "g>ecg ec e/f/g/e/ | d/c/B/A/ [K:F] Gd BG B/c/d/B/ |";
+    my $match = ABC::Grammar.parse($line, :rule<line_of_music>);
+    isa_ok $match, Match, 'line of music recognized';
+    is $match, $line, "Entire line was matched";
+    is $match<bar>[0], "g>ecg ec e/f/g/e/ |", "First bar is correct";
+    is $match<bar>[1], " d/c/B/A/ [K:F] Gd BG B/c/d/B/ |", "Second bar is correct";
+    ok @( $match<bar>[1]<element> ).grep("[K:F]"), "Key change got recognized";
+    # say $match<ABC::Grammar::line_of_music>.perl;
+}
+
+{
     my $music = q«A/B/c/A/ +trill+c>d e>deg | GG +trill+B>c d/B/A/G/ B/c/d/B/ |
     A/B/c/A/ c>d e>deg | dB/A/ gB +trill+A2 +trill+e2 ::
     g>ecg ec e/f/g/e/ | d/c/B/A/ Gd BG B/c/d/B/ | 

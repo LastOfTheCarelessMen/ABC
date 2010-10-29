@@ -45,9 +45,11 @@ grammar ABC::Grammar
     regex nth_repeat { '[' [ <nth_repeat_num> | <nth_repeat_text> ] }
     regex end_nth_repeat { ']' }
     
+    regex inline_field { '[' (<alpha>) ':' (.*?) ']' }
+    
     regex element { <broken_rhythm> | <stem> | <rest> | <tuplet>
                     | <gracing> | <grace_notes> | <nth_repeat> | <end_nth_repeat>
-                    | <spacing> }
+                    | <spacing> | <inline_field> }
     
     regex barline { ':|:' | '|:' | '|' | ':|' | '::' }
     
