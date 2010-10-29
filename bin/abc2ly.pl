@@ -73,92 +73,100 @@ sub HeaderToLilypond(ABC::Header $header) {
     say "}";
 }
 
-# MUST: this is context dependent too
-sub Duration(Context $context, $element) {
-    $element.value ~~ ABC::Duration ?? $element.value.ticks !! 0;
-}
+class TuneConvertor {
+    has $.context;
 
-sub StemToLilypond(Context $context, $stem, $suffix = "") {
-    if $stem ~~ ABC::Note {
-        print " { $context.get-Lilypond-pitch($stem.pitch) }";
-        print "{ $context.get-Lilypond-duration($stem) }$suffix ";
+    method new($key, $meter) {
+        self.bless(*, :context(Context.new(key_signature($key), $meter)));
     }
-}
-   
-sub SectionToLilypond(Context $context, @elements) {
-    say "\{";
+
+    # MUST: this is context dependent too
+    method Duration($element) {
+        $element.value ~~ ABC::Duration ?? $element.value.ticks !! 0;
+    }
     
-    my $suffix = "";
-    for @elements -> $element {
-        given $element.key {
-            when "stem" { StemToLilypond($context, $element.value, $suffix); }
-            when "rest" { print " r{ $context.get-Lilypond-duration($element.value) } " }
-            when "barline" { say " |"; }
-            when "tuplet" { 
-                print " \\times 2/3 \{"; 
-                for $element.value.notes -> $stem {
-                    StemToLilypond($context, $stem);
-                }
-                print " } ";  
-            }
-            when "broken_rhythm" {
-                StemToLilypond($context, $element.value.effective-stem1, $suffix);
-                # MUST: handle interior graciings
-                StemToLilypond($context, $element.value.effective-stem2);
-            }
-            when "gracing" {
-                given $element.value {
-                    when "~" { $suffix ~= "\\turn"; next; }
-                    when "." { $suffix ~= "\\staccato"; next; }
-                }
-            }
+    method StemToLilypond($stem, $suffix = "") {
+        if $stem ~~ ABC::Note {
+            print " { $.context.get-Lilypond-pitch($stem.pitch) }";
+            print "{ $.context.get-Lilypond-duration($stem) }$suffix ";
         }
-
-        $suffix = "";
     }
     
-    say "\}";
-}
-
-sub BodyToLilypond(Context $context, $key, @elements) {
-    say "\{";
-    say "\\key $key \\major";
-    $context.write-meter;
-
-    my $start-of-section = 0;
-    my $duration-in-section = 0;
-    for @elements.keys -> $i {
-        if $i > $start-of-section 
-           && @elements[$i].key eq "barline" 
-           && @elements[$i].value ne "|" {
+    method SectionToLilypond(@elements) {
+        say "\{";
+    
+        my $suffix = "";
+        for @elements -> $element {
+            given $element.key {
+                when "stem" { self.StemToLilypond($element.value, $suffix); }
+                when "rest" { print " r{ $.context.get-Lilypond-duration($element.value) } " }
+                when "barline" { say " |"; }
+                when "tuplet" { 
+                    print " \\times 2/3 \{"; 
+                    for $element.value.notes -> $stem {
+                        self.StemToLilypond($stem);
+                    }
+                    print " } ";  
+                }
+                when "broken_rhythm" {
+                    self.StemToLilypond($element.value.effective-stem1, $suffix);
+                    # MUST: handle interior graciings
+                    self.StemToLilypond($element.value.effective-stem2);
+                }
+                when "gracing" {
+                    given $element.value {
+                        when "~" { $suffix ~= "\\turn"; next; }
+                        when "." { $suffix ~= "\\staccato"; next; }
+                    }
+                }
+            }
+    
+            $suffix = "";
+        }
+    
+        say "\}";
+    }
+    
+    method BodyToLilypond($key, @elements) {
+        say "\{";
+        say "\\key $key \\major";
+        $.context.write-meter;
+    
+        my $start-of-section = 0;
+        my $duration-in-section = 0;
+        for @elements.keys -> $i {
+            if $i > $start-of-section 
+               && @elements[$i].key eq "barline" 
+               && @elements[$i].value ne "|" {
+                if $duration-in-section % 8 != 0 {
+                    print "\\partial 8*{ $duration-in-section % 8 } ";
+                }
+    
+                if @elements[$i].value eq ':|:' | ':|' | '::' {
+                    print "\\repeat volta 2 "; # 2 is abitrarily chosen here!
+                }
+                self.SectionToLilypond(@elements[$start-of-section ..^ $i]);
+                $start-of-section = $i + 1;
+                $duration-in-section = 0;
+            }
+            $duration-in-section += self.Duration(@elements[$i]);
+        }
+    
+        if $start-of-section + 1 < @elements.elems {
             if $duration-in-section % 8 != 0 {
                 print "\\partial 8*{ $duration-in-section % 8 } ";
             }
-            
-            if @elements[$i].value eq ':|:' | ':|' | '::' {
+    
+            if @elements[*-1].value eq ':|:' | ':|' | '::' {
                 print "\\repeat volta 2 "; # 2 is abitrarily chosen here!
             }
-            SectionToLilypond($context, @elements[$start-of-section ..^ $i]);
-            $start-of-section = $i + 1;
-            $duration-in-section = 0;
+            self.SectionToLilypond(@elements[$start-of-section ..^ +@elements]);
         }
-        $duration-in-section += Duration($context, @elements[$i]);
+    
+        say "\}";
     }
     
-    if $start-of-section + 1 < @elements.elems {
-        if $duration-in-section % 8 != 0 {
-            print "\\partial 8*{ $duration-in-section % 8 } ";
-        }
-        
-        if @elements[*-1].value eq ':|:' | ':|' | '::' {
-            print "\\repeat volta 2 "; # 2 is abitrarily chosen here!
-        }
-        SectionToLilypond($context, @elements[$start-of-section ..^ +@elements]);
-    }
-
-    say "\}";
 }
-
 
 my $match = ABC::Grammar.parse($*IN.slurp, :rule<tune_file>, :actions(ABC::Actions.new));
 
@@ -170,9 +178,8 @@ for @( $match.ast ) -> $tune {
     my $key = $tune.header.get("K")[0].value;
     my $meter = $tune.header.get("M")[0].value;
 
-    BodyToLilypond(Context.new(key_signature($key), $meter),
-                   $key.comb(/./)[0].lc,
-                   $tune.music);
+    my $convertor = TuneConvertor.new($key, $meter);
+    $convertor.BodyToLilypond($key.comb(/./)[0].lc, $tune.music);
     HeaderToLilypond($tune.header);
 
     say "}";    
