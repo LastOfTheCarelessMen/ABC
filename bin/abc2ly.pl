@@ -17,11 +17,12 @@ my %octave-map = ( 0  => "'",
                    1  => "''" );
 
 class Context {
+    has $.key-name;
     has %.key;
     has $.meter;
     
-    method new($key, $meter) {
-        self.bless(*, :key(key_signature($key)), :$meter);
+    method new($key-name, $meter) {
+        self.bless(*, :$key-name, :key(key_signature($key-name)), :$meter);
     }
     
     method get-real-pitch($nominal-pitch) {

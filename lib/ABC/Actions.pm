@@ -61,13 +61,13 @@ class ABC::Actions {
                                    $<stem>[1].ast);
     }
 
-    method inline_field($/) {
-        make ~$/[0] => ~$/[1];
-    }
-
+    # method inline_field($/) {
+    #     make ~$/[0] => ~$/[1];
+    # }
+    # 
     method element($/) {
         my $type;
-        for <broken_rhythm stem rest gracing grace_notes nth_repeat end_nth_repeat spacing tuplet> {
+        for <broken_rhythm stem rest gracing grace_notes nth_repeat end_nth_repeat spacing tuplet inline_field> {
             $type = $_ if $/{$_};
         }
         

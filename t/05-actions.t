@@ -81,6 +81,13 @@ plan *;
     is $match.ast.effective-stem2.ticks, 15/8, "second duration is 1 + 7/8";
 }
 
+{
+    my $match = ABC::Grammar.parse("[K:F]", :rule<element>, :actions(ABC::Actions.new));
+    isa_ok $match, Match, 'inline field recognized';
+    # isa_ok $match.ast, ABC::BrokenRhythm, '$match.ast is an ABC::BrokenRhythm';
+    is $match<inline_field>[0], "K", "field type is K";
+    is $match<inline_field>[1], "F", "field value is K";
+}
 
 {
     my $music = q«X:64
