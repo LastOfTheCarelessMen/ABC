@@ -20,8 +20,8 @@ class Context {
     has %.key;
     has $.meter;
     
-    method new(%key, $meter) {
-        self.bless(*, :%key, :$meter);
+    method new($key, $meter) {
+        self.bless(*, :key(key_signature($key)), :$meter);
     }
     
     method get-real-pitch($nominal-pitch) {
@@ -60,6 +60,29 @@ class Context {
     method write-meter() {
         print "\\time $.meter ";
     }
+    
+    method write-key() {
+        my $sf = %.key.map({ "{.key}{.value}" }).sort.Str.lc;
+        my $major-key-name;
+        given $sf {
+            when ""                     { $major-key-name = "c"; }
+            when "f^"                   { $major-key-name = "g"; }
+            when "c^ f^"                { $major-key-name = "d"; }
+            when "c^ f^ g^"             { $major-key-name = "a"; }
+            when "c^ d^ f^ g^"          { $major-key-name = "e"; }
+            when "a^ c^ d^ f^ g^"       { $major-key-name = "b"; }
+            when "a^ c^ d^ e^ f^ g^"    { $major-key-name = "fis"; }
+            when "a^ b^ c^ d^ e^ f^ g^" { $major-key-name = "cis"; }
+            when "b_"                   { $major-key-name = "f"; }
+            when "b_ e_"                { $major-key-name = "bes"; }
+            when "a_ b_ e_"             { $major-key-name = "ees"; }
+            when "a_ b_ d_ e_"          { $major-key-name = "aes"; }
+            when "a_ b_ d_ e_ g_"       { $major-key-name = "des"; }
+            when "a_ b_ c_ d_ e_ g_"    { $major-key-name = "ges"; }
+            when "a_ b_ c_ d_ e_ f_ g_" { $major-key-name = "ces"; }
+        }
+        say "\\key $major-key-name \\major";
+    }
 }
 
 sub HeaderToLilypond(ABC::Header $header) {
@@ -77,7 +100,7 @@ class TuneConvertor {
     has $.context;
 
     method new($key, $meter) {
-        self.bless(*, :context(Context.new(key_signature($key), $meter)));
+        self.bless(*, :context(Context.new($key, $meter)));
     }
 
     # MUST: this is context dependent too
@@ -127,9 +150,9 @@ class TuneConvertor {
         say "\}";
     }
     
-    method BodyToLilypond($key, @elements) {
+    method BodyToLilypond(@elements) {
         say "\{";
-        say "\\key $key \\major";
+        $.context.write-key;
         $.context.write-meter;
     
         my $start-of-section = 0;
@@ -179,7 +202,7 @@ for @( $match.ast ) -> $tune {
     my $meter = $tune.header.get("M")[0].value;
 
     my $convertor = TuneConvertor.new($key, $meter);
-    $convertor.BodyToLilypond($key.comb(/./)[0].lc, $tune.music);
+    $convertor.BodyToLilypond($tune.music);
     HeaderToLilypond($tune.header);
 
     say "}";    

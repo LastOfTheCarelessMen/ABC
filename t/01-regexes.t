@@ -222,7 +222,6 @@ for ':|:', '|:', '|', ':|', '::'
     my $match = ABC::Grammar.parse("[K:F]", :rule<inline_field>);
     isa_ok $match, Match, 'inline field recognized';
     is $match, "[K:F]", "Entire string was matched";
-    say :$match.perl;
     is $match[0], "K", "Correct field name found";
     is $match[1], "F", "Correct field value found";
 }
