@@ -61,10 +61,10 @@ class ABC::Actions {
                                    $<stem>[1].ast);
     }
 
-    # method inline_field($/) {
-    #     make ~$/[0] => ~$/[1];
-    # }
-    # 
+    method inline_field($/) {
+        make ~$/[0] => ~$/[1];
+    }
+    
     method element($/) {
         my $type;
         for <broken_rhythm stem rest gracing grace_notes nth_repeat end_nth_repeat spacing tuplet inline_field> {
@@ -74,7 +74,8 @@ class ABC::Actions {
         my $ast = $type => ~$/{$type};
         # say :$ast.perl;
         # say $/{$type}.ast.perl;
-        if $/{$type}.ast ~~ ABC::Duration {
+        # say $/{$type}.ast.WHAT;
+        if $/{$type}.ast ~~ ABC::Duration || $/{$type}.ast ~~ Pair {
             $ast = $type => $/{$type}.ast;
         }
         make $ast;

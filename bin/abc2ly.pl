@@ -143,6 +143,15 @@ class TuneConvertor {
                         when "." { $suffix ~= "\\staccato"; next; }
                     }
                 }
+                when "inline_field" {
+                    given $element.value.key {
+                        when "K" { 
+                            $!context = Context.new($element.value.value, $!context.meter); 
+                            $!context.write-key;
+                        }
+                    }
+                }
+                # .say;
             }
     
             $suffix = "";
