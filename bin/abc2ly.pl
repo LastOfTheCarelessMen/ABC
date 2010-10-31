@@ -110,38 +110,48 @@ class TuneConvertor {
     }
     
     method StemToLilypond($stem, $suffix = "") {
-        if $stem ~~ ABC::Note {
-            print " { $.context.get-Lilypond-pitch($stem.pitch) }";
-            print "{ $.context.get-Lilypond-duration($stem) }$suffix ";
+        given $stem {
+            when ABC::Note {
+                " "
+                ~ $.context.get-Lilypond-pitch($stem.pitch)
+                ~ $.context.get-Lilypond-duration($stem)
+                ~ $suffix
+                ~ " ";
+            }
+            "";
         }
     }
     
     method SectionToLilypond(@elements) {
         say "\{";
     
+        my $lilypond = "";
         my $suffix = "";
         for @elements -> $element {
             given $element.key {
-                when "stem" { self.StemToLilypond($element.value, $suffix); }
-                when "rest" { print " r{ $.context.get-Lilypond-duration($element.value) } " }
-                when "barline" { say " |"; }
+                when "stem" { $lilypond ~= self.StemToLilypond($element.value, $suffix); }
+                when "rest" { $lilypond ~=  " r{ $.context.get-Lilypond-duration($element.value) } " }
                 when "tuplet" { 
-                    print " \\times 2/3 \{"; 
+                    $lilypond ~= " \\times 2/3 \{"; 
                     for $element.value.notes -> $stem {
-                        self.StemToLilypond($stem);
+                        $lilypond ~= self.StemToLilypond($stem);
                     }
-                    print " } ";  
+                    $lilypond ~= " } ";  
                 }
                 when "broken_rhythm" {
-                    self.StemToLilypond($element.value.effective-stem1, $suffix);
+                    $lilypond ~= self.StemToLilypond($element.value.effective-stem1, $suffix);
                     # MUST: handle interior graciings
-                    self.StemToLilypond($element.value.effective-stem2);
+                    $lilypond ~= self.StemToLilypond($element.value.effective-stem2);
                 }
                 when "gracing" {
                     given $element.value {
                         when "~" { $suffix ~= "\\turn"; next; }
                         when "." { $suffix ~= "\\staccato"; next; }
                     }
+                }
+                when "barline" { 
+                    say "$lilypond |"; 
+                    $lilypond = ""; 
                 }
                 when "inline_field" {
                     given $element.value.key {
@@ -157,6 +167,7 @@ class TuneConvertor {
             $suffix = "";
         }
     
+        say $lilypond; 
         say "\}";
     }
     
