@@ -65,6 +65,7 @@ class Context {
     method eighths-in-measure() {
         given $.meter {
             when "6/8" { 6; }
+            when "9/8" { 9; }
             8;
         }
     }
@@ -178,6 +179,10 @@ class TuneConvertor {
                         when "K" { 
                             $!context = Context.new($element.value.value, $!context.meter); 
                             $!context.write-key;
+                        }
+                        when "M" {
+                            $!context = Context.new($!context.key-name, $element.value.value);
+                            $!context.write-meter;
                         }
                     }
                 }
