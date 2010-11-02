@@ -61,6 +61,13 @@ class Context {
     method write-meter() {
         print "\\time $.meter ";
     }
+
+    method eighths-in-measure() {
+        given $.meter {
+            when "6/8" { 6; }
+            8;
+        }
+    }
     
     method write-key() {
         my $sf = %.key.map({ "{.key}{.value}" }).sort.Str.lc;
@@ -122,12 +129,23 @@ class TuneConvertor {
         }
     }
     
+    method WriteBar($lilypond-bar, $duration) {
+        my $eighths = $.context.eighths-in-measure;
+        if $duration % $eighths != 0 {
+            print "\\partial 8*{ $duration % $eighths } ";
+        }
+        
+        print "$lilypond-bar"; 
+    }
+    
     method SectionToLilypond(@elements) {
         say "\{";
     
         my $lilypond = "";
+        my $duration = 0;
         my $suffix = "";
         for @elements -> $element {
+            $duration += self.Duration($element);
             given $element.key {
                 when "stem" { $lilypond ~= self.StemToLilypond($element.value, $suffix); }
                 when "rest" { $lilypond ~=  " r{ $.context.get-Lilypond-duration($element.value) } " }
@@ -149,9 +167,11 @@ class TuneConvertor {
                         when "." { $suffix ~= "\\staccato"; next; }
                     }
                 }
-                when "barline" { 
-                    say "$lilypond |"; 
-                    $lilypond = ""; 
+                when "barline" {
+                    self.WriteBar($lilypond, $duration);
+                    say " |"; 
+                    $lilypond = "";
+                    $duration = 0;
                 }
                 when "inline_field" {
                     given $element.value.key {
@@ -167,8 +187,8 @@ class TuneConvertor {
             $suffix = "";
         }
     
-        say $lilypond; 
-        say "\}";
+        self.WriteBar($lilypond, $duration);
+        say " \}";
     }
     
     method BodyToLilypond(@elements) {
@@ -177,30 +197,19 @@ class TuneConvertor {
         $.context.write-meter;
     
         my $start-of-section = 0;
-        my $duration-in-section = 0;
         for @elements.keys -> $i {
             if $i > $start-of-section 
                && @elements[$i].key eq "barline" 
                && @elements[$i].value ne "|" {
-                if $duration-in-section % 8 != 0 {
-                    print "\\partial 8*{ $duration-in-section % 8 } ";
-                }
-    
                 if @elements[$i].value eq ':|:' | ':|' | '::' {
                     print "\\repeat volta 2 "; # 2 is abitrarily chosen here!
                 }
                 self.SectionToLilypond(@elements[$start-of-section ..^ $i]);
                 $start-of-section = $i + 1;
-                $duration-in-section = 0;
             }
-            $duration-in-section += self.Duration(@elements[$i]);
         }
     
         if $start-of-section + 1 < @elements.elems {
-            if $duration-in-section % 8 != 0 {
-                print "\\partial 8*{ $duration-in-section % 8 } ";
-            }
-    
             if @elements[*-1].value eq ':|:' | ':|' | '::' {
                 print "\\repeat volta 2 "; # 2 is abitrarily chosen here!
             }
