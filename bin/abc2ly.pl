@@ -202,15 +202,35 @@ class TuneConvertor {
         $.context.write-meter;
     
         my $start-of-section = 0;
-        for @elements.keys -> $i {
-            if $i > $start-of-section 
-               && @elements[$i].key eq "barline" 
-               && @elements[$i].value ne "|" {
-                if @elements[$i].value eq ':|:' | ':|' | '::' {
+        loop (my $i = 0; $i < +@elements; $i++) {
+            if @elements[$i].key eq "nth_repeat"
+               || ($i > $start-of-section 
+                   && @elements[$i].key eq "barline" 
+                   && @elements[$i].value ne "|") {
+                if @elements[$i].key eq "nth_repeat" 
+                   || @elements[$i].value eq ':|:' | ':|' | '::' {
                     print "\\repeat volta 2 "; # 2 is abitrarily chosen here!
                 }
                 self.SectionToLilypond(@elements[$start-of-section ..^ $i]);
                 $start-of-section = $i + 1;
+            }
+
+            if @elements[$i].key eq "nth_repeat" {
+                say "\\alternative \{";
+                my $endings = 0;
+                loop (; $i < +@elements; $i++) {
+                    if @elements[$i].key eq "barline" 
+                       && @elements[$i].value ne "|" {
+                           self.SectionToLilypond(@elements[$start-of-section ..^ $i]);
+                           $start-of-section = $i + 1;
+                           last if ++$endings == 2;
+                    }
+                }
+                if $endings == 1 {
+                    self.SectionToLilypond(@elements[$start-of-section ..^ $i]);
+                    $start-of-section = $i + 1;
+                }
+                say "\}";
             }
         }
     
