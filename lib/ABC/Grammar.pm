@@ -27,7 +27,7 @@ grammar ABC::Grammar
     regex acciaccatura { '/' }
     regex grace_notes { '{' <acciaccatura>? <grace_note_stem>+ '}' }
     
-    regex long_gracing { '+' <alpha>+ '+' }
+    regex long_gracing { '+' [<alpha> | '.']+ '+' }
     regex gracing { '.' | '~' | <long_gracing> }
     
     regex spacing { \h+ }
