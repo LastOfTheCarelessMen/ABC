@@ -13,8 +13,10 @@ my %accidental-map = ( ''  => "",
                        '_'  => "es",
                        '__' => "eses" );
 
-my %octave-map = ( 0  => "'",
-                   1  => "''" );
+my %octave-map = ( -1 => "",
+                    0 => "'",
+                    1 => "''",
+                    2 => "'''" );
 
 class Context {
     has $.key-name;
@@ -41,7 +43,10 @@ class Context {
         my $match = ABC::Grammar.parse($real-pitch, :rule<pitch>);
         
         my $octave = +((~$match<basenote>) ~~ 'a'..'z');
-        # SHOULD: factor in $match<octave> too
+        given $match<octave> {
+            when /\,/ { $octave -= (~$match<octave>).chars }
+            when /\'/ { $octave += (~$match<octave>).chars }
+        }
         
         $match<basenote>.lc ~ %accidental-map{~$match<accidental>} ~ %octave-map{$octave};
     }
@@ -69,6 +74,7 @@ class Context {
         given $.meter {
             when "6/8" { 6; }
             when "9/8" { 9; }
+            when "3/4" { 6; }
             8;
         }
     }
