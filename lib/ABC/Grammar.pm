@@ -51,7 +51,7 @@ grammar ABC::Grammar
                     | <gracing> | <grace_notes> | <nth_repeat> | <end_nth_repeat>
                     | <spacing> | <inline_field> }
     
-    regex barline { ':|:' | '|:' | '|' | ':|' | '::' }
+    regex barline { '||' | ':|:' | '|:' | '|' | ':|' | '::' }
     
     regex bar { <element>+ <barline>? }
         

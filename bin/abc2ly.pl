@@ -51,7 +51,10 @@ class Context {
                              "1" => "8",
                              "3/2" => "8.",
                              "2" => "4",
-                             "3" => "4."
+                             "3" => "4.",
+                             "4" => "2",
+                             "6" => "2.",
+                             "8" => "1"
         );
     
     method get-Lilypond-duration(ABC::Duration $abc-duration) {
@@ -252,6 +255,8 @@ say '\\version "2.12.3"';
 
 for @( $match.ast ) -> $tune {
     say "\\score \{";
+    
+    # say ~$tune.music;
 
     my $key = $tune.header.get("K")[0].value;
     my $meter = $tune.header.get("M")[0].value;
