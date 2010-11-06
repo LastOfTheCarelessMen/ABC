@@ -160,9 +160,15 @@ class TuneConvertor {
                 when "stem" { $lilypond ~= self.StemToLilypond($element.value, $suffix); }
                 when "rest" { $lilypond ~=  " r{ $.context.get-Lilypond-duration($element.value) } " }
                 when "tuplet" { 
-                    $lilypond ~= " \\times 2/3 \{"; 
-                    for $element.value.notes -> $stem {
-                        $lilypond ~= self.StemToLilypond($stem);
+                    $lilypond ~= " \\times 2/3 \{";
+                    if +$element.value.notes == 3 && $element.value.ticks == 2 {
+                        $lilypond ~= self.StemToLilypond($element.value.notes[0], "[");
+                        $lilypond ~= self.StemToLilypond($element.value.notes[1]);
+                        $lilypond ~= self.StemToLilypond($element.value.notes[2], "]");
+                    } else {
+                        for $element.value.notes -> $stem {
+                            $lilypond ~= self.StemToLilypond($stem);
+                        }
                     }
                     $lilypond ~= " } ";  
                 }
