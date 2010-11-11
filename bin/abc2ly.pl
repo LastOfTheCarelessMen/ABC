@@ -6,6 +6,8 @@ use ABC::Actions;
 use ABC::Duration;
 use ABC::Note;
 
+my $paper-size = "letter"; # or switch to "a4" for European paper
+
 my %accidental-map = ( ''  => "",
                        '='  => "",
                        '^'  => "is",
@@ -267,6 +269,7 @@ class TuneConvertor {
 my $match = ABC::Grammar.parse($*IN.slurp, :rule<tune_file>, :actions(ABC::Actions.new));
 
 say '\\version "2.12.3"';
+say "#(set-default-paper-size \"{$paper-size}\")";
 
 for @( $match.ast ) -> $tune {
     say "\\score \{";
