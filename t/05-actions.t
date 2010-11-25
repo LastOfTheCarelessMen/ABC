@@ -90,6 +90,13 @@ plan *;
 }
 
 {
+    my $match = ABC::Grammar.parse("+fff+", :rule<long_gracing>, :actions(ABC::Actions.new));
+    isa_ok $match, Match, 'long gracing recognized';
+    isa_ok $match.ast, Str, '$match.ast is a Str';
+    is $match.ast, "fff", "gracing is fff";
+}
+
+{
     my $music = q«X:64
 T:Cuckold Come Out o' the Amrey
 S:Northumbrian Minstrelsy

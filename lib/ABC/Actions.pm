@@ -65,6 +65,10 @@ class ABC::Actions {
         make ~$/[0] => ~$/[1];
     }
     
+    method long_gracing($/) {
+        make ~$/<long_gracing_innards>;
+    }
+    
     method element($/) {
         my $type;
         for <broken_rhythm stem rest gracing grace_notes nth_repeat end_nth_repeat spacing tuplet inline_field> {
