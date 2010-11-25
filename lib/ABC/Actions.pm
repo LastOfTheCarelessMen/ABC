@@ -66,9 +66,13 @@ class ABC::Actions {
     }
     
     method long_gracing($/) {
-        make ~$/<long_gracing_innards>;
+        make ~$/<long_gracing_text>;
     }
-    
+
+    method gracing($/) {
+        make $/<long_gracing> ?? $/<long_gracing>.ast !! ~$/;
+    }
+
     method element($/) {
         my $type;
         for <broken_rhythm stem rest gracing grace_notes nth_repeat end_nth_repeat spacing tuplet inline_field> {
@@ -79,7 +83,7 @@ class ABC::Actions {
         # say :$ast.perl;
         # say $/{$type}.ast.perl;
         # say $/{$type}.ast.WHAT;
-        if $/{$type}.ast ~~ ABC::Duration || $/{$type}.ast ~~ Pair {
+        if $/{$type}.ast ~~ ABC::Duration || $/{$type}.ast ~~ Pair | Str {
             $ast = $type => $/{$type}.ast;
         }
         make $ast;

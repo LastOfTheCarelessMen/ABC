@@ -97,6 +97,28 @@ plan *;
 }
 
 {
+    my $match = ABC::Grammar.parse("+fff+", :rule<gracing>, :actions(ABC::Actions.new));
+    isa_ok $match, Match, 'long gracing recognized';
+    isa_ok $match.ast, Str, '$match.ast is a Str';
+    is $match.ast, "fff", "gracing is fff";
+}
+
+{
+    my $match = ABC::Grammar.parse("~", :rule<gracing>, :actions(ABC::Actions.new));
+    isa_ok $match, Match, 'gracing recognized';
+    isa_ok $match.ast, Str, '$match.ast is a Str';
+    is $match.ast, "~", "gracing is ~";
+}
+
+{
+    my $match = ABC::Grammar.parse("+fff+", :rule<element>, :actions(ABC::Actions.new));
+    isa_ok $match, Match, 'long gracing recognized';
+    is $match.ast.key, "gracing", '$match.ast.key is gracing';
+    isa_ok $match.ast.value, Str, '$match.ast.value is a Str';
+    is $match.ast.value, "fff", "gracing is fff";
+}
+
+{
     my $music = q«X:64
 T:Cuckold Come Out o' the Amrey
 S:Northumbrian Minstrelsy
