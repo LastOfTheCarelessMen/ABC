@@ -191,7 +191,7 @@ class TuneConvertor {
                     given $element.value {
                         when "~" { $suffix ~= "\\turn"; }
                         when "." { $suffix ~= "\\staccato"; }
-                        when "ppp" | "pp" | "p" | "mp" | "mf" | "f" | "ff" | "fff" 
+                        when /^p+$/ | "mp" | "mf" | /^f+$/ 
                                  { $suffix ~= "\\" ~ $element.value; }
                     }
                 }
