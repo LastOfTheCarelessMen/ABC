@@ -159,8 +159,14 @@ class TuneConvertor {
         for @elements -> $element {
             $duration += self.Duration($element);
             given $element.key {
-                when "stem" { $lilypond ~= self.StemToLilypond($element.value, $suffix); }
-                when "rest" { $lilypond ~=  " r{ $.context.get-Lilypond-duration($element.value) } " }
+                when "stem" { 
+                    $lilypond ~= self.StemToLilypond($element.value, $suffix); 
+                    $suffix = ""; 
+                }
+                when "rest" { 
+                    $lilypond ~=  " r{ $.context.get-Lilypond-duration($element.value) } "; 
+                    $suffix = ""; 
+                }
                 when "tuplet" { 
                     $lilypond ~= " \\times 2/3 \{";
                     if +$element.value.notes == 3 && $element.value.ticks == 2 {
@@ -173,16 +179,20 @@ class TuneConvertor {
                         }
                     }
                     $lilypond ~= " } ";  
+                    $suffix = "";
                 }
                 when "broken_rhythm" {
                     $lilypond ~= self.StemToLilypond($element.value.effective-stem1, $suffix);
                     # MUST: handle interior graciings
                     $lilypond ~= self.StemToLilypond($element.value.effective-stem2);
+                    $suffix = "";
                 }
                 when "gracing" {
                     given $element.value {
-                        when "~" { $suffix ~= "\\turn"; next; }
-                        when "." { $suffix ~= "\\staccato"; next; }
+                        when "~" { $suffix ~= "\\turn"; }
+                        when "." { $suffix ~= "\\staccato"; }
+                        when "ppp" | "pp" | "p" | "mp" | "mf" | "f" | "ff" | "fff" 
+                                 { $suffix ~= "\\" ~ $element.value; }
                     }
                 }
                 when "barline" {
@@ -205,8 +215,6 @@ class TuneConvertor {
                 }
                 # .say;
             }
-    
-            $suffix = "";
         }
     
         self.WriteBar($lilypond, $duration);
