@@ -238,9 +238,9 @@ class TuneConvertor {
                 }
                 self.SectionToLilypond(@elements[$start-of-section ..^ $i]);
                 $start-of-section = $i + 1;
-                if @elements[$i].value eq '||' {
-                    say '\\bar "||"';
-                }
+                # if @elements[$i].value eq '||' {
+                #     say '\\bar "||"';
+                # }
             }
 
             if @elements[$i].key eq "nth_repeat" {
