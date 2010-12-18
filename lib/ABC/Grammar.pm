@@ -8,7 +8,7 @@ grammar ABC::Grammar
     regex header { [<header_field> \v]+ }
 
     regex basenote { <[a..g]+[A..G]> }
-    regex octave { \'+ | \,+ }
+    regex octave { "'"+ | ","+ }
     regex accidental { '^' | '^^' | '_' | '__' | '=' }
     regex pitch { <accidental>? <basenote> <octave>? }
 
