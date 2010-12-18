@@ -24,9 +24,38 @@ class Context {
     has $.key-name;
     has %.key;
     has $.meter;
+    has $.length;
+    has %.cheat-length-map;
     
-    method new($key-name, $meter) {
-        self.bless(*, :$key-name, :key(key_signature($key-name)), :$meter);
+    method new($key-name, $meter, $length) {
+        my %cheat-length-map;
+        given $length {
+            when "1/8" { %cheat-length-map = ( '/' => "16",
+                                               "" => "8",
+                                               "1" => "8",
+                                               "3/2" => "8.",
+                                               "2" => "4",
+                                               "3" => "4.",
+                                               "4" => "2",
+                                               "6" => "2.",
+                                               "8" => "1");
+            }
+            when "1/4" { %cheat-length-map = ( '/' => "8",
+                                               "" => "4",
+                                               "1" => "4",
+                                               "3/2" => "4.",
+                                               "2" => "2",
+                                               "3" => "2.",
+                                               "4" => "1",
+                                               "6" => "1.");
+            }
+            die "Don't know how to handle note length $length";
+        }
+        self.bless(*, :$key-name, 
+                      :key(key_signature($key-name)), 
+                      :$meter, 
+                      :$length, 
+                      :%cheat-length-map);
     }
     
     method get-real-pitch($nominal-pitch) {
@@ -53,31 +82,18 @@ class Context {
         $match<basenote>.lc ~ %accidental-map{~$match<accidental>} ~ %octave-map{$octave};
     }
 
-    my %cheat-length-map = ( '/' => "16",
-                             "" => "8",
-                             "1" => "8",
-                             "3/2" => "8.",
-                             "2" => "4",
-                             "3" => "4.",
-                             "4" => "2",
-                             "6" => "2.",
-                             "8" => "1"
-        );
-    
     method get-Lilypond-duration(ABC::Duration $abc-duration) {
-        %cheat-length-map{$abc-duration.duration-to-str};
+        %.cheat-length-map{$abc-duration.duration-to-str};
     }
     
     method write-meter() {
         print "\\time $.meter ";
     }
 
-    method eighths-in-measure() {
+    method ticks-in-measure() {
         given $.meter {
-            when "6/8" { 6; }
-            when "9/8" { 9; }
-            when "3/4" { 6; }
-            8;
+            when "C" { 1 / $.length.eval; }
+            $.meter.eval / $.length.eval;
         }
     }
     
@@ -119,8 +135,8 @@ sub HeaderToLilypond(ABC::Header $header) {
 class TuneConvertor {
     has $.context;
 
-    method new($key, $meter) {
-        self.bless(*, :context(Context.new($key, $meter)));
+    method new($key, $meter, $length) {
+        self.bless(*, :context(Context.new($key, $meter, $length)));
     }
 
     # MUST: this is context dependent too
@@ -142,9 +158,9 @@ class TuneConvertor {
     }
     
     method WriteBar($lilypond-bar, $duration) {
-        my $eighths = $.context.eighths-in-measure;
-        if $duration % $eighths != 0 {
-            print "\\partial 8*{ $duration % $eighths } ";
+        my $ticks-in-measure = $.context.ticks-in-measure;
+        if $duration % $ticks-in-measure != 0 {
+            print "\\partial { 1 / $.context.length.eval }*{ $duration % $ticks-in-measure } ";
         }
         
         print "$lilypond-bar"; 
@@ -204,12 +220,21 @@ class TuneConvertor {
                 when "inline_field" {
                     given $element.value.key {
                         when "K" { 
-                            $!context = Context.new($element.value.value, $!context.meter); 
+                            $!context = Context.new($element.value.value, 
+                                                    $!context.meter, 
+                                                    $!context.length); 
                             $!context.write-key;
                         }
                         when "M" {
-                            $!context = Context.new($!context.key-name, $element.value.value);
+                            $!context = Context.new($!context.key-name,
+                                                    $element.value.value,
+                                                    $!context.length);
                             $!context.write-meter;
+                        }
+                        when "L" {
+                            $!context = Context.new($!context.key-name,
+                                                    $!context.meter,
+                                                    $element.value.value);
                         }
                     }
                 }
@@ -241,9 +266,13 @@ class TuneConvertor {
                 # if @elements[$i].value eq '||' {
                 #     say '\\bar "||"';
                 # }
+                if @elements[$i].value eq '|]' {
+                    say '\\bar "|."';
+                }
             }
 
             if @elements[$i].key eq "nth_repeat" {
+                my $final-bar = False;
                 say "\\alternative \{";
                 my $endings = 0;
                 loop (; $i < +@elements; $i++) {
@@ -251,14 +280,21 @@ class TuneConvertor {
                        && @elements[$i].value ne "|" {
                            self.SectionToLilypond(@elements[$start-of-section ..^ $i]);
                            $start-of-section = $i + 1;
+                           $final-bar = True if @elements[$i].value eq '|]';
                            last if ++$endings == 2;
                     }
                 }
                 if $endings == 1 {
                     self.SectionToLilypond(@elements[$start-of-section ..^ $i]);
                     $start-of-section = $i + 1;
+                    $final-bar = True if @elements[$i].value eq '|]';
                 }
                 say "\}";
+                
+                if $final-bar {
+                    say '\\bar "|."';
+                }
+                
             }
         }
     
@@ -267,6 +303,9 @@ class TuneConvertor {
                 print "\\repeat volta 2 "; # 2 is abitrarily chosen here!
             }
             self.SectionToLilypond(@elements[$start-of-section ..^ +@elements]);
+            if @elements[*-1].value eq '|]' {
+                say '\\bar "|."';
+            }
         }
     
         say "\}";
@@ -286,8 +325,9 @@ for @( $match.ast ) -> $tune {
 
     my $key = $tune.header.get("K")[0].value;
     my $meter = $tune.header.get("M")[0].value;
+    my $length = $tune.header.get("L")[0].value;
 
-    my $convertor = TuneConvertor.new($key, $meter);
+    my $convertor = TuneConvertor.new($key, $meter, $length);
     $convertor.BodyToLilypond($tune.music);
     HeaderToLilypond($tune.header);
 

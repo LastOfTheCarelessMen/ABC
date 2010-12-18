@@ -164,7 +164,7 @@ plan *;
 #     is $match<stem>[1], "b", 'second note is b';
 # }
 
-for ':|:', '|:', '|', ':|', '::'  
+for ':|:', '|:', '|', ':|', '::', '|]' 
 {
     my $match = ABC::Grammar.parse($_, :rule<barline>);
     isa_ok $match, Match, "barline $_ recognized";
