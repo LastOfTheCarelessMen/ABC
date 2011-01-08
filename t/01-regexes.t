@@ -283,4 +283,4 @@ g/f/e/d/ c/d/e/f/ gc e/f/g/e/ | dB/A/ gB +trill+A2 +trill+e2 :|
     is $match<music><line_of_music>.elems, 4, "Four lines matched";
 }
 
-done_testing;
+done;

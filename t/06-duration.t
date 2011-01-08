@@ -15,4 +15,4 @@ is duration-from-parse("", "2").ticks.perl, (1/2).perl, "/2 works properly";
 is duration-from-parse("1").ticks.perl, (1).perl, "1 works properly";
 is duration-from-parse("").ticks.perl, (1).perl, "'' works properly";
 
-done_testing;
+done;

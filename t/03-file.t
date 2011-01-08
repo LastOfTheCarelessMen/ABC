@@ -17,4 +17,4 @@ plan *;
     is @titles[2], "Peacock Followed the Hen. JWDM.07", "Third is Peacock";
 }
 
-done_testing;
+done;
