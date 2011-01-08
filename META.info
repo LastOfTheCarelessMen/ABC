@@ -1,0 +1,8 @@
+{
+    "name"        : "ABC",
+    "version"     : "*",
+    "description" : "Toolkit for dealing with ABC music notation",
+    "depends"     : [],
+    "repo-type"   : "git",
+    "repo-url"    : "git://github.com/colomon/ABC.git"
+}
