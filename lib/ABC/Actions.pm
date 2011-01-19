@@ -24,10 +24,9 @@ class ABC::Actions {
     
     method note_length($/) {
         if $<note_length_denominator> {
-            make duration-from-parse($<top>[0] // "", 
-                                     $<note_length_denominator>[0]<bottom>[0]);
+            make duration-from-parse($<top>[0], $<note_length_denominator>[0]<bottom>[0]);
         } else {
-            make duration-from-parse($<top>[0] // "");
+            make duration-from-parse($<top>[0]);
         }
     }
     

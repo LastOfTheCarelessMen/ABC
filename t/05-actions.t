@@ -45,6 +45,14 @@ plan *;
 }
 
 {
+    my $match = ABC::Grammar.parse("F3/2", :rule<mnote>, :actions(ABC::Actions.new));
+    isa_ok $match, Match, 'element recognized';
+    isa_ok $match.ast, ABC::Note, '$match.ast is an ABC::Note';
+    is $match.ast.pitch, "F", "Pitch F";
+    is $match.ast.ticks, 3/2, "Duration 3/2 ticks";
+}
+
+{
     my $match = ABC::Grammar.parse("(3abc", :rule<tuplet>, :actions(ABC::Actions.new));
     isa_ok $match, Match, 'tuplet recognized';
     isa_ok $match.ast, ABC::Tuplet, '$match.ast is an ABC::Tuplet';
