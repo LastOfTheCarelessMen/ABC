@@ -104,6 +104,18 @@ plan *;
 }
 
 {
+    my $match = ABC::Grammar.parse("(", :rule<element>);
+    isa_ok $match, Match, '"(" is an element';
+    is $match<slur_begin>, '(', '"(" is a slur begin';
+}
+
+{
+    my $match = ABC::Grammar.parse(")", :rule<element>);
+    isa_ok $match, Match, '")" is an element';
+    is $match<slur_end>, ')', '")" is a slur end';
+}
+
+{
     my $match = ABC::Grammar.parse("_D,5/4", :rule<element>);
     isa_ok $match, Match, '"_D,5/4" is an element';
     is $match<stem><mnote>[0]<pitch><basenote>, "D", '"_D,5/4" has base note D';

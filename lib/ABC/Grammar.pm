@@ -22,6 +22,9 @@ grammar ABC::Grammar
     regex rest_type { <[x..z]> }
     regex rest { <rest_type> <note_length> }
     
+    regex slur_begin { '(' }
+    regex slur_end { ')' }
+    
     regex grace_note { <pitch> <note_length>? } # as mnote, but without tie
     regex grace_note_stem { <grace_note> | [ '[' <grace_note>+ ']' ]  }
     regex acciaccatura { '/' }
@@ -48,7 +51,7 @@ grammar ABC::Grammar
     
     regex inline_field { '[' (<alpha>) ':' (.*?) ']' }
     
-    regex element { <broken_rhythm> | <stem> | <rest> | <tuplet>
+    regex element { <broken_rhythm> | <stem> | <rest> | <tuplet> | <slur_begin> | <slur_end>
                     | <gracing> | <grace_notes> | <nth_repeat> | <end_nth_repeat>
                     | <spacing> | <inline_field> }
     
