@@ -37,12 +37,14 @@ grammar ABC::Grammar
     regex spacing { \h+ }
     
     regex broken_rhythm_bracket { ['<'+ | '>'+] }
-    regex broken_rhythm { <stem> <g1=gracing>* <broken_rhythm_bracket> <g2=gracing>* <stem> }
+    regex b_elem { <gracing> | <grace_notes> | <slur_begin> | <slur_end> }
+    regex broken_rhythm { <stem> <g1=b_elem>* <broken_rhythm_bracket> <g2=b_elem>* <stem> }
     
+    regex t_elem { <gracing> | <grace_notes> | <broken_rhythm> | <slur_begin> | <slur_end> }
     # next line should work, but is NYI in Rakudo
-    # regex tuple { '('(<digit>+) [<gracing>* <stem>] ** { $0 } }
+    # regex tuple { '('(<digit>+) [<t_elem>* <stem>] ** { $0 } }
     # next block makes the most common case work
-    regex tuplet { '(3' [<gracing>* <stem>] ** 3 }
+    regex tuplet { '(3' [<t_elem>* <stem>] ** 3 }
     
     regex nth_repeat_num { <digit>+ [[',' | '-'] <digit>+]* }
     regex nth_repeat_text { '"' .*? '"' }
