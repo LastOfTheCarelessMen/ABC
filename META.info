@@ -3,6 +3,6 @@
     "version"     : "*",
     "description" : "Toolkit for dealing with ABC music notation",
     "depends"     : [],
-    "repo-type"   : "git",
-    "repo-url"    : "git://github.com/colomon/ABC.git"
+    "source-type"   : "git",
+    "source-url"    : "git://github.com/colomon/ABC.git"
 }
