@@ -140,8 +140,9 @@ grammar ABC::Grammar
         }
         else
         {
-            $resulting_note ~= %key_signature{$pitch<basenote>.uc} 
-                    if (%key_signature.exists($pitch<basenote>.uc));
+            if %key_signature.exists($pitch<basenote>.uc) {
+                $resulting_note ~= %key_signature{$pitch<basenote>.uc};
+            }
         }
         $resulting_note ~= $pitch<basenote>.Str;
         $resulting_note ~= $pitch<octave>.Str if $pitch<octave>;
