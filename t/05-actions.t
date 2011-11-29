@@ -93,8 +93,8 @@ plan *;
     my $match = ABC::Grammar.parse("[K:F]", :rule<element>, :actions(ABC::Actions.new));
     isa_ok $match, Match, 'inline field recognized';
     # isa_ok $match.ast, ABC::BrokenRhythm, '$match.ast is an ABC::BrokenRhythm';
-    is $match<inline_field>[0], "K", "field type is K";
-    is $match<inline_field>[1], "F", "field value is K";
+    is $match<inline_field><alpha>, "K", "field type is K";
+    is $match<inline_field><value>, "F", "field value is K";
 }
 
 {

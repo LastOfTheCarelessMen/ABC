@@ -61,7 +61,7 @@ class ABC::Actions {
     }
 
     method inline_field($/) {
-        make ~$/[0] => ~$/[1];
+        make ~$/<alpha> => ~$/<value>;
     }
     
     method long_gracing($/) {

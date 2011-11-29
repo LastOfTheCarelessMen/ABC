@@ -1,4 +1,5 @@
 use v6;
+# use Grammar::Tracer;
 
 grammar ABC::Grammar
 {
@@ -51,7 +52,7 @@ grammar ABC::Grammar
     regex nth_repeat { '[' [ <nth_repeat_num> | <nth_repeat_text> ] }
     regex end_nth_repeat { ']' }
     
-    regex inline_field { '[' (<alpha>) ':' (.*?) ']' }
+    regex inline_field { '[' <alpha> ':' $<value>=[.*?] ']' }
     
     regex element { <broken_rhythm> | <stem> | <rest> | <tuplet> | <slur_begin> | <slur_end>
                     | <gracing> | <grace_notes> | <nth_repeat> | <end_nth_repeat>

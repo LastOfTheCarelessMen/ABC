@@ -267,8 +267,8 @@ for ':|:', '|:', '|', ':|', '::', '|]'
     isa_ok $match, Match, 'Got a match';
     ok $match, 'inline field recognized';
     is $match, "[K:F]", "Entire string was matched";
-    is $match[0], "K", "Correct field name found";
-    is $match[1], "F", "Correct field value found";
+    is $match<alpha>, "K", "Correct field name found";
+    is $match<value>, "F", "Correct field value found";
 }
 
 {
