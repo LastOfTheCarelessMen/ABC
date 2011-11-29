@@ -9,7 +9,7 @@ grammar ABC::Grammar
 
     regex basenote { <[a..g]+[A..G]> }
     regex octave { "'"+ | ","+ }
-    regex accidental { '^' | '^^' | '_' | '__' | '=' }
+    regex accidental { '^^' | '^' | '__' | '_' | '=' }
     regex pitch { <accidental>? <basenote> <octave>? }
 
     regex tie { '-' }
