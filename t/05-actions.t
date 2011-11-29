@@ -14,7 +14,7 @@ plan *;
 
 {
     my $match = ABC::Grammar.parse("e3", :rule<mnote>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'element recognized';
+    ok $match, 'element recognized';
     isa_ok $match.ast, ABC::Note, '$match.ast is an ABC::Note';
     is $match.ast.pitch, "e", "Pitch e";
     is $match.ast.ticks, 3, "Duration 3 ticks";
@@ -22,7 +22,7 @@ plan *;
 
 {
     my $match = ABC::Grammar.parse("e", :rule<mnote>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'element recognized';
+    ok $match, 'element recognized';
     isa_ok $match.ast, ABC::Note, '$match.ast is an ABC::Note';
     is $match.ast.pitch, "e", "Pitch e";
     is $match.ast.ticks, 1, "Duration 1 ticks";
@@ -30,7 +30,7 @@ plan *;
 
 {
     my $match = ABC::Grammar.parse("^e,/", :rule<mnote>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'element recognized';
+    ok $match, 'element recognized';
     isa_ok $match.ast, ABC::Note, '$match.ast is an ABC::Note';
     is $match.ast.pitch, "^e,", "Pitch ^e,";
     is $match.ast.ticks, 1/2, "Duration 1/2 ticks";
@@ -38,7 +38,7 @@ plan *;
 
 {
     my $match = ABC::Grammar.parse("z/", :rule<rest>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'rest recognized';
+    ok $match, 'rest recognized';
     isa_ok $match.ast, ABC::Rest, '$match.ast is an ABC::Rest';
     is $match.ast.type, "z", "Rest is z";
     is $match.ast.ticks, 1/2, "Duration 1/2 ticks";
@@ -46,7 +46,7 @@ plan *;
 
 {
     my $match = ABC::Grammar.parse("F3/2", :rule<mnote>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'element recognized';
+    ok $match, 'element recognized';
     isa_ok $match.ast, ABC::Note, '$match.ast is an ABC::Note';
     is $match.ast.pitch, "F", "Pitch F";
     is $match.ast.ticks, 3/2, "Duration 3/2 ticks";
@@ -54,7 +54,7 @@ plan *;
 
 {
     my $match = ABC::Grammar.parse("(3abc", :rule<tuplet>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'tuplet recognized';
+    ok $match, 'tuplet recognized';
     isa_ok $match.ast, ABC::Tuplet, '$match.ast is an ABC::Tuplet';
     is $match.ast.tuple, "3", "It's a triplet";
     is $match.ast.ticks, 2, "Duration 2 ticks";
@@ -65,7 +65,7 @@ plan *;
 
 {
     my $match = ABC::Grammar.parse("a>~b", :rule<broken_rhythm>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'broken rhythm recognized';
+    ok $match, 'broken rhythm recognized';
     isa_ok $match.ast, ABC::BrokenRhythm, '$match.ast is an ABC::BrokenRhythm';
     is $match.ast.ticks, 2, "total duration is two ticks";
     isa_ok $match.ast.effective-stem1, ABC::Note, "effective-stem1 is a note";
@@ -78,7 +78,7 @@ plan *;
 
 {
     my $match = ABC::Grammar.parse("a<<<b", :rule<broken_rhythm>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'broken rhythm recognized';
+    ok $match, 'broken rhythm recognized';
     isa_ok $match.ast, ABC::BrokenRhythm, '$match.ast is an ABC::BrokenRhythm';
     is $match.ast.ticks, 2, "total duration is two ticks";
     isa_ok $match.ast.effective-stem1, ABC::Note, "effective-stem1 is a note";
@@ -91,7 +91,7 @@ plan *;
 
 {
     my $match = ABC::Grammar.parse("[K:F]", :rule<element>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'inline field recognized';
+    ok $match, 'inline field recognized';
     # isa_ok $match.ast, ABC::BrokenRhythm, '$match.ast is an ABC::BrokenRhythm';
     is $match<inline_field><alpha>, "K", "field type is K";
     is $match<inline_field><value>, "F", "field value is K";
@@ -99,28 +99,28 @@ plan *;
 
 {
     my $match = ABC::Grammar.parse("+fff+", :rule<long_gracing>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'long gracing recognized';
+    ok $match, 'long gracing recognized';
     isa_ok $match.ast, Str, '$match.ast is a Str';
     is $match.ast, "fff", "gracing is fff";
 }
 
 {
     my $match = ABC::Grammar.parse("+fff+", :rule<gracing>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'long gracing recognized';
+    ok $match, 'long gracing recognized';
     isa_ok $match.ast, Str, '$match.ast is a Str';
     is $match.ast, "fff", "gracing is fff";
 }
 
 {
     my $match = ABC::Grammar.parse("~", :rule<gracing>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'gracing recognized';
+    ok $match, 'gracing recognized';
     isa_ok $match.ast, Str, '$match.ast is a Str';
     is $match.ast, "~", "gracing is ~";
 }
 
 {
     my $match = ABC::Grammar.parse("+fff+", :rule<element>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'long gracing recognized';
+    ok $match, 'long gracing recognized';
     is $match.ast.key, "gracing", '$match.ast.key is gracing';
     isa_ok $match.ast.value, Str, '$match.ast.value is a Str';
     is $match.ast.value, "fff", "gracing is fff";
@@ -135,7 +135,7 @@ L:1/8
 K:D
 »;
     my $match = ABC::Grammar.parse($music, :rule<header>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'tune recognized';
+    ok $match, 'tune recognized';
     isa_ok $match.ast, ABC::Header, '$match.ast is an ABC::Header';
     is $match.ast.get("T").elems, 1, "One T field found";
     is $match.ast.get("T")[0].value, "Cuckold Come Out o' the Amrey", "And it's correct";
@@ -144,7 +144,7 @@ K:D
 
 {
     my $match = ABC::Grammar.parse("e3", :rule<element>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'element recognized';
+    ok $match, 'element recognized';
     isa_ok $match.ast, Pair, '$match.ast is a Pair';
     is $match.ast.key, "stem", "Stem found";
     isa_ok $match.ast.value, ABC::Note, "Value is note";
@@ -152,7 +152,7 @@ K:D
 
 {
     my $match = ABC::Grammar.parse("G2g gdc|", :rule<bar>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'element recognized';
+    ok $match, 'element recognized';
     is $match.ast.elems, 7, '$match.ast has seven elements';
     is $match.ast[3].key, "stem", "Fourth is stem";
     is $match.ast[*-1].key, "barline", "Last is barline";
@@ -160,7 +160,7 @@ K:D
 
 {
     my $match = ABC::Grammar.parse("G2g gdc", :rule<bar>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'element recognized';
+    ok $match, 'element recognized';
     is $match.ast.elems, 6, '$match.ast has six elements';
     is $match.ast[3].key, "stem", "Fourth is stem";
     is $match.ast[*-1].key, "stem", "Last is stem";
@@ -172,7 +172,7 @@ BAB G2G|G2g gdB|c2a B2g|A2=f fcA:|
 »;
 
     my $match = ABC::Grammar.parse($music, :rule<music>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'element recognized';
+    ok $match, 'element recognized';
 #     say $match.ast.perl;
     is $match.ast.elems, 57, '$match.ast has 57 elements';
     # say $match.ast.elems;
@@ -197,7 +197,7 @@ BAB G2G|G2g gdB|c2a B2g|A2=f fcA:|
 »;
 
     my $match = ABC::Grammar.parse($music, :rule<tune>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'tune recognized';
+    ok $match, 'tune recognized';
     isa_ok $match.ast, ABC::Tune, 'and ABC::Tune created';
     ok $match.ast.header.is-valid, "ABC::Tune's header is valid";
     is $match.ast.music.elems, 57, '$match.ast.music has 57 elements';
@@ -205,7 +205,7 @@ BAB G2G|G2g gdB|c2a B2g|A2=f fcA:|
 
 {
     my $match = ABC::Grammar.parse(slurp("samples.abc"), :rule<tune_file>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'samples.abc is a valid tune file';
+    ok $match, 'samples.abc is a valid tune file';
     # say $match.ast.perl;
     is @( $match<tune> ).elems, 3, "Three tunes were found";
     # is @( $match.ast )[0].elems, 3, "Three tunes were found";

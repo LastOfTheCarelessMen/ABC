@@ -6,7 +6,7 @@ plan *;
 
 {
     my $match = ABC::Grammar.parse(slurp("samples.abc"), :rule<tune_file>);
-    isa_ok $match, Match, 'samples.abc is a valid tune file';
+    ok $match, 'samples.abc is a valid tune file';
     is @( $match<tune> ).elems, 3, "Three tunes were found";
 
     my @titles = @( $match<tune> ).map({ @( .<header><header_field> ).grep({ .<header_field_name> eq "T" })[0] }).map({ .<header_field_data> });
