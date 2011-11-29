@@ -93,11 +93,9 @@ grammar ABC::Grammar
         
         # say :$key_signature_name.perl;
 
-        # <[a..g]+[A..G]> should be <ABC::basenote
-        
         my $match = ABC::Grammar.parse($key_signature_name, :rule<key_sig>);
         # say :$match.perl;
-        die "Illegal key signature\n" unless $match ~~ Match;
+        die "Illegal key signature\n" unless $match;
         my $lookup = [~] $match<basenote>.uc, $match[0];
         # say :$lookup.perl;
         my $sharps = %keys{$lookup};
