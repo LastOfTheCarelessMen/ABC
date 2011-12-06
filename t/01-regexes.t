@@ -5,6 +5,15 @@ use ABC::Grammar;
 plan *;
 
 {
+    my $match = ABC::Grammar.parse('"Cmin"', :rule<chord_or_text>);
+    isa_ok $match, Match, 'Got a match';
+    ok $match,  '"Cmin" is a chord';
+    is $match<chord>, "Cmin", '"Cmin" is chord Cmin';
+    is $match<chord>[0]<basenote>, "C", '"Cmin" has base note C';
+    is $match<chord>[0]<chord_type>, "min", '"Cmin" has chord_type "min"';
+}
+
+{
     my $match = ABC::Grammar.parse("^A,", :rule<pitch>);
     isa_ok $match, Match, 'Got a match';
     ok $match,  '"^A," is a pitch';

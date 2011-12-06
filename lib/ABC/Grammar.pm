@@ -54,9 +54,17 @@ grammar ABC::Grammar
     
     regex inline_field { '[' <alpha> ':' $<value>=[.*?] ']' }
     
+    regex chord_accidental { '#' | 'b' | '=' }
+    regex chord_type { [ <alpha> | <digit> | '+' | '-' ]+ }
+    regex chord_newline { '\n' | ';' }
+    regex chord { <basenote> <chord_accidental>? <chord_type>? [ '/' <basenote> <chord-accidental>? ]? <non_quote>* } 
+    regex non_quote { <-["]> }
+    regex text_expression { [ '^' | '<' | '>' | '_' | '@' ] <non_quote>+ }
+    regex chord_or_text { '"' [ <chord> | <text_expression> ] [ <chord_newline> [ <chord> | <text_expression> ] ]* '"' }
+    
     regex element { <broken_rhythm> | <stem> | <rest> | <tuplet> | <slur_begin> | <slur_end>
                     | <gracing> | <grace_notes> | <nth_repeat> | <end_nth_repeat>
-                    | <spacing> | <inline_field> }
+                    | <spacing> | <inline_field> | <chord_or_text> }
     
     regex barline { '||' | '|]' | ':|:' | '|:' | '|' | ':|' | '::' }
     
