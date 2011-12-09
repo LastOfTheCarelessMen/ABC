@@ -157,23 +157,26 @@ class TuneConvertor {
         }
     }
     
-    method WriteBar($lilypond-bar, $duration) {
+    method WrapBar($lilypond-bar, $duration) {
         my $ticks-in-measure = $.context.ticks-in-measure;
+        my $result = "";
         if $duration % $ticks-in-measure != 0 {
-            print "\\partial { 1 / $.context.length.eval }*{ $duration % $ticks-in-measure } ";
+            $result = "\\partial { 1 / $.context.length.eval }*{ $duration % $ticks-in-measure } ";
         }
         
-        print "$lilypond-bar"; 
+        $result ~ $lilypond-bar; 
     }
     
     method SectionToLilypond(@elements) {
-        say "\{";
-    
+        my $chords = "";
+        my $notes = "";
         my $lilypond = "";
         my $duration = 0;
+        my $chord-duration = 0;
         my $suffix = "";
         for @elements -> $element {
             $duration += self.Duration($element);
+            $chord-duration += self.Duration($element);
             given $element.key {
                 when "stem" { 
                     $lilypond ~= self.StemToLilypond($element.value, $suffix); 
@@ -212,8 +215,8 @@ class TuneConvertor {
                     }
                 }
                 when "barline" {
-                    self.WriteBar($lilypond, $duration);
-                    say " |"; 
+                    $notes ~= self.WrapBar($lilypond, $duration);
+                    $notes ~= " |\n"; 
                     $lilypond = "";
                     $duration = 0;
                 }
@@ -242,7 +245,9 @@ class TuneConvertor {
             }
         }
     
-        self.WriteBar($lilypond, $duration);
+        say "\{";
+        $notes ~= self.WrapBar($lilypond, $duration);
+        say $notes;
         say " \}";
     }
     
