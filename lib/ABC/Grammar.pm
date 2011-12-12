@@ -57,7 +57,8 @@ grammar ABC::Grammar
     regex chord_accidental { '#' | 'b' | '=' }
     regex chord_type { [ <alpha> | <digit> | '+' | '-' ]+ }
     regex chord_newline { '\n' | ';' }
-    regex chord { <basenote> <chord_accidental>? <chord_type>? [ '/' <basenote> <chord-accidental>? ]? <non_quote>* } 
+    regex chord { <mainnote=basenote> <mainaccidental=chord_accidental>? <maintype=chord_type>? 
+                  [ '/' <bassnote=basenote> <bass_accidental=chord_accidental>? ]? <non_quote>* } 
     regex non_quote { <-["]> }
     regex text_expression { [ '^' | '<' | '>' | '_' | '@' ] <non_quote>+ }
     regex chord_or_text { '"' [ <chord> | <text_expression> ] [ <chord_newline> [ <chord> | <text_expression> ] ]* '"' }

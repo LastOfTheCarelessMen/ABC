@@ -9,8 +9,45 @@ use ABC::Stem;
 use ABC::Rest;
 use ABC::Tuplet;
 use ABC::BrokenRhythm;
+use ABC::Chord;
 
 plan *;
+
+{
+    my $match = ABC::Grammar.parse('F#', :rule<chord>, :actions(ABC::Actions.new));
+    ok $match, 'chord recognized';
+    isa_ok $match.ast, ABC::Chord, '$match.ast is an ABC::Chord';
+    is $match.ast.main-note, "F", "Pitch F";
+    is $match.ast.main-accidental, "#", "...sharp";
+}
+
+{
+    my $match = ABC::Grammar.parse('Bbmin/G#', :rule<chord>, :actions(ABC::Actions.new));
+    ok $match, 'chord recognized';
+    isa_ok $match.ast, ABC::Chord, '$match.ast is an ABC::Chord';
+    is $match.ast.main-note, "B", "Pitch B";
+    is $match.ast.main-accidental, "b", "...flat";
+    is $match.ast.main-type, "min", "...min";
+    is $match.ast.bass-note, "G", "over G";
+    is $match.ast.bass-accidental, "#", "...#";
+}
+
+{
+    my $match = ABC::Grammar.parse('"F#"', :rule<chord_or_text>, :actions(ABC::Actions.new));
+    ok $match, 'chord_or_text recognized';
+    isa_ok $match.ast[0], ABC::Chord, '$match.ast[0] is an ABC::Chord';
+    is $match.ast[0].main-note, "F", "Pitch F";
+    is $match.ast[0].main-accidental, "#", "...sharp";
+}
+
+{
+    my $match = ABC::Grammar.parse('"F#"', :rule<element>, :actions(ABC::Actions.new));
+    ok $match, 'element recognized';
+    isa_ok $match.ast, Pair, '$match.ast is a Pair';
+    is $match.ast.key, "chord_or_text", '$match.ast.key is "chord_or_text"';
+    is $match.ast.value[0].main-note, "F", "Pitch F";
+    is $match.ast.value[0].main-accidental, "#", "...sharp";
+}
 
 {
     my $match = ABC::Grammar.parse("e3", :rule<mnote>, :actions(ABC::Actions.new));

@@ -7,7 +7,7 @@ use ABC::Note;
 use ABC::Rest;
 use ABC::Tuplet;
 use ABC::BrokenRhythm;
-
+use ABC::Chord;
 
 class ABC::Actions {
     method header_field($/) {
@@ -71,18 +71,31 @@ class ABC::Actions {
     method gracing($/) {
         make $/<long_gracing> ?? $/<long_gracing>.ast !! ~$/;
     }
-
+    
+    method chord($/) {
+        # say "hello?";
+        # say $/<chord_accidental>[0].WHAT;
+        # say $/<chord_accidental>[0].perl;
+        make ABC::Chord.new(~$/<mainnote>, ~$/<mainaccidental>[0] // "", ~$/<maintype>, 
+                            ~$/<bassnote>, ~$/<bass_accidental>);
+    }
+    
+    method chord_or_text($/) {
+        make $/<chord>.map({ $_.ast });
+    }
+    
     method element($/) {
         my $type;
-        for <broken_rhythm stem rest slur_begin slur_end gracing grace_notes nth_repeat end_nth_repeat spacing tuplet inline_field> {
+        for <broken_rhythm stem rest slur_begin slur_end gracing grace_notes nth_repeat end_nth_repeat spacing tuplet inline_field chord_or_text> {
             $type = $_ if $/{$_};
         }
+        # say $type ~ " => " ~ $/{$type}.ast.WHAT;
         
         my $ast = $type => ~$/{$type};
         # say :$ast.perl;
         # say $/{$type}.ast.perl;
         # say $/{$type}.ast.WHAT;
-        if $/{$type}.ast ~~ ABC::Duration || $/{$type}.ast ~~ Pair | Str {
+        if $/{$type}.ast ~~ ABC::Duration || $/{$type}.ast ~~ Pair | Str | List {
             $ast = $type => $/{$type}.ast;
         }
         make $ast;
