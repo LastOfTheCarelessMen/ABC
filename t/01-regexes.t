@@ -2,8 +2,6 @@ use v6;
 use Test;
 use ABC::Grammar;
 
-plan *;
-
 {
     my $match = ABC::Grammar.parse('"Cmin"', :rule<chord_or_text>);
     isa_ok $match, Match, 'Got a match';
@@ -339,6 +337,37 @@ g/f/e/d/ c/d/e/f/ gc e/f/g/e/ | dB/A/ gB +trill+A2 +trill+e2 :|
         is .<header_field>.flat.map({ .<header_field_name> }), "X T S M L K", "Got the right field names";
     }
     is $match<music><line_of_music>.elems, 4, "Four lines matched";
+}
+
+{
+    my $music = q«X:1
+T:Are You Coming From The Races?
+O:from the playing of Frank Maher
+M:2/4
+L:1/8
+R:Single
+K:D
+DE|:F2 F2|AF ED|E2 EF|ED DE|F2 F2|AF ED|E2 D2|
+|1 D2 DE:|2 D2 dc|:B2 Bc|BA FG|AB AF|
+AF dc|B2 Bc|BA FA|B2 A2|1 A2 dc:|2 A2
+
+X:2
+T:Bride's Jig
+O:from the playing of Frank Maher
+M:2/4
+L:1/8
+R:Single
+K:Edor
+|:B E2 G|FE D2|E>F GA|Bc BA|B E2 G|FE D2|E>F GE|A2 A2:|
+|:AB cd|e4|AB cB|BA FA|AB cd|e4|AB cB|A2 A2:|
+»;
+    my $match = ABC::Grammar.parse($music, :rule<tune_file>);
+    isa_ok $match, Match, 'Got a match';
+    ok $match, 'tune_file recognized';
+    
+    is $match<tune>.elems, 2, 'found two tunes';
+    is $match<tune>[0]<music><line_of_music>.elems, 3;
+    is $match<tune>[1]<music><line_of_music>.elems, 2;
 }
 
 done;

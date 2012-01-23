@@ -49,7 +49,7 @@ grammar ABC::Grammar
     
     regex nth_repeat_num { <digit>+ [[',' | '-'] <digit>+]* }
     regex nth_repeat_text { '"' .*? '"' }
-    regex nth_repeat { '[' [ <nth_repeat_num> | <nth_repeat_text> ] }
+    regex nth_repeat { '['? [ <nth_repeat_num> | <nth_repeat_text> ] }
     regex end_nth_repeat { ']' }
     
     regex inline_field { '[' <alpha> ':' $<value>=[.*?] ']' }
@@ -67,7 +67,7 @@ grammar ABC::Grammar
                     | <gracing> | <grace_notes> | <nth_repeat> | <end_nth_repeat>
                     | <spacing> | <inline_field> | <chord_or_text> }
     
-    regex barline { '||' | '|]' | ':|:' | '|:' | '|' | ':|' | '::' }
+    regex barline { '||' | '|]' | ':|:' | '|:' | '|' | ':|' | '::' | '||:' }
     
     regex bar { <element>+ <barline>? }
         
