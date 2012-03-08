@@ -258,6 +258,7 @@ class TuneConvertor {
     
         my $start-of-section = 0;
         loop (my $i = 0; $i < +@elements; $i++) {
+            # say @elements[$i].WHAT;
             if @elements[$i].key eq "nth_repeat"
                || ($i > $start-of-section 
                    && @elements[$i].key eq "barline" 
@@ -281,6 +282,7 @@ class TuneConvertor {
                 say "\\alternative \{";
                 my $endings = 0;
                 loop (; $i < +@elements; $i++) {
+                    # say @elements[$i].WHAT;
                     if @elements[$i].key eq "barline" 
                        && @elements[$i].value ne "|" {
                            self.SectionToLilypond(@elements[$start-of-section ..^ $i]);
@@ -290,6 +292,7 @@ class TuneConvertor {
                     }
                 }
                 if $endings == 1 {
+                    # say @elements[$i].WHAT;
                     self.SectionToLilypond(@elements[$start-of-section ..^ $i]);
                     $start-of-section = $i + 1;
                     $final-bar = True if @elements[$i].value eq '|]';
@@ -330,7 +333,7 @@ for @( $match.ast ) -> $tune {
 
     my $key = $tune.header.get("K")[0].value;
     my $meter = $tune.header.get("M")[0].value;
-    my $length = $tune.header.get("L")[0].value;
+    my $length = $tune.header.get("L") ?? $tune.header.get("L")[0].value !! "1/8";
 
     my $convertor = TuneConvertor.new($key, $meter, $length);
     $convertor.BodyToLilypond($tune.music);
