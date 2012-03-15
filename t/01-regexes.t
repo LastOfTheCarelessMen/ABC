@@ -279,6 +279,15 @@ for ':|:', '|:', '|', ':|', '::', '|]'
 }
 
 {
+    my $match = ABC::Grammar.parse("[M:3/4]", :rule<inline_field>);
+    isa_ok $match, Match, 'Got a match';
+    ok $match, 'inline field recognized';
+    is $match, "[M:3/4]", "Entire string was matched";
+    is $match<alpha>, "M", "Correct field name found";
+    is $match<value>, "3/4", "Correct field value found";
+}
+
+{
     my $line = "g>ecg ec e/f/g/e/ | d/c/B/A/ [K:F] Gd BG B/c/d/B/ |";
     my $match = ABC::Grammar.parse($line, :rule<line_of_music>);
     isa_ok $match, Match, 'Got a match';
@@ -287,6 +296,18 @@ for ':|:', '|:', '|', ':|', '::', '|]'
     is $match<bar>[0], "g>ecg ec e/f/g/e/ |", "First bar is correct";
     is $match<bar>[1], " d/c/B/A/ [K:F] Gd BG B/c/d/B/ |", "Second bar is correct";
     ok @( $match<bar>[1]<element> ).grep("[K:F]"), "Key change got recognized";
+    # say $match<ABC::Grammar::line_of_music>.perl;
+}
+
+{
+    my $line = "g>ecg ec e/f/g/e/ | d/c/B/A/ [M:C] Gd BG B/c/d/B/ |";
+    my $match = ABC::Grammar.parse($line, :rule<line_of_music>);
+    isa_ok $match, Match, 'Got a match';
+    ok $match, 'line of music recognized';
+    is $match, $line, "Entire line was matched";
+    is $match<bar>[0], "g>ecg ec e/f/g/e/ |", "First bar is correct";
+    is $match<bar>[1], " d/c/B/A/ [M:C] Gd BG B/c/d/B/ |", "Second bar is correct";
+    ok @( $match<bar>[1]<element> ).grep("[M:C]"), "Meter change got recognized";
     # say $match<ABC::Grammar::line_of_music>.perl;
 }
 

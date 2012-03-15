@@ -339,6 +339,6 @@ for @( $match.ast ) -> $tune {
     $convertor.BodyToLilypond($tune.music);
     HeaderToLilypond($tune.header);
 
-    say "}";    
+    say "}\n\n";    
 }
 
