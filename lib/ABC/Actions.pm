@@ -72,6 +72,14 @@ class ABC::Actions {
         make $/<long_gracing> ?? $/<long_gracing>.ast !! ~$/;
     }
     
+    method slur_begin($/) {
+        make ~$/<slur_begin>;
+    }
+    
+    method slur_end($/) {
+        make ~$/<slur_end>;
+    }
+    
     method chord($/) {
         # say "hello?";
         # say $/<chord_accidental>[0].WHAT;

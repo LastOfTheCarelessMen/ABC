@@ -242,6 +242,12 @@ class TuneConvertor {
                         }
                     }
                 }
+                when "slur_begin" {
+                    $suffix ~= "(";
+                }
+                when "slur_end" {
+                    $lilypond .= subst(/(\s+)$/, { ")$0" });
+                }
                 # .say;
             }
         }
