@@ -150,6 +150,7 @@ class TuneConvertor {
                 " "
                 ~ $.context.get-Lilypond-pitch($stem.pitch)
                 ~ $.context.get-Lilypond-duration($stem)
+                ~ ($stem.is-tie ?? '~' !! '')
                 ~ $suffix
                 ~ " ";
             }
