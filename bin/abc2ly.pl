@@ -5,6 +5,7 @@ use ABC::Grammar;
 use ABC::Actions;
 use ABC::Duration;
 use ABC::Note;
+use ABC::LongRest;
 
 my $paper-size = "letter"; # or switch to "a4" for European paper
 
@@ -94,6 +95,14 @@ class Context {
         given $.meter {
             when "C" { 1 / $.length.eval; }
             $.meter.eval / $.length.eval;
+        }
+    }
+
+    method get-Lilypond-measure-length() {
+        given $.meter {
+            when "C" | "4/4" { "1" }
+            when "3/4" | 6/8 { "2." }
+            when "2/4" { "2" }
         }
     }
     
@@ -247,6 +256,12 @@ class TuneConvertor {
                 }
                 when "slur_end" {
                     $lilypond .= subst(/(\s+)$/, { ")$0" });
+                }
+                when "multi_measure_rest" {
+                    $lilypond ~= "\\compressFullBarRests R"
+                               ~ $!context.get-Lilypond-measure-length
+                               ~ "*"
+                               ~ $element.value.measures_rest ~ " ";
                 }
                 # .say;
             }

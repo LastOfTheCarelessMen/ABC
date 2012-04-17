@@ -8,6 +8,7 @@ use ABC::Rest;
 use ABC::Tuplet;
 use ABC::BrokenRhythm;
 use ABC::Chord;
+use ABC::LongRest;
 
 class ABC::Actions {
     method header_field($/) {
@@ -47,6 +48,10 @@ class ABC::Actions {
     method rest($/) {
         make ABC::Rest.new(~$<rest_type>, $<note_length>.ast);
     }
+
+    method multi_measure_rest($/) {
+        make ABC::LongRest.new(~$<number>);
+    }
     
     method tuplet($/) {
         make ABC::Tuplet.new(3, @( $<stem> )>>.ast);
@@ -73,11 +78,11 @@ class ABC::Actions {
     }
     
     method slur_begin($/) {
-        make ~$/<slur_begin>;
+        make ~$/;
     }
     
     method slur_end($/) {
-        make ~$/<slur_end>;
+        make ~$/;
     }
     
     method chord($/) {
@@ -94,7 +99,7 @@ class ABC::Actions {
     
     method element($/) {
         my $type;
-        for <broken_rhythm stem rest slur_begin slur_end gracing grace_notes nth_repeat end_nth_repeat spacing tuplet inline_field chord_or_text> {
+        for <broken_rhythm stem rest slur_begin slur_end multi_measure_rest gracing grace_notes nth_repeat end_nth_repeat spacing tuplet inline_field chord_or_text> {
             $type = $_ if $/{$_};
         }
         # say $type ~ " => " ~ $/{$type}.ast.WHAT;
@@ -103,7 +108,7 @@ class ABC::Actions {
         # say :$ast.perl;
         # say $/{$type}.ast.perl;
         # say $/{$type}.ast.WHAT;
-        if $/{$type}.ast ~~ ABC::Duration || $/{$type}.ast ~~ Pair | Str | List {
+        if $/{$type}.ast ~~ ABC::Duration | ABC::LongRest | Pair | Str | List {
             $ast = $type => $/{$type}.ast;
         }
         make $ast;

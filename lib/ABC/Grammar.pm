@@ -22,6 +22,7 @@ grammar ABC::Grammar
     
     regex rest_type { <[x..z]> }
     regex rest { <rest_type> <note_length> }
+    regex multi_measure_rest { 'Z' <number> }
     
     regex slur_begin { '(' }
     regex slur_end { ')' }
@@ -63,7 +64,8 @@ grammar ABC::Grammar
     regex text_expression { [ '^' | '<' | '>' | '_' | '@' ] <non_quote>+ }
     regex chord_or_text { '"' [ <chord> | <text_expression> ] [ <chord_newline> [ <chord> | <text_expression> ] ]* '"' }
     
-    regex element { <broken_rhythm> | <stem> | <rest> | <tuplet> | <slur_begin> | <slur_end>
+    regex element { <broken_rhythm> | <stem> | <rest> | <tuplet> | <slur_begin> | <slur_end> 
+                    | <multi_measure_rest>
                     | <gracing> | <grace_notes> | <nth_repeat> | <end_nth_repeat>
                     | <spacing> | <inline_field> | <chord_or_text> }
     
