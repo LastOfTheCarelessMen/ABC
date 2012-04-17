@@ -86,8 +86,8 @@ class Context {
         %.cheat-length-map{$abc-duration.duration-to-str};
     }
     
-    method write-meter() {
-        print "\\time $.meter ";
+    method meter-to-string() {
+        "\\time $.meter ";
     }
 
     method ticks-in-measure() {
@@ -97,7 +97,7 @@ class Context {
         }
     }
     
-    method write-key() {
+    method key-to-string() {
         my $sf = %.key.map({ "{.key}{.value}" }).sort.Str.lc;
         my $major-key-name;
         given $sf {
@@ -117,7 +117,7 @@ class Context {
             when "a_ b_ c_ d_ e_ g_"    { $major-key-name = "ges"; }
             when "a_ b_ c_ d_ e_ f_ g_" { $major-key-name = "ces"; }
         }
-        say "\\key $major-key-name \\major";
+        "\\key $major-key-name \\major\n";
     }
 }
 
@@ -227,13 +227,13 @@ class TuneConvertor {
                             $!context = Context.new($element.value.value, 
                                                     $!context.meter, 
                                                     $!context.length); 
-                            $!context.write-key;
+                            $lilypond ~= $!context.key-to-string;
                         }
                         when "M" {
                             $!context = Context.new($!context.key-name,
                                                     $element.value.value,
                                                     $!context.length);
-                            $!context.write-meter;
+                            $lilypond ~= $!context.meter-to-string;
                         }
                         when "L" {
                             $!context = Context.new($!context.key-name,
@@ -260,8 +260,8 @@ class TuneConvertor {
     
     method BodyToLilypond(@elements) {
         say "\{";
-        $.context.write-key;
-        $.context.write-meter;
+        print $.context.key-to-string;
+        printf $.context.meter-to-string;
     
         my $start-of-section = 0;
         loop (my $i = 0; $i < +@elements; $i++) {
