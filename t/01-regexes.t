@@ -370,8 +370,8 @@ L:1/8
 R:Single
 K:D
 DE|:F2 F2|AF ED|E2 EF|ED DE|F2 F2|AF ED|E2 D2|
-|1 D2 DE:|2 D2 dc|:B2 Bc|BA FG|AB AF|
-AF dc|B2 Bc|BA FA|B2 A2|1 A2 dc:|2 A2
+|[1 D2 DE:|[2 D2 dc|:B2 Bc|BA FG|AB AF|
+AF dc|B2 Bc|BA FA|B2 A2|[1 A2 dc:|[2 A2
 
 X:2
 T:Bride's Jig
