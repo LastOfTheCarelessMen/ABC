@@ -48,6 +48,15 @@ use ABC::Chord;
 }
 
 {
+    my $match = ABC::Grammar.parse('"^Bb whistle"', :rule<element>, :actions(ABC::Actions.new));
+    ok $match, 'element recognized';
+    isa_ok $match.ast, Pair, '$match.ast is a Pair';
+    is $match.ast.key, "chord_or_text", '$match.ast.key is "chord_or_text"';
+    isa_ok $match.ast.value[0], Str, "And it's text";
+    is $match.ast.value[0], "^Bb whistle", '$match.ast.value[0] is ^Bb whistle';
+}
+
+{
     my $match = ABC::Grammar.parse("e3", :rule<mnote>, :actions(ABC::Actions.new));
     ok $match, 'element recognized';
     isa_ok $match.ast, ABC::Note, '$match.ast is an ABC::Note';
