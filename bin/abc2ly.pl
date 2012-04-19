@@ -193,7 +193,7 @@ class TuneConvertor {
                     $suffix = ""; 
                 }
                 when "rest" { 
-                    $lilypond ~=  " r{ $.context.get-Lilypond-duration($element.value) } "; 
+                    $lilypond ~=  " r{ $.context.get-Lilypond-duration($element.value) }$suffix "; 
                     $suffix = ""; 
                 }
                 when "tuplet" { 
@@ -222,6 +222,11 @@ class TuneConvertor {
                         when "." { $suffix ~= "\\staccato"; }
                         when /^p+$/ | "mp" | "mf" | /^f+$/ 
                                  { $suffix ~= "\\" ~ $element.value; }
+                    }
+                }
+                when "long_gracing" {
+                    given $element.value {
+                        when "fermata" { $suffix ~= "\\fermata"; }
                     }
                 }
                 when "barline" {
