@@ -257,13 +257,25 @@ class TuneConvertor {
                     $suffix ~= "(";
                 }
                 when "slur_end" {
-                    $lilypond .= subst(/(\s+)$/, { ")$0" });
+                    $lilypond .= subst(/(\s+)$/, { ")$_" });
                 }
                 when "multi_measure_rest" {
                     $lilypond ~= "\\compressFullBarRests R"
                                ~ $!context.get-Lilypond-measure-length
                                ~ "*"
                                ~ $element.value.measures_rest ~ " ";
+                }
+                when "chord_or_text" {
+                    for $element.value -> $chord_or_text {
+                        $*ERR.say: :$chord_or_text.perl;
+                        if $chord_or_text ~~ ABC::Chord {
+                            $*ERR.say: "Chord found but not processed";
+                        } else {
+                            given $element.value {
+                                when /^ '^'(.*)/ { $suffix ~= '^"' ~ $0 ~ '" ' }
+                            }
+                        }
+                    }
                 }
                 # .say;
             }
