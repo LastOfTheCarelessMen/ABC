@@ -112,7 +112,6 @@ use ABC::Grammar;
     my $match = ABC::Grammar.parse("+trill+", :rule<element>);
     isa_ok $match, Match, 'Got a match';
     ok $match, '"+trill+" is an element';
-    $*ERR.say: $match<gracing>;
     is $match<gracing>, "+trill+", '"+trill+" gracing is +trill+';
 }
 
