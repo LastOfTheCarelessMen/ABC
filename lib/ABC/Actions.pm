@@ -89,8 +89,8 @@ class ABC::Actions {
         # say "hello?";
         # say $/<chord_accidental>[0].WHAT;
         # say $/<chord_accidental>[0].perl;
-        make ABC::Chord.new(~$/<mainnote>, ~$/<mainaccidental>[0] // "", ~$/<maintype>, 
-                            ~$/<bassnote>, ~$/<bass_accidental>);
+        make ABC::Chord.new(~$/<mainnote>, ~($/<mainaccidental> // ""), ~($/<maintype> // ""), 
+                            ~($/<bassnote> // ""), ~($/<bass_accidental> // ""));
     }
     
     method chord_or_text($/) {
