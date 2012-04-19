@@ -2,8 +2,6 @@ use v6;
 use Test;
 use ABC::Grammar;
 
-plan *;
-
 {
     my %key = ABC::Grammar::key_signature("D");
     is %key.elems, 2, "D has two sharps";

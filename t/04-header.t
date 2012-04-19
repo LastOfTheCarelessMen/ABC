@@ -2,8 +2,6 @@ use v6;
 use Test;
 use ABC::Header;
 
-plan *;
-
 isa_ok ABC::Header.new, ABC::Header, "Can create ABC::Header object";
 
 {

@@ -11,8 +11,6 @@ use ABC::Tuplet;
 use ABC::BrokenRhythm;
 use ABC::Chord;
 
-plan *;
-
 {
     my $match = ABC::Grammar.parse('F#', :rule<chord>, :actions(ABC::Actions.new));
     ok $match, 'chord recognized';

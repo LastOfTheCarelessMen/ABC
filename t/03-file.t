@@ -2,8 +2,6 @@ use v6;
 use Test;
 use ABC::Grammar;
 
-plan *;
-
 {
     my $match = ABC::Grammar.parse(slurp("samples.abc"), :rule<tune_file>);
     ok $match, 'samples.abc is a valid tune file';
