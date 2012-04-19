@@ -3,11 +3,11 @@ use v6;
 role ABC::Duration {
     has $.ticks;
 
-    our multi sub duration-from-parse($top) is export {
+    multi sub duration-from-parse($top) is export {
         ABC::Duration.new(:ticks(($top // 1).Int));
     }
     
-    our multi sub duration-from-parse($top, $bottom) is export {
+    multi sub duration-from-parse($top, $bottom) is export {
         ABC::Duration.new(:ticks(($top // 1).Int / ($bottom // 2).Int));
     }
     
