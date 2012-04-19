@@ -34,7 +34,7 @@ class ABC::Actions {
     method mnote($/) {
         make ABC::Note.new(~$<pitch>, 
                            $<note_length>.ast, 
-                           $<tie> eq '-');
+                           ?$<tie>);
     }
     
     method stem($/) {
@@ -120,12 +120,17 @@ class ABC::Actions {
     
     method bar($/) {
         my @bar = @( $<element> )>>.ast;
-        @bar.push($<barline>>>.ast);
+        if $<barline> {
+            @bar.push($<barline>>>.ast);
+        }
         make @bar;
     }
     
     method line_of_music($/) {
-        my @line = $<barline>>>.ast;
+        my @line;
+        if $<barline> {
+            @line.push($<barline>>>.ast);
+        }
         my @bars = @( $<bar> )>>.ast;
         for @bars -> $bar {
             for $bar.list {
