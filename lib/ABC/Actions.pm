@@ -99,7 +99,7 @@ class ABC::Actions {
     
     method element($/) {
         my $type;
-        for <broken_rhythm stem rest slur_begin slur_end multi_measure_rest long_gracing gracing grace_notes nth_repeat end_nth_repeat spacing tuplet inline_field chord_or_text> {
+        for <broken_rhythm stem rest slur_begin slur_end multi_measure_rest gracing grace_notes nth_repeat end_nth_repeat spacing tuplet inline_field chord_or_text> {
             $type = $_ if $/{$_};
         }
         # say $type ~ " => " ~ $/{$type}.ast.WHAT;

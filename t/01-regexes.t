@@ -112,6 +112,7 @@ use ABC::Grammar;
     my $match = ABC::Grammar.parse("+trill+", :rule<element>);
     isa_ok $match, Match, 'Got a match';
     ok $match, '"+trill+" is an element';
+    $*ERR.say: $match<gracing>;
     is $match<gracing>, "+trill+", '"+trill+" gracing is +trill+';
 }
 
@@ -190,7 +191,7 @@ use ABC::Grammar;
 }
 
 {
-    my $match = ABC::Grammar.parse("(3abcd", :rule<tuplet>);
+    my $match = ABC::Grammar.parse("(3abc", :rule<tuplet>);
     isa_ok $match, Match, 'Got a match';
     ok $match, '"(3abc" is a tuplet';
     is ~$match, "(3abc", '"(3abc" was the portion matched';

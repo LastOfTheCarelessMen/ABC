@@ -65,7 +65,7 @@ grammar ABC::Grammar
     regex chord_or_text { '"' [ <chord> | <text_expression> ] [ <chord_newline> [ <chord> | <text_expression> ] ]* '"' }
     
     regex element { <broken_rhythm> | <stem> | <rest> | <tuplet> | <slur_begin> | <slur_end> 
-                    | <multi_measure_rest> | <long_gracing>
+                    | <multi_measure_rest>
                     | <gracing> | <grace_notes> | <nth_repeat> | <end_nth_repeat>
                     | <spacing> | <inline_field> | <chord_or_text> }
     
