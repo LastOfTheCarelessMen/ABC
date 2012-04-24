@@ -158,13 +158,21 @@ class TuneConvertor {
     method StemToLilypond($stem, $suffix = "") {
         given $stem {
             when ABC::Note {
-                " "
-                ~ $.context.get-Lilypond-pitch($stem.pitch)
-                ~ $.context.get-Lilypond-duration($stem)
-                ~ ($stem.is-tie ?? '~' !! '')
-                ~ $suffix
-                ~ " ";
+                " " ~ $.context.get-Lilypond-pitch($stem.pitch)
+                    ~ $.context.get-Lilypond-duration($stem)
+                    ~ ($stem.is-tie ?? '~' !! '')
+                    ~ $suffix
+                    ~ " ";
             }
+            
+            when ABC::Stem {
+                " <" ~ $stem.notes.map({ $.context.get-Lilypond-pitch($_.pitch) }).join(' ') ~ ">"
+                     ~ $.context.get-Lilypond-duration($stem.notes[0])
+                     ~ ($stem.notes[0].is-tie ?? '~' !! '')
+                     ~ $suffix
+                     ~ " ";
+            }
+            
             "";
         }
     }
