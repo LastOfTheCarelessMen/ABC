@@ -9,6 +9,7 @@ use ABC::Tuplet;
 use ABC::BrokenRhythm;
 use ABC::Chord;
 use ABC::LongRest;
+use ABC::GraceNotes;
 
 class ABC::Actions {
     method header_field($/) {
@@ -65,6 +66,25 @@ class ABC::Actions {
                                    $<stem>[1].ast);
     }
 
+    method grace_note($/) {
+        make ABC::Note.new(~$<pitch>, 
+                           $<note_length>.ast,
+                           False);
+    }
+    
+    method grace_note_stem($/) {
+        if @( $<grace_note> ) == 1 {
+            make $<grace_note>[0].ast;
+        } else {
+            make ABC::Stem.new(@( $<grace_note> )>>.ast);
+        }
+    }
+
+    method grace_notes($/) {
+        make ABC::GraceNotes.new(?$<acciaccatura>, @( $<grace_note_stem> )>>.ast);
+    }
+
+    
     method inline_field($/) {
         make ~$/<alpha> => ~$/<value>;
     }
@@ -110,7 +130,7 @@ class ABC::Actions {
         # say :$ast.perl;
         # say $/{$type}.ast.perl;
         # say $/{$type}.ast.WHAT;
-        if $/{$type}.ast ~~ ABC::Duration | ABC::LongRest | Pair | Str | List {
+        if $/{$type}.ast ~~ ABC::Duration | ABC::LongRest | ABC::GraceNotes | Pair | Str | List {
             $ast = $type => $/{$type}.ast;
         }
         make $ast;

@@ -39,6 +39,15 @@ use ABC::Chord;
 }
 
 {
+    my $match = ABC::Grammar.parse('{gf}', :rule<grace_notes>, :actions(ABC::Actions.new));
+    ok $match, 'grace_notes recognized';
+    isa_ok $match.ast, ABC::GraceNotes, '$match.ast is an ABC::GraceNotes';
+    nok $match.ast.acciaccatura, "It's not an acciaccatura";
+    is $match.ast.notes[0].pitch, "g", "Pitch g found";
+    is $match.ast.notes[1].pitch, "f", "Pitch g found";
+}
+
+{
     my $match = ABC::Grammar.parse('"F#"', :rule<element>, :actions(ABC::Actions.new));
     ok $match, 'element recognized';
     isa_ok $match.ast, Pair, '$match.ast is a Pair';

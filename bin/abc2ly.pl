@@ -287,6 +287,23 @@ class TuneConvertor {
                         }
                     }
                 }
+                when "grace_notes" {
+                    $*ERR.say: "Unused suffix in grace note code: $suffix" if $suffix;
+                    
+                    $lilypond ~= "\\grace \{";
+                    if $element.value.notes == 1 {
+                        $lilypond ~= self.StemToLilypond($element.value.notes[0], ""); 
+                    } else {
+                        $lilypond ~= self.StemToLilypond($element.value.notes[0], "[");
+                        for 1..^($element.value.notes - 1) {
+                            $lilypond ~= self.StemToLilypond($element.value.notes[$_], "");
+                        }
+                        $lilypond ~= self.StemToLilypond($element.value.notes[*-1], "]");
+                    }
+                    $lilypond ~= " \} ";
+                    
+                    $suffix = "";
+                }
                 # .say;
             }
         }
@@ -338,10 +355,9 @@ class TuneConvertor {
                     }
                 }
                 if $endings == 1 {
-                    # say @elements[$i].WHAT;
                     self.SectionToLilypond(@elements[$start-of-section ..^ $i]);
                     $start-of-section = $i + 1;
-                    $final-bar = True if @elements[$i].value eq '|]';
+                    $final-bar = True if $i < +@elements && @elements[$i].value eq '|]';
                 }
                 say "\}";
                 
