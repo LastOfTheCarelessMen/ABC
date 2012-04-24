@@ -173,7 +173,7 @@ class TuneConvertor {
                      ~ " ";
             }
             
-            "";
+            die "Unrecognized alleged stem: " ~ $stem.perl;
         }
     }
     
