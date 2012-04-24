@@ -64,7 +64,7 @@ class Context {
         if $match<accidental> {
             $nominal-pitch;
         } else {
-            ($.key{$match<basenote>.uc} // "") ~ $match<basenote> ~ $match<octave>;
+            ($.key{$match<basenote>.uc} // "") ~ $match<basenote> ~ ($match<octave> // "");
         }
     }
     
@@ -76,14 +76,16 @@ class Context {
         
         my $octave = +((~$match<basenote>) ~~ 'a'..'z');
         given $match<octave> {
+            when !*.defined { } # skip if no additional octave info
             when /\,/ { $octave -= (~$match<octave>).chars }
             when /\'/ { $octave += (~$match<octave>).chars }
         }
         
-        $match<basenote>.lc ~ %accidental-map{~$match<accidental>} ~ %octave-map{$octave};
+        $match<basenote>.lc ~ %accidental-map{~($match<accidental> // "")} ~ %octave-map{$octave};
     }
 
     method get-Lilypond-duration(ABC::Duration $abc-duration) {
+        die "Unknown duration { $abc-duration.duration-to-str }" unless %.cheat-length-map{$abc-duration.duration-to-str};
         %.cheat-length-map{$abc-duration.duration-to-str};
     }
     
