@@ -108,7 +108,7 @@ grammar ABC::Grammar
         my $match = ABC::Grammar.parse($key_signature_name, :rule<key_sig>);
         # say :$match.perl;
         die "Illegal key signature\n" unless $match;
-        my $lookup = [~] $match<basenote>.uc, $match[0];
+        my $lookup = $match<basenote>.uc ~ ($match[0] // "");
         # say :$lookup.perl;
         my $sharps = %keys{$lookup};
 
@@ -160,7 +160,7 @@ grammar ABC::Grammar
     }
 }
 
-sub header_hash($header_match)
+sub header_hash($header_match) #OK
 {
     gather for $header_match<header_field>
     {
