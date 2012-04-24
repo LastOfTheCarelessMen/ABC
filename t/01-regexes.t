@@ -312,6 +312,25 @@ for ':|:', '|:', '|', ':|', '::', '|]'
 }
 
 {
+    my $line = "| [K:F] Gd BG [B/c/d/B/]|";
+    my $match = ABC::Grammar.parse($line, :rule<line_of_music>);
+    isa_ok $match, Match, 'Got a match';
+    ok $match, 'line of music recognized';
+    is $match, $line, "Entire line was matched";
+    is $match<bar>[0]<element>[1], "[K:F]", "Key signature change is correctly captured";
+    # is $match<bar>[1], " d/c/B/A/ [K:F] Gd BG B/c/d/B/ |", "Second bar is correct";
+}
+
+{
+    my $line = 'E2 CE GCEG|c4 B3 ^F|(A2 G2) =F2 D2|C4 {B,C}E2 D>E|[1 (D4 C2) z2:|[2 (D4 C2) z3/2 [G/2D/2]|';
+    my $match = ABC::Grammar.parse($line, :rule<line_of_music>);
+    isa_ok $match, Match, 'Got a match';
+    ok $match, 'line of music recognized';
+    is $match, $line, "Entire line was matched";
+    is $match<bar>[5]<element>[0], "[2", "nth repeat works";
+}
+
+{
     my $music = q«A/B/c/A/ +trill+c>d e>deg | GG +trill+B>c d/B/A/G/ B/c/d/B/ |
     A/B/c/A/ c>d e>deg | dB/A/ gB +trill+A2 +trill+e2 ::
     g>ecg ec e/f/g/e/ | d/c/B/A/ Gd BG B/c/d/B/ | 
