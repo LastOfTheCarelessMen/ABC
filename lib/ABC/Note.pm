@@ -13,4 +13,8 @@ class ABC::Note does ABC::Duration {
     method Str() {
         $.pitch ~ self.duration-to-str ~ ($.is-tie ?? "-" !! "");
     }
+
+    method perl() {
+        "ABC::Note.new({ $.pitch.perl }, { $.ticks.perl }, { $.is-tie.perl })";
+    }
 }
