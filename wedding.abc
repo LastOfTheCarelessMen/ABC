@@ -17,9 +17,25 @@ K:C
 z6 (3CCC|C4 z2 (3CCC|C4 z2 (3CCC|[C2E2] (3[CE][CE][CE] [C2E2] (3[CE][CE][CE]|
 [C2E2G2] (3[CEG][CEG][CEG] [C2E2G2] (3[CEG][CEG][CEG]|
 c4 B3 ^F|(A2 G2) =F2 D2|C4 {B,C}D2 G,>D|E2 CE GCEG|c4 B3 ^F|(A2 G2) =F2 D2|
-C4 {B,C}E2 D>E|(D4 C2) (3CCC| C2 (3CEG c2 (3CCC|C2 (3EGc e2 (3CCC|[C2E2] (3EGc E2 (3Gce|
+C4 {B,C}E2 D>E|(D4 C2) (3CCC| C2 (3CEG c2 (3CCC|C2 (3EGc e2 (3CCC|[C2E2] (3EGc e2 (3Gce|
 g2 (3Gce g2 (3ceg | c4 B3 ^F|(A2 G2) =F2 D2|C4 {B,C}D2 G,>D|E2 CE GCEG|c4 B3 ^F|(A2 G2) =F2 D2|
 C4 {B,C}E2 D>E|(D4 C2) (3CCC|: c4 c3c|(e2 d2) B2 G2|G3c c3e|(e2 d2) B2 G2|G3e e3g|
 (g4 f2) e2|d2 (^c>e d2) A>c|B2 G2 A2 B2|c4 B3 ^F|(A2 G2) =F2 D2|C4 {B,C}D2 G,>D|
 E2 CE GCEG|c4 B3 ^F|(A2 G2) =F2 D2|C4 {B,C}E2 D>E|[1 (D4 C2) z2:|[2 (D4 C2) z3/2 [G/2D/2]|
-|: [K:G] [G3/2D3/2]B,/2 B,3/2[B/2G/2] [B3/2G3/2]G/2 G3/2[d/2B/2]|
+|: [K:G] [G3/2D3/2]B,/2 B,3/2[B/2G/2] [B3/2G3/2]D/2 D3/2[d/2B/2]|
+[d3/2B3/2]G/2 G3/2[e/2g/2] [e3/2g3/2]G/2 G3/2[c/2e/2]|
+[B3/2d3/2]G/2 G3/2[e/2g/2] [e3/2g3/2]G/2 G3/2c/2|
+[G3/2B3/2]G/2 G3/2[B/2d/2] [B3/2d3/2]D/2 D3/2[G/2B/2]|
+[F3/2A3/2]D/2 D3/2[B/2d/2] [B3/2d3/2]D/2 D3/2[G/2B/2]|
+[1 [F7/2A7/2] D/ D>D D3/2[D/G/]:| [2 [F4A4] D2F2|
+|: [F3/2B3/2]B,/2 B,3/2[B/2^d/2] [B3/2^d3/2]F/2 F3/2[^d/2f/2]|
+[^d3/2f3/2]B/2 B3/2[g/2b/2] [g3/2b3/2]B/2 B3/2[e/2g/2]|
+[^d3/2f3/2]B/2 B3/2[e/2g/2] [e3/2g3/2]B/2 B3/2e/2|
+^d3/2B/2 B3/2[^d/2f/2] [^d2f2]D2|
+[G3/2D3/2]G,/2 G,3/2[B/2G/2] [B3/2G3/2]D/2 D3/2[d/2B/2]|
+[d3/2B3/2]G/2 G3/2[e/2g/2] [e3/2g3/2]G/2 G3/2[c/2e/2]|
+[B3/2d3/2]G/2 G3/2[e/2g/2] [e3/2g3/2]G/2 G3/2[A/2c/2]|
+[1 [G4B4] z2 F2:|[2 [G4B4] z4|]
+
+
+
