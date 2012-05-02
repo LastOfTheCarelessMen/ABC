@@ -4,14 +4,20 @@ C:Pachelbel
 M:2/2
 L:1/8
 K:D
-DFAd CEAc|B,DFB A,CFA|B,DGB A,DFA|B,DGB CEAc|
-f4 e4|d4 c4|B4 A4|B4 c4|
+"D" DFAd "A" CEAc|"Bm" B,DFB "F#m" A,CFA|"G" B,DGB "D" A,DFA|"G" B,DGB "A" CEAc|
+"D" f4 "A" e4|"Bm" d4 "F#m" c4|"G" B4 "D" A4|"G" "A" B4 c4|
 d4 c4|B4 A4|G4 F4|G4 E4|
 (D2 F2) (A2 G2)|(F2 D2) (F2 E2)|(D2 B,2) (D2 A2)|(G2 B2) (A2 G2)|
-(F2 D2) (E2 c2)|(d2 f2) (a2 A2)|(B2 G2) (A2 F2)|D2 d2 +trill+d>c|
+(F2 D2) (E2 c2)|(d2 f2) (a2 A2)|(B2 G2) (A2 F2)|D2 d2 +trill+d3c|
 dcdD CAEF|DdcB cfab|gfeg fedc|BAGF EGFE|
 DEFG AEAG|FBAG AGFE|DB,Bc dcBA|GFEB ABAG|
 Fz f2 e4|z2 d2 f4|b4 a4|b4 c'4|
+d'2 d2 c4|z2 B2 d4|d6 d2|d2 g2 e2 a2|
+(af/g/) (af/g/) a/(A/B/c/ d/e/f/g/)|(fd/e/) f(F/G/)(A/B/A/G/ A/F/G/A/)|
+(GB/A/ GF/E/) (F/E/D/E/ F/G/A/B/)|(GB/A/ Bc/d/) (A/B/c/d/ e/f/g/a/)|
+(fd/e/ fe/d/) (e/c/d/e/ f/e/d/c/)|(dB/c/) d(D/E/)(F/G/F/E/ F/d/c/d/)|
+(Bd/c/ BA/G/) (A/G/F/G/ A/B/c/d/)|(Bd/c/ dc/B/) (c/d/e/d/ c/d/B/c/)|
+dz3 cz3|Bz3 dz3|Dz3 Dz3|Dz3 Ez3|+fermata+D8|]
 
 X:2
 T:Bridal March
@@ -20,8 +26,8 @@ M:2/4
 L:1/8
 K:G
 [D2d2][D3/2d3/2][D/d/]|[D2d2][D2d2]|[D4d4]|[D4d4]|
-|:(D2 G) z/G/|G3z|(D2 A) z/F/|G3z|(D2 G>c|
-c2 B>A|G2 F>G|A3)z|(D2 G) z/G/|G3z|(D2 A) z/F/|G3z|(D2 G>B|d2 B>G)|
+|:"G" (D2 G) z/G/|G3z|"G" (D2 "D" A) z/F/|"G" G3z|"G" (D2 G>c|
+"C" c2 B>A|"G" G2 F>G|"D" A3)z|"G" (D2 G) z/G/|G3z|"G" (D2 "D" A) z/F/|G3z|(D2 G>B|d2 B>G)|
 (E2 A>B|G3) G|c2 BA|E2 E2|F2 G>A|A3 d|c2 BA|E2 E2|
 (E2 F>^G)|^G4|(B2 ^cB|A2 ^G2)|
 
@@ -39,10 +45,4 @@ g2 (3Gce g2 (3ceg | c4 B3 ^F|(A2 G2) =F2 D2|C4 {B,C}D2 G,>D|E2 CE GCEG|c4 B3 ^F|
 C4 {B,C}E2 D>E|(D4 C2) (3CCC|: c4 c3c|(e2 d2) B2 G2|G3c c3e|(e2 d2) B2 G2|G3e e3g|
 (g4 f2) e2|d2 (^c>e d2) A>c|B2 G2 A2 B2|c4 B3 ^F|(A2 G2) =F2 D2|C4 {B,C}D2 G,>D|
 E2 CE GCEG|c4 B3 ^F|(A2 G2) =F2 D2|C4 {B,C}E2 D>E|[1 (D4 C2) z2:|[2 (D4 C2) |]
-
-
-
-
-
-
 
