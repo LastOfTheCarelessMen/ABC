@@ -12,6 +12,10 @@ class ABC::Chord {
     }
 
     method Str() {
-        $.main-type ~ $.main-accidental ~ $.main-type ~ ($.bass-note ?? '/' ~ $.bass-note ~ $.bass-accidental !! "");
+        $.main-note ~ $.main-accidental ~ $.main-type ~ ($.bass-note ?? '/' ~ $.bass-note ~ $.bass-accidental !! "");
+    }
+
+    method perl() {
+        "ABC::Chord.new({ $.main-note.perl }, { $.main-accidental.perl }, { $.main-type.perl }, { $.bass-note.perl }, { $.bass-accidental.perl })";
     }
 }

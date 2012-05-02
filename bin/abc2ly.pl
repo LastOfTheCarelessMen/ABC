@@ -280,7 +280,7 @@ class TuneConvertor {
                     for @($element.value) -> $chord_or_text {
                         $*ERR.say: :$chord_or_text.perl;
                         if $chord_or_text ~~ ABC::Chord {
-                            $*ERR.say: "Chord found but not processed";
+                            $suffix ~= '^"' ~ $chord_or_text ~ '"';
                         } else {
                             given $element.value {
                                 when /^ '^'(.*)/ { $suffix ~= '^"' ~ $0 ~ '" ' }
