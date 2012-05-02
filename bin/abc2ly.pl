@@ -3,7 +3,7 @@ use ABC::Header;
 use ABC::Tune;
 use ABC::Grammar;
 use ABC::Actions;
-use ABC::Duration;
+use ABC::Duration; #OK
 use ABC::Note;
 use ABC::LongRest;
 
@@ -189,7 +189,6 @@ class TuneConvertor {
     }
     
     method SectionToLilypond(@elements) {
-        my $chords = "";
         my $notes = "";
         my $lilypond = "";
         my $duration = 0;
@@ -278,7 +277,6 @@ class TuneConvertor {
                 }
                 when "chord_or_text" {
                     for @($element.value) -> $chord_or_text {
-                        $*ERR.say: :$chord_or_text.perl;
                         if $chord_or_text ~~ ABC::Chord {
                             $suffix ~= '^"' ~ $chord_or_text ~ '"';
                         } else {
@@ -390,6 +388,7 @@ say '\\version "2.12.3"';
 say "#(set-default-paper-size \"{$paper-size}\")";
 
 for @( $match.ast ) -> $tune {
+    $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
     say "\\score \{";
     
     # say ~$tune.music;

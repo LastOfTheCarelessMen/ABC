@@ -10,6 +10,11 @@ class ABC::Header {
     our method get($name) {
         self.lines.grep({ .key eq $name });
     }
+
+    our method get-first-value($name) {
+        my $pair = self.lines.first({ .key eq $name });
+        $pair ?? $pair.value !! Any;
+    }
     
     our method is-valid() {
         self.lines.elems > 1 
