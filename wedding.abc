@@ -5,7 +5,7 @@ M:2/2
 L:1/8
 K:D
 "D" DFAd "A" CEAc|"Bm" B,DFB "F#m" A,CFA|"G" B,DGB "D" A,DFA|"G" B,DGB "A" CEAc|
-"D" f4 "A" e4|"Bm" d4 "F#m" c4|"G" B4 "D" A4|"G" "A" B4 c4|
+"D" f4 "A" e4|"Bm" d4 "F#m" c4|"G" B4 "D" A4|"G" B4 "A" c4|
 d4 c4|B4 A4|G4 F4|G4 E4|
 (D2 F2) (A2 G2)|(F2 D2) (F2 E2)|(D2 B,2) (D2 A2)|(G2 B2) (A2 G2)|
 (F2 D2) (E2 c2)|(d2 f2) (a2 A2)|(B2 G2) (A2 F2)|D2 d2 +trill+d3c|
@@ -27,9 +27,11 @@ L:1/8
 K:G
 [D2d2][D3/2d3/2][D/d/]|[D2d2][D2d2]|[D4d4]|[D4d4]|
 |:"G" (D2 G) z/G/|G3z|"G" (D2 "D" A) z/F/|"G" G3z|"G" (D2 G>c|
-"C" c2 B>A|"G" G2 F>G|"D" A3)z|"G" (D2 G) z/G/|G3z|"G" (D2 "D" A) z/F/|G3z|(D2 G>B|d2 B>G)|
-(E2 A>B|G3) G|c2 BA|E2 E2|F2 G>A|A3 d|c2 BA|E2 E2|
-(E2 F>^G)|^G4|(B2 ^cB|A2 ^G2)|
+"C" c2 B>A|"G" G2 F>G|"D" A3)z|"G" (D2 G) z/G/|G3z|"G" (D2 "D" A) z/F/|"G" G3z|"G" (D2 G>B|"Bm" d2 "G" B>G)|
+("Am" E2 "C" A>B|"G" G3) G|"C" c2 BA|"Am" E2 E2|"D" F2 "G" G>A|"D" A3 d|
+"C" c2 BA|"Am" E2 E2|"D" F2 "G" G>A|"D" A4|
+"G" (D2 G) z/G/|G3z|"G" (D2 "D" A) z/F/|"G" G3z|
+"G" (D2 G>B|"Bm" d2 "G" B>G)|("Am" E2 "C" A>B|"G" G4) :|
 
 X:3
 T:Wedding March from Midsummer Night's Dream
