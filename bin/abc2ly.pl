@@ -315,8 +315,8 @@ class TuneConvertor {
     
     method BodyToLilypond(@elements, $out) {
         $out.say: "\{";
-        print $.context.key-to-string;
-        printf $.context.meter-to-string;
+        $out.print: $.context.key-to-string;
+        $out.print: $.context.meter-to-string;
     
         my $start-of-section = 0;
         loop (my $i = 0; $i < +@elements; $i++) {
@@ -327,7 +327,7 @@ class TuneConvertor {
                    && @elements[$i].value ne "|") {
                 if @elements[$i].key eq "nth_repeat" 
                    || @elements[$i].value eq ':|:' | ':|' | '::' {
-                    print "\\repeat volta 2 "; # 2 is abitrarily chosen here!
+                    $out.print: "\\repeat volta 2 "; # 2 is abitrarily chosen here!
                 }
                 self.SectionToLilypond(@elements[$start-of-section ..^ $i], $out);
                 $start-of-section = $i + 1;
@@ -369,7 +369,7 @@ class TuneConvertor {
     
         if $start-of-section + 1 < @elements.elems {
             if @elements[*-1].value eq ':|:' | ':|' | '::' {
-                print "\\repeat volta 2 "; # 2 is abitrarily chosen here!
+                $out.print: "\\repeat volta 2 "; # 2 is abitrarily chosen here!
             }
             self.SectionToLilypond(@elements[$start-of-section ..^ +@elements]);
             if @elements[*-1].value eq '|]' {
@@ -406,4 +406,22 @@ sub TuneStreamToLilypondStream($in, $out) {
     }
 }
 
-TuneStreamToLilypondStream($*IN, $*OUT);
+multi sub MAIN() {
+    TuneStreamToLilypondStream($*IN, $*OUT);
+}
+
+multi sub MAIN($abc-file) {
+    my $ly-file = $abc-file ~ ".ly";
+    if $abc-file ~~ /^(.*) ".abc"/ {
+        $ly-file = $0 ~ ".ly";
+    }
+    $*ERR.say: "Reading $abc-file, writing $ly-file";
+    
+    my $in = open $abc-file, :r or die "Unable to open $abc-file";
+    my $out = open $ly-file, :w or die "Unable to open $ly-file";
+    
+    TuneStreamToLilypondStream($in, $out);
+    
+    $out.close;
+    $in.close;
+}
