@@ -41,10 +41,13 @@ L:1/8
 K:C
 z6 (3CCC|C4 z2 (3CCC|C4 z2 (3CCC|[C2E2] (3[CE][CE][CE] [C2E2] (3[CE][CE][CE]|
 [C2E2G2] (3[CEG][CEG][CEG] [C2E2G2] (3[CEG][CEG][CEG]|
-c4 B3 ^F|(A2 G2) =F2 D2|C4 {B,C}D2 G,>D|E2 CE GCEG|c4 B3 ^F|(A2 G2) =F2 D2|
-C4 {B,C}E2 D>E|(D4 C2) (3CCC| C2 (3CEG c2 (3CCC|C2 (3EGc e2 (3CCC|[C2E2] (3EGc e2 (3Gce|
-g2 (3Gce g2 (3ceg | c4 B3 ^F|(A2 G2) =F2 D2|C4 {B,C}D2 G,>D|E2 CE GCEG|c4 B3 ^F|(A2 G2) =F2 D2|
-C4 {B,C}E2 D>E|(D4 C2) (3CCC|: c4 c3c|(e2 d2) B2 G2|G3c c3e|(e2 d2) B2 G2|G3e e3g|
-(g4 f2) e2|d2 (^c>e d2) A>c|B2 G2 A2 B2|c4 B3 ^F|(A2 G2) =F2 D2|C4 {B,C}D2 G,>D|
-E2 CE GCEG|c4 B3 ^F|(A2 G2) =F2 D2|C4 {B,C}E2 D>E|[1 (D4 C2) z2:|[2 (D4 C2) |]
+"Am" c4 "B" B3 ^F|("B/E" A2 "Em" G2) "Dm/F" =F2 D2|"C/G" C4 {B,C}"G" D2 G,>D|"C" E2 "^no chord" CE GCEG|
+"Am" c4 "B" B3 ^F|("B/E" A2 "Em" G2) "Dm/F" =F2 D2|"C/G" C4 {B,C}E2 "G" D>E|("G" D4 "C" C2) (3CCC|
+"^no chord" C2 (3CEG c2 (3CCC|C2 (3EGc e2 (3CCC|[C2E2] (3EGc e2 (3Gce|g2 (3Gce g2 (3ceg |
+"Am" c4 "B" B3 ^F|("B/E" A2 "Em" G2) "Dm/F" =F2 D2|"C/G" C4 {B,C}"G" D2 G,>D|"C" E2 "^no chord" CE GCEG|
+"Am" c4 "B" B3 ^F|("B/E" A2 "Em" G2) "Dm/F" =F2 D2|"C/G" C4 {B,C}E2 "G" D>E|("G" D4 "C" C2) "^no chord" (3CCC|
+|: "C" c4 c3c|("C/G" e2 "Bdim/G" d2) B2 G2|"C" G3c "C/E" c3e|("C/G" e2 "Bdim/G" d2) B2 G2|
+"C" G3e "C/E" e3g|("F" g4 "Dm/F" f2) "F" e2|"F" d2 ("Faug" ^c>e "F#dim" d2) "D/F#" A>c|"G" B2 "^no chord" G2 A2 B2|
+"Am" c4 "B" B3 ^F|("B/E" A2 "Em" G2) "Dm/F" =F2 D2|"C/G" C4 {B,C}"G" D2 G,>D|"C" E2 "^no chord" CE GCEG|
+"Am" c4 "B" B3 ^F|("B/E" A2 "Em" G2) "Dm/F" =F2 D2|"C/G" C4 {B,C}E2 "G" D>E|[1 ("G" D4 "C" C2) z2:|[2 ("G" D4 "C" C4) |]
 
