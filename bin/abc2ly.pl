@@ -136,8 +136,7 @@ class Context {
 sub HeaderToLilypond(ABC::Header $header, $out) {
     $out.say: "\\header \{";
     
-    my @titles = $header.get("T")>>.value;
-    $out.say: "    piece = \"{ @titles[0] }\"";
+    $out.say: "    piece = \"{ $header.get-first-value("T") }\"";
     my @composers = $header.get("C")>>.value;
     $out.say: "    composer = \"{ @composers[0] }\"" if ?@composers;
     
@@ -394,9 +393,9 @@ sub TuneStreamToLilypondStream($in, $out) {
 
         # say ~$tune.music;
 
-        my $key = $tune.header.get("K")[0].value;
-        my $meter = $tune.header.get("M")[0].value;
-        my $length = $tune.header.get("L") ?? $tune.header.get("L")[0].value !! "1/8";
+        my $key = $tune.header.get-first-value("K");
+        my $meter = $tune.header.get-first-value("M");
+        my $length = $tune.header.get-first-value("L") // "1/8";
 
         my $convertor = TuneConvertor.new($key, $meter, $length);
         $convertor.BodyToLilypond($tune.music, $out);
