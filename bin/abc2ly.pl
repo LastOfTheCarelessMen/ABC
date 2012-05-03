@@ -133,15 +133,15 @@ class Context {
     }
 }
 
-sub HeaderToLilypond(ABC::Header $header) {
-    say "\\header \{";
+sub HeaderToLilypond(ABC::Header $header, $out) {
+    $out.say: "\\header \{";
     
     my @titles = $header.get("T")>>.value;
-    say "    piece = \"{ @titles[0] }\"";
+    $out.say: "    piece = \"{ @titles[0] }\"";
     my @composers = $header.get("C")>>.value;
-    say "    composer = \"{ @composers[0] }\"" if ?@composers;
+    $out.say: "    composer = \"{ @composers[0] }\"" if ?@composers;
     
-    say "}";
+    $out.say: "}";
 }
 
 class TuneConvertor {
@@ -188,7 +188,7 @@ class TuneConvertor {
         $result ~ $lilypond-bar; 
     }
     
-    method SectionToLilypond(@elements) {
+    method SectionToLilypond(@elements, $out) {
         my $notes = "";
         my $lilypond = "";
         my $duration = 0;
@@ -307,14 +307,14 @@ class TuneConvertor {
             }
         }
     
-        say "\{";
+        $out.say: "\{";
         $notes ~= self.WrapBar($lilypond, $duration);
-        say $notes;
-        say " \}";
+        $out.say: $notes;
+        $out.say: " \}";
     }
     
-    method BodyToLilypond(@elements) {
-        say "\{";
+    method BodyToLilypond(@elements, $out) {
+        $out.say: "\{";
         print $.context.key-to-string;
         printf $.context.meter-to-string;
     
@@ -329,39 +329,39 @@ class TuneConvertor {
                    || @elements[$i].value eq ':|:' | ':|' | '::' {
                     print "\\repeat volta 2 "; # 2 is abitrarily chosen here!
                 }
-                self.SectionToLilypond(@elements[$start-of-section ..^ $i]);
+                self.SectionToLilypond(@elements[$start-of-section ..^ $i], $out);
                 $start-of-section = $i + 1;
                 # if @elements[$i].value eq '||' {
                 #     say '\\bar "||"';
                 # }
                 if @elements[$i].value eq '|]' {
-                    say '\\bar "|."';
+                    $out.say: '\\bar "|."';
                 }
             }
 
             if @elements[$i].key eq "nth_repeat" {
                 my $final-bar = False;
-                say "\\alternative \{";
+                $out.say: "\\alternative \{";
                 my $endings = 0;
                 loop (; $i < +@elements; $i++) {
                     # say @elements[$i].WHAT;
                     if @elements[$i].key eq "barline" 
                        && @elements[$i].value ne "|" {
-                           self.SectionToLilypond(@elements[$start-of-section ..^ $i]);
+                           self.SectionToLilypond(@elements[$start-of-section ..^ $i], $out);
                            $start-of-section = $i + 1;
                            $final-bar = True if @elements[$i].value eq '|]';
                            last if ++$endings == 2;
                     }
                 }
                 if $endings == 1 {
-                    self.SectionToLilypond(@elements[$start-of-section ..^ $i]);
+                    self.SectionToLilypond(@elements[$start-of-section ..^ $i], $out);
                     $start-of-section = $i + 1;
                     $final-bar = True if $i < +@elements && @elements[$i].value eq '|]';
                 }
-                say "\}";
+                $out.say: "\}";
                 
                 if $final-bar {
-                    say '\\bar "|."';
+                    $out.say: '\\bar "|."';
                 }
                 
             }
@@ -373,34 +373,37 @@ class TuneConvertor {
             }
             self.SectionToLilypond(@elements[$start-of-section ..^ +@elements]);
             if @elements[*-1].value eq '|]' {
-                say '\\bar "|."';
+                $out.say: '\\bar "|."';
             }
         }
     
-        say "\}";
+        $out.say: "\}";
     }
     
 }
 
-my $match = ABC::Grammar.parse($*IN.slurp, :rule<tune_file>, :actions(ABC::Actions.new));
+sub TuneStreamToLilypondStream($in, $out) {
+    my $match = ABC::Grammar.parse($in.slurp, :rule<tune_file>, :actions(ABC::Actions.new));
 
-say '\\version "2.12.3"';
-say "#(set-default-paper-size \"{$paper-size}\")";
-
-for @( $match.ast ) -> $tune {
-    $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
-    say "\\score \{";
+    $out.say: '\\version "2.12.3"';
+    $out.say: "#(set-default-paper-size \"{$paper-size}\")";
     
-    # say ~$tune.music;
+    for @( $match.ast ) -> $tune {
+        $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
+        $out.say: "\\score \{";
 
-    my $key = $tune.header.get("K")[0].value;
-    my $meter = $tune.header.get("M")[0].value;
-    my $length = $tune.header.get("L") ?? $tune.header.get("L")[0].value !! "1/8";
+        # say ~$tune.music;
 
-    my $convertor = TuneConvertor.new($key, $meter, $length);
-    $convertor.BodyToLilypond($tune.music);
-    HeaderToLilypond($tune.header);
+        my $key = $tune.header.get("K")[0].value;
+        my $meter = $tune.header.get("M")[0].value;
+        my $length = $tune.header.get("L") ?? $tune.header.get("L")[0].value !! "1/8";
 
-    say "}\n\n";    
+        my $convertor = TuneConvertor.new($key, $meter, $length);
+        $convertor.BodyToLilypond($tune.music, $out);
+        HeaderToLilypond($tune.header, $out);
+
+        $out.say: "}\n\n";    
+    }
 }
 
+TuneStreamToLilypondStream($*IN, $*OUT);
