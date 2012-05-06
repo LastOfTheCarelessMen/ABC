@@ -6,4 +6,8 @@ files to Lilypond format, allowing you to create beautiful PDF sheet music.
 
     env PERL6LIB=/Users/colomon/tools/ABC/lib: perl6 bin/abc2ly.pl <frip.abc >frip.ly
 
-As of 11/29/2011, this works on the latest Rakudo nom, and on the old 7/11 Rakudo Star.
+or
+
+    mono /Users/colomon/tools/niecza/run/Niecza.exe -Ilib bin/abc2ly.pl <frip.abc >frip.ly
+
+As of 5/6/2012, this works on the 2/12 Rakudo or the 5/12 Niecza.
