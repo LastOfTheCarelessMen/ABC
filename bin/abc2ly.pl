@@ -193,6 +193,7 @@ class TuneConvertor {
         my $duration = 0;
         my $chord-duration = 0;
         my $suffix = "";
+        my $in-slur = False;
         for @elements -> $element {
             $duration += self.Duration($element);
             $chord-duration += self.Duration($element);
@@ -264,9 +265,12 @@ class TuneConvertor {
                 }
                 when "slur_begin" {
                     $suffix ~= "(";
+                    $in-slur = True;
                 }
                 when "slur_end" {
-                    $lilypond .= subst(/(\s+)$/, { ")$_" });
+                    $lilypond .= subst(/(\s+)$/, { ")$_" }) if $in-slur;
+                    $*ERR.say: "Warning: End-slur found without begin-slur" unless $in-slur;
+                    $in-slur = False;
                 }
                 when "multi_measure_rest" {
                     $lilypond ~= "\\compressFullBarRests R"

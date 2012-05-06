@@ -13,6 +13,10 @@ use ABC::GraceNotes;
 
 class ABC::Actions {
     method header_field($/) {
+        if $<header_field_name> eq "T" {
+            $*ERR.say: "Parsing " ~ $<header_field_data>;
+        }
+        
         make ~$<header_field_name> => ~$<header_field_data>;
     }
     
