@@ -231,9 +231,10 @@ class TuneConvertor {
                         when "~" { $suffix ~= "\\turn"; }
                         when "." { $suffix ~= "\\staccato"; }
                         when "fermata" { $suffix ~= "\\fermata"; }
+                        when "trill" { $suffix ~= "\\trill"; }
                         when /^p+$/ | "mp" | "mf" | /^f+$/ 
                                  { $suffix ~= "\\" ~ $element.value; }
-                        $*ERR.say: "Unrecognized gracing: " ~ $element.perl;
+                        $*ERR.say: "Unrecognized gracing: " ~ $element.value.perl;
                     }
                 }
                 when "barline" {
