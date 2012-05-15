@@ -16,20 +16,19 @@ class ABC::BrokenRhythm does ABC::Duration {
                    :ticks($stem1.ticks + $stem2.ticks));
     }
 
-    my method broken-factor() {
+    method broken-factor() {
         1 / 2 ** $.broken-rhythm.chars.Int;
     }
     
-    my method broken-direction-forward() {
+    method broken-direction-forward() {
         $.broken-rhythm ~~ /\>/;
     }
     
-    my multi sub new-rhythm(ABC::Note $note, $ticks) {
-        ABC::Note.new($note.pitch, ABC::Duration.new(:$ticks), $note.is-tie);
-    }
-
-    my multi sub new-rhythm(ABC::Stem $stem, $ticks) {
-        ABC::Stem.new($stem.notes.map({ new-rhythm($_, $ticks); }));
+    sub new-rhythm($note, $ticks) {
+        given $note {
+            when ABC::Note { ABC::Note.new($note.pitch, ABC::Duration.new(:$ticks), $note.is-tie); }
+            when ABC::Stem { ABC::Stem.new($note.notes.map({ new-rhythm($_, $ticks); })); }
+        }
     }
 
     method effective-stem1() {
