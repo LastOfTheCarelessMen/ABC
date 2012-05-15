@@ -200,6 +200,32 @@ use ABC::Grammar;
     is $match<stem>[2], "c", 'third note is c';
 }
 
+{
+    my $match = ABC::Grammar.parse("[a2bc]3", :rule<stem>);
+    isa_ok $match, Match, 'Got a match';
+    ok $match, '"[a2bc]3" is a stem';
+    is ~$match, "[a2bc]3", '"[a2bc]3" was the portion matched';
+    is +@( $match<mnote> ), 3, 'Three notes matched';
+    is $match<mnote>[0], "a2", 'first note is a2';
+    is $match<mnote>[1], "b", 'second note is b';
+    is $match<mnote>[2], "c", 'third note is c';
+    is $match<note_length>, "3", 'correct duration';
+    nok ?$match<tie>, 'not tied';
+}
+
+{
+    my $match = ABC::Grammar.parse("[a2bc]3-", :rule<stem>);
+    isa_ok $match, Match, 'Got a match';
+    ok $match, '"[a2bc]3-" is a stem';
+    is ~$match, "[a2bc]3-", '"[a2bc]3-" was the portion matched';
+    is +@( $match<mnote> ), 3, 'Three notes matched';
+    is $match<mnote>[0], "a2", 'first note is a2';
+    is $match<mnote>[1], "b", 'second note is b';
+    is $match<mnote>[2], "c", 'third note is c';
+    is $match<note_length>, "3", 'correct duration';
+    ok ?$match<tie>, 'tied';
+}
+
 # (3 is the only case that works currently.  :(
 # {
 #     my $match = ABC::Grammar.parse("(2abcd", :rule<tuple>);

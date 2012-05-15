@@ -90,6 +90,28 @@ use ABC::Chord;
 }
 
 {
+    my $match = ABC::Grammar.parse("[a2bc]3", :rule<stem>, :actions(ABC::Actions.new));
+    ok $match, 'element recognized';
+    isa_ok $match.ast, ABC::Stem, '$match.ast is an ABC::Stem';
+    is $match.ast.notes[0], "a2", "Pitch 1 a";
+    is $match.ast.notes[1], "b", "Pitch 2 b";
+    is $match.ast.notes[2], "c", "Pitch 3 c";
+    is $match.ast.ticks, 6, "Duration 6 ticks";
+    nok $match.ast.is-tie, "Not tied";
+}
+
+{
+    my $match = ABC::Grammar.parse("[a2bc]/-", :rule<stem>, :actions(ABC::Actions.new));
+    ok $match, 'element recognized';
+    isa_ok $match.ast, ABC::Stem, '$match.ast is an ABC::Stem';
+    is $match.ast.notes[0], "a2", "Pitch 1 a";
+    is $match.ast.notes[1], "b", "Pitch 2 b";
+    is $match.ast.notes[2], "c", "Pitch 3 c";
+    is $match.ast.ticks, 1, "Duration 1 tick";
+    ok $match.ast.is-tie, "Tied";
+}
+
+{
     my $match = ABC::Grammar.parse("z/", :rule<rest>, :actions(ABC::Actions.new));
     ok $match, 'rest recognized';
     isa_ok $match.ast, ABC::Rest, '$match.ast is an ABC::Rest';

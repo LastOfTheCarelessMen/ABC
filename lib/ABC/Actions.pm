@@ -46,7 +46,7 @@ class ABC::Actions {
         if @( $<mnote> ) == 1 {
             make $<mnote>[0].ast;
         } else {
-            make ABC::Stem.new(@( $<mnote> )>>.ast);
+            make ABC::Stem.new(@( $<mnote> )>>.ast, $<note_length>.ast, ?$<tie>);
         }
     }
     
