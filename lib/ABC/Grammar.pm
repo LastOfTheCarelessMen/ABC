@@ -32,7 +32,7 @@ grammar ABC::Grammar
     regex acciaccatura { '/' }
     regex grace_notes { '{' <acciaccatura>? <grace_note_stem>+ '}' }
     
-    regex long_gracing_text { [<alpha> | '.']+ }
+    regex long_gracing_text { [<alpha> | '.' | ')' | '(']+ }
     regex long_gracing { '+' <long_gracing_text> '+' }
     regex gracing { '.' | '~' | <long_gracing> }
     
@@ -73,7 +73,7 @@ grammar ABC::Grammar
     
     regex bar { <element>+ <barline>? }
         
-    regex line_of_music { <barline>? <bar>+ }
+    regex line_of_music { <barline>? <bar>+ '\\'? }
     
     regex music { [<line_of_music> \s*\v?]+ }
     
