@@ -286,6 +286,17 @@ for ':|:', '|:', '|', ':|', '::', '|]'
 }
 
 {
+    my $line = "g>ecg ec e/f/g/e/ |1 d/c/B/A/ Gd BG B/c/d/B/ |";
+    my $match = ABC::Grammar.parse($line, :rule<line_of_music>);
+    isa_ok $match, Match, 'Got a match';
+    ok $match, 'line of music recognized';
+    is $match, $line, "Entire line was matched";
+    is $match<bar>[0], "g>ecg ec e/f/g/e/ |", "First bar is correct";
+    is $match<bar>[1], "1 d/c/B/A/ Gd BG B/c/d/B/ |", "Second bar is correct, even with stupid hacky |1 ending marker";
+    # say $match<ABC::Grammar::line_of_music>.perl;
+}
+
+{
     my $line = "|A/B/c/A/ c>d e>deg | dB/A/ gB +trill+A2 +trill+e2 ::";
     my $match = ABC::Grammar.parse($line, :rule<line_of_music>);
     isa_ok $match, Match, 'Got a match';

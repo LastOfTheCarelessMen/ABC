@@ -52,7 +52,7 @@ grammar ABC::Grammar
     
     regex nth_repeat_num { <digit>+ [[',' | '-'] <digit>+]* }
     regex nth_repeat_text { '"' .*? '"' }
-    regex nth_repeat { '[' [ <nth_repeat_num> | <nth_repeat_text> ] }
+    regex nth_repeat { ['[' [ <nth_repeat_num> | <nth_repeat_text> ]] | [<?after '|'> <nth_repeat_num>] }
     regex end_nth_repeat { ']' }
     
     regex inline_field { '[' <alpha> ':' $<value>=[.*?] ']' }

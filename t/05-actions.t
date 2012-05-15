@@ -242,6 +242,24 @@ K:D
 }
 
 {
+    my $music = q«BAB G2G|G2g gdc|1BAB G2G|2=F2f fcA|
+BAB G2G|G2g gdB|c2a B2g|A2=f fcA:|
+»;
+
+    my $match = ABC::Grammar.parse($music, :rule<music>, :actions(ABC::Actions.new));
+    ok $match, 'element recognized';
+#     say $match.ast.perl;
+    is $match.ast.elems, 59, '$match.ast has 59 elements';
+    # say $match.ast.elems;
+    # say $match.ast[28].WHAT;
+    # say $match.ast[28].perl;
+    is $match.ast[22].key, "nth_repeat", "21st is nth_repeat";
+    is $match.ast[22].value, "2", "21st is '2'";
+    is $match.ast[30].key, "endline", "29th is endline";
+    is $match.ast[*-1].key, "endline", "Last is endline";
+}
+
+{
     my $music = q«BAB G2G|G2g gdc|BAB G2G|=F2f fcA|
 BAB G2G|G2g gdB|c2a B2g|A2=f fcA:|
 »;
