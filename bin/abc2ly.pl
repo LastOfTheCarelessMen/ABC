@@ -375,7 +375,7 @@ class TuneConvertor {
             if @elements[*-1].value eq ':|:' | ':|' | '::' {
                 $out.print: "\\repeat volta 2 "; # 2 is abitrarily chosen here!
             }
-            self.SectionToLilypond(@elements[$start-of-section ..^ +@elements]);
+            self.SectionToLilypond(@elements[$start-of-section ..^ +@elements], $out);
             if @elements[*-1].value eq '|]' {
                 $out.say: '\\bar "|."';
             }

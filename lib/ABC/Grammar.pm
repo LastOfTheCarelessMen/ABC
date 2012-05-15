@@ -27,7 +27,7 @@ grammar ABC::Grammar
     regex slur_begin { '(' }
     regex slur_end { ')' }
     
-    regex grace_note { <pitch> <note_length>? } # as mnote, but without tie
+    regex grace_note { <pitch> <note_length> } # as mnote, but without tie
     regex grace_note_stem { <grace_note> | [ '[' <grace_note>+ ']' ]  }
     regex acciaccatura { '/' }
     regex grace_notes { '{' <acciaccatura>? <grace_note_stem>+ '}' }
