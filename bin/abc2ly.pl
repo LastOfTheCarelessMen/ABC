@@ -155,26 +155,26 @@ class TuneConvertor {
         $element.value ~~ ABC::Duration ?? $element.value.ticks !! 0;
     }
     
-    method StemToLilypond($stem, $suffix = "") {
+    method StemPitchToLilypond($stem) {
         given $stem {
             when ABC::Note {
-                " " ~ $.context.get-Lilypond-pitch($stem.pitch)
-                    ~ $.context.get-Lilypond-duration($stem)
-                    ~ ($stem.is-tie ?? '~' !! '')
-                    ~ $suffix
-                    ~ " ";
+                $.context.get-Lilypond-pitch($stem.pitch)
             }
-            
+
             when ABC::Stem {
-                " <" ~ $stem.notes.map({ $.context.get-Lilypond-pitch($_.pitch) }).join(' ') ~ ">"
-                     ~ $.context.get-Lilypond-duration($stem)
-                     ~ ($stem.is-tie ?? '~' !! '')
-                     ~ $suffix
-                     ~ " ";
+                "<" ~ $stem.notes.map({ $.context.get-Lilypond-pitch($_.pitch) }).join(' ') ~ ">"
             }
-            
+
             die "Unrecognized alleged stem: " ~ $stem.perl;
         }
+    }
+    
+    method StemToLilypond($stem, $suffix = "") {
+        " " ~ self.StemPitchToLilypond($stem)
+            ~ $.context.get-Lilypond-duration($stem)
+            ~ ($stem.is-tie ?? '~' !! '')
+            ~ $suffix
+            ~ " ";
     }
     
     method WrapBar($lilypond-bar, $duration) {
