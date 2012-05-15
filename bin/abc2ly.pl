@@ -31,6 +31,17 @@ class Context {
     method new($key-name, $meter, $length) {
         my %cheat-length-map;
         given $length {
+            when "1/16" { %cheat-length-map = ( '/' => "32",
+                                               "" => "16",
+                                               "1" => "16",
+                                               "3/2" => "16.",
+                                               "2" => "8",
+                                               "3" => "8.",
+                                               "7/2" => "8..",
+                                               "4" => "4",
+                                               "6" => "4.",
+                                               "8" => "2");
+            }
             when "1/8" { %cheat-length-map = ( '/' => "16",
                                                "" => "8",
                                                "1" => "8",
@@ -207,16 +218,12 @@ class TuneConvertor {
                     $suffix = ""; 
                 }
                 when "tuplet" { 
-                    $lilypond ~= " \\times 2/3 \{";
-                    if +$element.value.notes == 3 && $element.value.ticks == 2 {
-                        $lilypond ~= self.StemToLilypond($element.value.notes[0], "[");
-                        $lilypond ~= self.StemToLilypond($element.value.notes[1]);
-                        $lilypond ~= self.StemToLilypond($element.value.notes[2], "]");
-                    } else {
-                        for $element.value.notes -> $stem {
-                            $lilypond ~= self.StemToLilypond($stem);
-                        }
+                    $lilypond ~= " \\times 2/{ $element.value.tuple } \{";
+                    $lilypond ~= self.StemToLilypond($element.value.notes[0], "[");
+                    for 1..($element.value.notes - 2) -> $i {
+                        $lilypond ~= self.StemToLilypond($element.value.notes[$i]);
                     }
+                    $lilypond ~= self.StemToLilypond($element.value.notes[*-1], "]");
                     $lilypond ~= " } ";  
                     $suffix = "";
                 }

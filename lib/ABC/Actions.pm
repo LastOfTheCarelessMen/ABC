@@ -59,7 +59,7 @@ class ABC::Actions {
     }
     
     method tuplet($/) {
-        make ABC::Tuplet.new(3, @( $<stem> )>>.ast);
+        make ABC::Tuplet.new(+@( $<stem> ), @( $<stem> )>>.ast);
     }
     
     method broken_rhythm($/) {

@@ -43,10 +43,12 @@ grammar ABC::Grammar
     regex broken_rhythm { <stem> <g1=b_elem>* <broken_rhythm_bracket> <g2=b_elem>* <stem> }
     
     regex t_elem { <gracing> | <grace_notes> | <broken_rhythm> | <slur_begin> | <slur_end> }
-    # next line should work, but is NYI in Rakudo
-    # regex tuple { '('(<digit>+) [<t_elem>* <stem>] ** { $0 } }
-    # next block makes the most common case work
-    regex tuplet { '(3' [<t_elem>* <stem>] ** 3 }
+    # next line should work, but is NYI in Rakudo/Niecza
+    # regex tuplet { '('(<digit>+) [<t_elem>* <stem>] ** { +$0 } }
+    # next block makes the most common cases work
+    regex tuplet { ['(3' [<t_elem>* <stem>] ** 3 <slur_end>? ] 
+                 | ['(4' [<t_elem>* <stem>] ** 4 <slur_end>? ]
+                 | ['(5' [<t_elem>* <stem>] ** 5 <slur_end>? ] }
     
     regex nth_repeat_num { <digit>+ [[',' | '-'] <digit>+]* }
     regex nth_repeat_text { '"' .*? '"' }

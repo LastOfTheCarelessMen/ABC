@@ -201,6 +201,19 @@ use ABC::Grammar;
 }
 
 {
+    my $match = ABC::Grammar.parse("(5abcde", :rule<tuplet>);
+    isa_ok $match, Match, 'Got a match';
+    ok $match, '"(5abcde" is a tuplet';
+    is ~$match, "(5abcde", '"(5abcde" was the portion matched';
+    is +@( $match<stem> ), 5, 'Three notes matched';
+    is $match<stem>[0], "a", 'first note is a';
+    is $match<stem>[1], "b", 'second note is b';
+    is $match<stem>[2], "c", 'third note is c';
+    is $match<stem>[3], "d", 'fourth note is d';
+    is $match<stem>[4], "e", 'fifth note is e';
+}
+
+{
     my $match = ABC::Grammar.parse("[a2bc]3", :rule<stem>);
     isa_ok $match, Match, 'Got a match';
     ok $match, '"[a2bc]3" is a stem';
