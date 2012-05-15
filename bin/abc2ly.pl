@@ -167,8 +167,8 @@ class TuneConvertor {
             
             when ABC::Stem {
                 " <" ~ $stem.notes.map({ $.context.get-Lilypond-pitch($_.pitch) }).join(' ') ~ ">"
-                     ~ $.context.get-Lilypond-duration($stem.notes[0])
-                     ~ ($stem.notes[0].is-tie ?? '~' !! '')
+                     ~ $.context.get-Lilypond-duration($stem)
+                     ~ ($stem.is-tie ?? '~' !! '')
                      ~ $suffix
                      ~ " ";
             }
