@@ -169,11 +169,20 @@ class ABC::Actions {
     
     method music($/) {
         my @music;
-        for @( $<line_of_music> )>>.ast -> $line {
-            for $line.list {
-                @music.push($_);
+        # $*ERR.say: "Started music action";
+        for @( $/.caps ) {
+            # $*ERR.say: ~$_.key ~ " => " ~ ~$_.value;
+            when *.key eq "line_of_music" {
+                for $_.value.ast.list {
+                    @music.push($_);
+                }
+            }
+            when *.key eq "header_field" {
+                @music.push("inline_field" => $_.value.ast);
             }
         }
+        # state $count = 0;
+        # die if ++$count == 10;
         make @music;
     }
     

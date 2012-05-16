@@ -460,4 +460,52 @@ K:Edor
     is $match<tune>[1]<music><line_of_music>.elems, 2;
 }
 
+{
+    my $music = q«X:1
+T:Are You Coming From The Races?
+O:from the playing of Frank Maher
+M:2/4
+L:1/8
+R:Single
+K:D
+DE|:F2 F2|AF ED|E2 EF|ED DE|F2 F2|AF ED|E2 D2|
+|[1 D2 DE:|[2 D2 dc|:B2 Bc|BA FG|AB AF|
+AF dc|B2 Bc|BA FA|B2 A2|[1 A2 dc:|[2 A2
+
+X:2
+T:Bride's Jig
+O:from the playing of Frank Maher
+M:2/4
+L:1/8
+R:Single
+K:Edor
+|:B E2 G|FE D2|E>F GA|Bc BA|B E2 G|FE D2|E>F GE|A2 A2:|
+|:AB cd|e4|AB cB|BA FA|AB cd|e4|AB cB|A2 A2:|»;
+    my $match = ABC::Grammar.parse($music, :rule<tune_file>);
+    isa_ok $match, Match, 'Got a match';
+    ok $match, 'tune_file recognized';
+    
+    is $match<tune>.elems, 2, 'found two tunes';
+    is $match<tune>[0]<music><line_of_music>.elems, 3;
+    is $match<tune>[1]<music><line_of_music>.elems, 2;
+}
+
+{
+    my $music = q«X:1
+T:Canon in D
+C:Pachelbel
+M:2/2
+L:1/8
+K:D
+"D" DFAd "A" CEAc|"Bm" B,DFB "F#m" A,CFA|"G" B,DGB "D" A,DFA|"G" B,DGB "A" CEAc|
+"D" f4 "A" e4|"Bm" d4 "F#m" c4|"G" B4 "D" A4|"G" B4 "A" c4|
+»;
+    my $match = ABC::Grammar.parse($music, :rule<tune_file>);
+    isa_ok $match, Match, 'Got a match';
+    ok $match, 'tune_file recognized';
+    
+    is $match<tune>.elems, 1, 'found one tune';
+    is $match<tune>[0]<music><line_of_music>.elems, 2, "with two lines of music";
+}
+
 done;

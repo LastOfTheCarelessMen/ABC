@@ -305,4 +305,22 @@ BAB G2G|G2g gdB|c2a B2g|A2=f fcA:|
     isa_ok @( $match.ast )[0][0], ABC::Tune, "First is an ABC::Tune";
 }
 
+{
+    my $music = q«X:1
+T:Canon in D
+C:Pachelbel
+M:2/2
+L:1/8
+K:D
+"D" DFAd "A" CEAc|"Bm" B,DFB "F#m" A,CFA|"G" B,DGB "D" A,DFA|"G" B,DGB "A" CEAc|
+"D" f4 "A" e4|"Bm" d4 "F#m" c4|"G" B4 "D" A4|"G" B4 "A" c4|»;
+    my $match = ABC::Grammar.parse($music, :rule<tune_file>, :actions(ABC::Actions.new));
+    isa_ok $match, Match, 'Got a match';
+    ok $match, 'tune_file recognized';
+    
+    is $match<tune>.elems, 1, 'found one tune';
+    is $match<tune>[0]<music><line_of_music>.elems, 2, "with two lines of music";
+}
+
+
 done;
