@@ -42,7 +42,9 @@ class Context {
                                                "6" => "4.",
                                                "8" => "2");
             }
-            when "1/8" { %cheat-length-map = ( '/' => "16",
+            when "1/8" { %cheat-length-map = ( "1/4" => "32",
+                                               '/' => "16",
+                                               "3/4" => "16.",
                                                "" => "8",
                                                "1" => "8",
                                                "3/2" => "8.",
@@ -102,19 +104,23 @@ class Context {
     }
     
     method meter-to-string() {
-        "\\time $.meter ";
+        given $.meter {
+            when "C"  { "\\time 4/4" }
+            when "C|" { "\\time 2/2" }
+            "\\time $.meter ";
+        }
     }
 
     method ticks-in-measure() {
         given $.meter {
-            when "C" { 1 / $.length.eval; }
+            when "C" | "C|" { 1 / $.length.eval; }
             $.meter.eval / $.length.eval;
         }
     }
 
     method get-Lilypond-measure-length() {
         given $.meter {
-            when "C" | "4/4" { "1" }
+            when "C" | "C|" | "4/4" { "1" }
             when "3/4" | 6/8 { "2." }
             when "2/4" { "2" }
         }
@@ -147,7 +153,9 @@ class Context {
 sub HeaderToLilypond(ABC::Header $header, $out) {
     $out.say: "\\header \{";
     
-    $out.say: "    piece = \"{ $header.get-first-value("T") }\"";
+    my $title = $header.get-first-value("T");
+    $title .=subst('"', "'", :g);
+    $out.say: "    piece = \" $title \"";
     my @composers = $header.get("C")>>.value;
     $out.say: "    composer = \"{ @composers[0] }\"" if ?@composers;
     
@@ -192,7 +200,15 @@ class TuneConvertor {
         my $ticks-in-measure = $.context.ticks-in-measure;
         my $result = "";
         if $duration % $ticks-in-measure != 0 {
-            $result = "\\partial { 1 / $.context.length.eval }*{ $duration % $ticks-in-measure } ";
+            my $note-length = 1 / $.context.length.eval;
+            my $count = $duration % $ticks-in-measure;
+            if $count ~~ Rat {
+                while $count.denominator > 1 {
+                    $note-length *= 2; # makes twice as short
+                    $count *= 2;       # makes twice as long
+                }
+            }
+            $result = "\\partial { $note-length }*{ $count } ";
         }
         
         $result ~ $lilypond-bar; 
