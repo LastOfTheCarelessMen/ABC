@@ -77,7 +77,11 @@ grammar ABC::Grammar
         
     regex line_of_music { <barline>? <bar>+ '\\'? }
     
-    regex music { [<line_of_music> \s*\v?]+ }
+    regex interior_header_field_name { < K M L > }
+    regex interior_header_field_data { \N* }
+    regex interior_header_field { ^^ <interior_header_field_name> ':' \s* <interior_header_field_data> $$ }
+    
+    regex music { [[<line_of_music> | <interior_header_field>] \s*]+ }
     
     regex tune { <header> <music> }
     

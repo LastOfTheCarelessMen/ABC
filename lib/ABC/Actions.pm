@@ -20,6 +20,10 @@ class ABC::Actions {
         make ~$<header_field_name> => ~$<header_field_data>;
     }
     
+    method interior_header_field($/) {
+        make ~$<interior_header_field_name> => ~$<interior_header_field_data>;
+    }
+    
     method header($/) { 
         my $header = ABC::Header.new;
         for @( $<header_field> ) -> $field {
@@ -177,7 +181,7 @@ class ABC::Actions {
                     @music.push($_);
                 }
             }
-            when *.key eq "header_field" {
+            when *.key eq "interior_header_field" {
                 @music.push("inline_field" => $_.value.ast);
             }
         }
