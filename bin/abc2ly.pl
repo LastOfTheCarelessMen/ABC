@@ -203,6 +203,9 @@ class TuneConvertor {
             my $note-length = 1 / $.context.length.eval;
             my $count = $duration % $ticks-in-measure;
             if $count ~~ Rat {
+                my $log2 = $count.denominator.log(2);
+                die "Strange partial measure found: $lilypond-bar" if $log2 != $log2.Int;
+                
                 while $count.denominator > 1 {
                     $note-length *= 2; # makes twice as short
                     $count *= 2;       # makes twice as long
