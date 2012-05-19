@@ -3,11 +3,17 @@ use v6;
 use ABC::Duration;
 
 class ABC::Note does ABC::Duration {
-    has $.pitch;
+    has $.accidental;
+    has $.basenote;
+    has $.octave;
     has $.is-tie;
     
-    method new($pitch, ABC::Duration $duration, $is-tie) {
-        self.bless(*, :$pitch, :ticks($duration.ticks), :$is-tie);
+    method new($accidental, $basenote, $octave, ABC::Duration $duration, $is-tie) {
+        self.bless(*, :$accidental, :$basenote, :$octave, :ticks($duration.ticks), :$is-tie);
+    }
+
+    method pitch() {
+        $.accidental ~ $.basenote ~ $.octave;
     }
 
     method Str() {

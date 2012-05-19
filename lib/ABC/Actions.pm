@@ -41,7 +41,9 @@ class ABC::Actions {
     }
     
     method mnote($/) {
-        make ABC::Note.new(~$<pitch>, 
+        make ABC::Note.new(~($<pitch><accidental> // ""),
+                           ~$<pitch><basenote>,
+                           ~($<pitch><octave> // ""),
                            $<note_length>.ast, 
                            ?$<tie>);
     }
@@ -75,7 +77,9 @@ class ABC::Actions {
     }
 
     method grace_note($/) {
-        make ABC::Note.new(~$<pitch>, 
+        make ABC::Note.new(~($<pitch><accidental> // ""),
+                           ~$<pitch><basenote>,
+                           ~($<pitch><octave> // ""),
                            $<note_length>.ast,
                            False);
     }

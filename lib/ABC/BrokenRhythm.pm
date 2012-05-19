@@ -26,7 +26,13 @@ class ABC::BrokenRhythm does ABC::Duration {
     
     sub new-rhythm($note, $ticks) {
         given $note {
-            when ABC::Note { ABC::Note.new($note.pitch, ABC::Duration.new(:$ticks), $note.is-tie); }
+            when ABC::Note { 
+                ABC::Note.new($note.accidental,
+                              $note.basenote,
+                              $note.octave,
+                              ABC::Duration.new(:$ticks), 
+                              $note.is-tie); 
+            }
             when ABC::Stem { ABC::Stem.new($note.notes.map({ new-rhythm($_, $ticks); })); }
         }
     }
