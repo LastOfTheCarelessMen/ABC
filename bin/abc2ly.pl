@@ -72,30 +72,18 @@ class Context {
                       :$length, 
                       :%cheat-length-map);
     }
-    
-    method get-real-pitch($nominal-pitch) {
-        my $match = ABC::Grammar.parse($nominal-pitch, :rule<pitch>);
-        if $match<accidental> {
-            $nominal-pitch;
-        } else {
-            ($.key{$match<basenote>.uc} // "") ~ $match<basenote> ~ ($match<octave> // "");
-        }
-    }
-    
-    method get-Lilypond-pitch($abc-pitch) {
-        # say :$abc-pitch.perl;
-        my $real-pitch = self.get-real-pitch($abc-pitch);
-        # say :$real-pitch.perl;
-        my $match = ABC::Grammar.parse($real-pitch, :rule<pitch>);
+
+    method get-Lilypond-pitch(ABC::Note $abc-pitch) {
+        my $real-accidental = $abc-pitch.accidental || ($.key{$abc-pitch.basenote.uc} // "");
         
-        my $octave = +((~$match<basenote>) ~~ 'a'..'z');
-        given $match<octave> {
+        my $octave = +($abc-pitch.basenote ~~ 'a'..'z');
+        given $abc-pitch.octave {
             when !*.defined { } # skip if no additional octave info
-            when /\,/ { $octave -= (~$match<octave>).chars }
-            when /\'/ { $octave += (~$match<octave>).chars }
+            when /\,/ { $octave -= $abc-pitch.octave.chars }
+            when /\'/ { $octave += $abc-pitch.octave.chars }
         }
         
-        $match<basenote>.lc ~ %accidental-map{~($match<accidental> // "")} ~ %octave-map{$octave};
+        $abc-pitch.basenote.lc ~ %accidental-map{$real-accidental} ~ %octave-map{$octave};
     }
 
     method get-Lilypond-duration(ABC::Duration $abc-duration) {
@@ -177,11 +165,11 @@ class TuneConvertor {
     method StemPitchToLilypond($stem) {
         given $stem {
             when ABC::Note {
-                $.context.get-Lilypond-pitch($stem.pitch)
+                $.context.get-Lilypond-pitch($stem)
             }
 
             when ABC::Stem {
-                "<" ~ $stem.notes.map({ $.context.get-Lilypond-pitch($_.pitch) }).join(' ') ~ ">"
+                "<" ~ $stem.notes.map({ $.context.get-Lilypond-pitch($_) }).join(' ') ~ ">"
             }
 
             die "Unrecognized alleged stem: " ~ $stem.perl;
