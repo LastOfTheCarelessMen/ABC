@@ -20,57 +20,31 @@ my %octave-map = ( -1 => "",
                     0 => "'",
                     1 => "''",
                     2 => "'''" );
-
+                    
 class Context {
     has $.key-name;
     has %.key;
     has $.meter;
     has $.length;
-    has %.cheat-length-map;
+    has %.twos;
     
     method new($key-name, $meter, $length) {
-        my %cheat-length-map;
-        given $length {
-            when "1/16" { %cheat-length-map = ( '/' => "32",
-                                               "" => "16",
-                                               "1" => "16",
-                                               "3/2" => "16.",
-                                               "2" => "8",
-                                               "3" => "8.",
-                                               "7/2" => "8..",
-                                               "4" => "4",
-                                               "6" => "4.",
-                                               "8" => "2");
-            }
-            when "1/8" { %cheat-length-map = ( "1/4" => "32",
-                                               '/' => "16",
-                                               "3/4" => "16.",
-                                               "" => "8",
-                                               "1" => "8",
-                                               "3/2" => "8.",
-                                               "2" => "4",
-                                               "3" => "4.",
-                                               "7/2" => "4..",
-                                               "4" => "2",
-                                               "6" => "2.",
-                                               "8" => "1");
-            }
-            when "1/4" { %cheat-length-map = ( '/' => "8",
-                                               "" => "4",
-                                               "1" => "4",
-                                               "3/2" => "4.",
-                                               "2" => "2",
-                                               "3" => "2.",
-                                               "4" => "1",
-                                               "6" => "1.");
-            }
-            die "Don't know how to handle note length $length";
+        my %twos;
+        my $n = 1;
+        while $n < 1000 {
+            %twos{$n} = 1;
+            $n *= 2;
         }
+
         self.bless(*, :$key-name, 
                       :key(key_signature($key-name)), 
                       :$meter, 
                       :$length, 
-                      :%cheat-length-map);
+                      :%twos);
+    }
+
+    method is-a-power-of-two(Rat $r) {
+        $r.denominator == 1 ?? (%.twos{$r.numerator} // False) !! (%.twos{$r.denominator} // False);
     }
 
     method get-Lilypond-pitch(ABC::Note $abc-pitch) {
@@ -87,8 +61,21 @@ class Context {
     }
 
     method get-Lilypond-duration(ABC::Duration $abc-duration) {
-        die "Unknown duration { $abc-duration.duration-to-str }" unless %.cheat-length-map{$abc-duration.duration-to-str};
-        %.cheat-length-map{$abc-duration.duration-to-str};
+        my $ticks = $abc-duration.ticks.Rat * $.length;
+        my $dots = "";
+        given $ticks.numerator {
+            when 3 { $dots = ".";  $ticks *= 2/3; }
+            when 7 { $dots = ".."; $ticks *= 4/7; }
+        }
+        die "Don't know how to handle duration { $abc-duration.ticks }" unless self.is-a-power-of-two($ticks);
+        die "Don't know how to handle duration { $abc-duration.ticks }" if $ticks > 4;
+        if $ticks == 4 { 
+            "\\longa" ~ $dots;
+        } elsif $ticks == 2 { 
+            "\\breve" ~ $dots;
+        } else {
+            $ticks.denominator ~ $dots;
+        }
     }
     
     method meter-to-string() {
