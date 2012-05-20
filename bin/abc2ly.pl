@@ -21,30 +21,25 @@ my %octave-map = ( -1 => "",
                     1 => "''",
                     2 => "'''" );
                     
+sub is-a-power-of-two($n) {
+    if $n ~~ Rat {
+        is-a-power-of-two($n.numerator) && is-a-power-of-two($n.denominator);
+    } else {
+        !($n +& ($n - 1));
+    }
+}
+                    
 class Context {
     has $.key-name;
     has %.key;
     has $.meter;
     has $.length;
-    has %.twos;
     
     method new($key-name, $meter, $length) {
-        my %twos;
-        my $n = 1;
-        while $n < 1000 {
-            %twos{$n} = 1;
-            $n *= 2;
-        }
-
         self.bless(*, :$key-name, 
                       :key(key_signature($key-name)), 
                       :$meter, 
-                      :$length, 
-                      :%twos);
-    }
-
-    method is-a-power-of-two(Rat $r) {
-        $r.denominator == 1 ?? (%.twos{$r.numerator} // False) !! (%.twos{$r.denominator} // False);
+                      :$length);
     }
 
     method get-Lilypond-pitch(ABC::Note $abc-pitch) {
@@ -67,7 +62,7 @@ class Context {
             when 3 { $dots = ".";  $ticks *= 2/3; }
             when 7 { $dots = ".."; $ticks *= 4/7; }
         }
-        die "Don't know how to handle duration { $abc-duration.ticks }" unless self.is-a-power-of-two($ticks);
+        die "Don't know how to handle duration { $abc-duration.ticks }" unless is-a-power-of-two($ticks);
         die "Don't know how to handle duration { $abc-duration.ticks }" if $ticks > 4;
         if $ticks == 4 { 
             "\\longa" ~ $dots;
@@ -178,8 +173,7 @@ class TuneConvertor {
             my $note-length = 1 / $.context.length.eval;
             my $count = $duration % $ticks-in-measure;
             if $count ~~ Rat {
-                my $log2 = $count.denominator.log(2);
-                die "Strange partial measure found: $lilypond-bar" if $log2 != $log2.Int;
+                die "Strange partial measure found: $lilypond-bar" unless is-a-power-of-two($count.denominator);
                 
                 while $count.denominator > 1 {
                     $note-length *= 2; # makes twice as short
