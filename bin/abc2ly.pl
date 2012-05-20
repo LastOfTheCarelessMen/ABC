@@ -83,8 +83,8 @@ class Context {
 
     method ticks-in-measure() {
         given $.meter {
-            when "C" | "C|" { 1 / $.length.eval; }
-            $.meter.eval / $.length.eval;
+            when "C" | "C|" { 1 / $.length; }
+            $.meter / $.length;
         }
     }
 
@@ -170,7 +170,7 @@ class TuneConvertor {
         my $ticks-in-measure = $.context.ticks-in-measure;
         my $result = "";
         if $duration % $ticks-in-measure != 0 {
-            my $note-length = 1 / $.context.length.eval;
+            my $note-length = 1 / $.context.length;
             my $count = $duration % $ticks-in-measure;
             if $count ~~ Rat {
                 die "Strange partial measure found: $lilypond-bar" unless is-a-power-of-two($count.denominator);
