@@ -20,7 +20,9 @@ my %octave-map = ( -1 => "",
                     0 => "'",
                     1 => "''",
                     2 => "'''" );
-                    
+
+my %unrecognized_gracings;
+                
 sub is-a-power-of-two($n) {
     if $n ~~ Rat {
         is-a-power-of-two($n.numerator) && is-a-power-of-two($n.denominator);
@@ -225,6 +227,9 @@ class TuneConvertor {
                     given $element.value {
                         when "~" { $suffix ~= "\\turn"; }
                         when "." { $suffix ~= "\\staccato"; }
+                        when "segno" { $lilypond ~= '\\mark \\markup { \\musicglyph #"scripts.segno" }'; }
+                        when "coda"  { $lilypond ~= '\\mark \\markup { \\musicglyph #"scripts.coda" }'; }
+                        when "D.C."  { $lilypond ~= '\\mark "D.C."'}
                         when "crescendo(" | "<("  { $suffix ~= "\\<"; }
                         when "crescendo)" | "<)"  { $suffix ~= "\\!"; }
                         when "diminuendo(" | ">(" { $suffix ~= "\\>"; }
@@ -232,6 +237,7 @@ class TuneConvertor {
                         when /^p+$/ | "mp" | "mf" | /^f+$/ | "fermata" | "accent" | "trill"
                                  { $suffix ~= "\\" ~ $element.value; }
                         $*ERR.say: "Unrecognized gracing: " ~ $element.value.perl;
+                        %unrecognized_gracings{~$element.value} = 1;
                     }
                 }
                 when "barline" {
@@ -425,4 +431,6 @@ multi sub MAIN($abc-file) {
     
     $out.close;
     $in.close;
+    
+    $*ERR.say: "Unrecognized gracings: " ~ %unrecognized_gracings.keys.join(", ") if %unrecognized_gracings;
 }
