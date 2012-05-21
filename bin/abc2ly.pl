@@ -225,9 +225,11 @@ class TuneConvertor {
                     given $element.value {
                         when "~" { $suffix ~= "\\turn"; }
                         when "." { $suffix ~= "\\staccato"; }
-                        when "fermata" { $suffix ~= "\\fermata"; }
-                        when "trill" { $suffix ~= "\\trill"; }
-                        when /^p+$/ | "mp" | "mf" | /^f+$/ 
+                        when "crescendo(" | "<("  { $suffix ~= "\\<"; }
+                        when "crescendo)" | "<)"  { $suffix ~= "\\!"; }
+                        when "diminuendo(" | ">(" { $suffix ~= "\\>"; }
+                        when "diminuendo)" | ">)" { $suffix ~= "\\!"; }
+                        when /^p+$/ | "mp" | "mf" | /^f+$/ | "fermata" | "accent" | "trill"
                                  { $suffix ~= "\\" ~ $element.value; }
                         $*ERR.say: "Unrecognized gracing: " ~ $element.value.perl;
                     }
