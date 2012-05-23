@@ -242,7 +242,11 @@ class TuneConvertor {
                 }
                 when "barline" {
                     $notes ~= self.WrapBar($lilypond, $duration);
-                    $notes ~= " |\n"; 
+                    if $element.value eq "||" {
+                        $notes ~= ' \\bar "||"';
+                    } else {
+                        $notes ~= " |\n"; 
+                    }
                     $lilypond = "";
                     $duration = 0;
                 }
@@ -338,16 +342,14 @@ class TuneConvertor {
                 }
                 self.SectionToLilypond(@elements[$start-of-section ..^ $i], $out);
                 $start-of-section = $i + 1;
-                # if @elements[$i].value eq '||' {
-                #     say '\\bar "||"';
-                # }
-                if @elements[$i].value eq '|]' {
-                    $out.say: '\\bar "|."';
+                given @elements[$i].value {
+                    when '||' { $out.say: '\\bar "||"'; }
+                    when '|]' { $out.say: '\\bar "|."'; }
                 }
             }
 
             if @elements[$i].key eq "nth_repeat" {
-                my $final-bar = False;
+                my $final-bar = "";
                 $out.say: "\\alternative \{";
                 my $endings = 0;
                 loop (; $i < +@elements; $i++) {
@@ -363,12 +365,13 @@ class TuneConvertor {
                 if $endings == 1 {
                     self.SectionToLilypond(@elements[$start-of-section ..^ $i], $out);
                     $start-of-section = $i + 1;
-                    $final-bar = True if $i < +@elements && @elements[$i].value eq '|]';
+                    $final-bar = @elements[$i].value if $i < +@elements && @elements[$i].value eq '|]' | '||';
                 }
                 $out.say: "\}";
                 
-                if $final-bar {
-                    $out.say: '\\bar "|."';
+                given $final-bar {
+                    when '||' { $out.say: '\\bar "||"'; }
+                    when '|]' { $out.say: '\\bar "|."'; }
                 }
                 
             }
@@ -391,6 +394,7 @@ class TuneConvertor {
 
 sub TuneStreamToLilypondStream($in, $out) {
     my $match = ABC::Grammar.parse($in.slurp, :rule<tune_file>, :actions(ABC::Actions.new));
+    die "Did not match ABC grammar" unless $match;
 
     $out.say: '\\version "2.12.3"';
     $out.say: "#(set-default-paper-size \"{$paper-size}\")";

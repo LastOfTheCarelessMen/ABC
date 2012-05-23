@@ -3,91 +3,91 @@ use v6;
 
 grammar ABC::Grammar
 {
-    regex header_field_name { \w }
-    regex header_field_data { \N* }
-    regex header_field { ^^ <header_field_name> ':' \s* <header_field_data> $$ }
-    regex header { [<header_field> \v+]+ }
+    token header_field_name { \w }
+    token header_field_data { \N* }
+    token header_field { ^^ <header_field_name> ':' \s* <header_field_data> $$ }
+    token header { [<header_field> \v+]+ }
 
-    regex basenote { <[a..g]+[A..G]> }
-    regex octave { "'"+ | ","+ }
-    regex accidental { '^^' | '^' | '__' | '_' | '=' }
-    regex pitch { <accidental>? <basenote> <octave>? }
+    token basenote { <[a..g]+[A..G]> }
+    token octave { "'"+ | ","+ }
+    token accidental { '^^' | '^' | '__' | '_' | '=' }
+    token pitch { <accidental>? <basenote> <octave>? }
 
-    regex tie { '-' }
-    regex number { <digit>+ }
-    regex note_length_denominator { '/' <bottom=number>? }
-    regex note_length { <top=number>? <note_length_denominator>? }
-    regex mnote { <pitch> <note_length> <tie>? }
-    regex stem { <mnote> | [ '[' <mnote>+ ']' <note_length> <tie>? ]  }
+    token tie { '-' }
+    token number { <digit>+ }
+    token note_length_denominator { '/' <bottom=number>? }
+    token note_length { <top=number>? <note_length_denominator>? }
+    token mnote { <pitch> <note_length> <tie>? }
+    token stem { <mnote> | [ '[' <mnote>+ ']' <note_length> <tie>? ]  }
     
-    regex rest_type { <[x..z]> }
-    regex rest { <rest_type> <note_length> }
-    regex multi_measure_rest { 'Z' <number> }
+    token rest_type { <[x..z]> }
+    token rest { <rest_type> <note_length> }
+    token multi_measure_rest { 'Z' <number> }
     
-    regex slur_begin { '(' }
-    regex slur_end { ')' }
+    token slur_begin { '(' }
+    token slur_end { ')' }
     
-    regex grace_note { <pitch> <note_length> } # as mnote, but without tie
-    regex grace_note_stem { <grace_note> | [ '[' <grace_note>+ ']' ]  }
-    regex acciaccatura { '/' }
-    regex grace_notes { '{' <acciaccatura>? <grace_note_stem>+ '}' }
+    token grace_note { <pitch> <note_length> } # as mnote, but without tie
+    token grace_note_stem { <grace_note> | [ '[' <grace_note>+ ']' ]  }
+    token acciaccatura { '/' }
+    token grace_notes { '{' <acciaccatura>? <grace_note_stem>+ '}' }
     
-    regex long_gracing_text { [<alpha> | '.' | ')' | '(']+ }
-    regex long_gracing { '+' <long_gracing_text> '+' }
-    regex gracing { '.' | '~' | <long_gracing> }
+    token long_gracing_text { [<alpha> | '.' | ')' | '(']+ }
+    token long_gracing { '+' <long_gracing_text> '+' }
+    token gracing { '.' | '~' | <long_gracing> }
     
-    regex spacing { \h+ }
+    token spacing { \h+ }
     
-    regex broken_rhythm_bracket { ['<'+ | '>'+] }
-    regex b_elem { <gracing> | <grace_notes> | <slur_begin> | <slur_end> }
-    regex broken_rhythm { <stem> <g1=b_elem>* <broken_rhythm_bracket> <g2=b_elem>* <stem> }
+    token broken_rhythm_bracket { ['<'+ | '>'+] }
+    token b_elem { <gracing> | <grace_notes> | <slur_begin> | <slur_end> }
+    token broken_rhythm { <stem> <g1=b_elem>* <broken_rhythm_bracket> <g2=b_elem>* <stem> }
     
-    regex t_elem { <gracing> | <grace_notes> | <broken_rhythm> | <slur_begin> | <slur_end> }
+    token t_elem { <gracing> | <grace_notes> | <broken_rhythm> | <slur_begin> | <slur_end> }
     # next line should work, but is NYI in Rakudo/Niecza
-    regex tuplet { '('(<digit>+) {} [<t_elem>* <stem>] ** { +$0 } <slur_end>? }
+    token tuplet { '('(<digit>+) {} [<t_elem>* <stem>] ** { +$0 } <slur_end>? }
     # next block makes the most common cases work
-    # regex tuplet { ['(3' [<t_elem>* <stem>] ** 3 <slur_end>? ] 
+    # token tuplet { ['(3' [<t_elem>* <stem>] ** 3 <slur_end>? ] 
     #              | ['(4' [<t_elem>* <stem>] ** 4 <slur_end>? ]
     #              | ['(5' [<t_elem>* <stem>] ** 5 <slur_end>? ] }
     
-    regex nth_repeat_num { <digit>+ [[',' | '-'] <digit>+]* }
-    regex nth_repeat_text { '"' .*? '"' }
-    regex nth_repeat { ['[' [ <nth_repeat_num> | <nth_repeat_text> ]] | [<?after '|'> <nth_repeat_num>] }
-    regex end_nth_repeat { ']' }
+    token nth_repeat_num { <digit>+ [[',' | '-'] <digit>+]* }
+    token nth_repeat_text { '"' .*? '"' }
+    token nth_repeat { ['[' [ <nth_repeat_num> | <nth_repeat_text> ]] | [<?after '|'> <nth_repeat_num>] }
+    token end_nth_repeat { ']' }
     
     regex inline_field { '[' <alpha> ':' $<value>=[.*?] ']' }
     
-    regex chord_accidental { '#' | 'b' | '=' }
-    regex chord_type { [ <alpha> | <digit> | '+' | '-' ]+ }
-    regex chord_newline { '\n' | ';' }
-    regex chord { <mainnote=basenote> <mainaccidental=chord_accidental>? <maintype=chord_type>? 
+    token chord_accidental { '#' | 'b' | '=' }
+    token chord_type { [ <alpha> | <digit> | '+' | '-' ]+ }
+    token chord_newline { '\n' | ';' }
+    token chord { <mainnote=basenote> <mainaccidental=chord_accidental>? <maintype=chord_type>? 
                   [ '/' <bassnote=basenote> <bass_accidental=chord_accidental>? ]? <non_quote>* } 
-    regex non_quote { <-["]> }
-    regex text_expression { [ '^' | '<' | '>' | '_' | '@' ] <non_quote>+ }
-    regex chord_or_text { '"' [ <chord> | <text_expression> ] [ <chord_newline> [ <chord> | <text_expression> ] ]* '"' }
+    token non_quote { <-["]> }
+    token text_expression { [ '^' | '<' | '>' | '_' | '@' ] <non_quote>+ }
+    token chord_or_text { '"' [ <chord> | <text_expression> ] [ <chord_newline> [ <chord> | <text_expression> ] ]* '"' }
     
-    regex element { <broken_rhythm> | <stem> | <rest> | <tuplet> | <slur_begin> | <slur_end> 
+    token element { <broken_rhythm> | <stem> | <rest> | <tuplet> | <slur_begin> | <slur_end> 
                     | <multi_measure_rest>
                     | <gracing> | <grace_notes> | <nth_repeat> | <end_nth_repeat>
                     | <spacing> | <inline_field> | <chord_or_text> }
     
-    regex barline { '||' | '|]' | ':|:' | '|:' | '|' | ':|' | '::' | '||:' }
+    token barline { '||' | '|]' | ':|:' | '|:' | '|' | ':|' | '::' | '||:' }
     
-    regex bar { <element>+ <barline>? }
+    token bar { <element>+ <barline>? }
         
-    regex line_of_music { <barline>? <bar>+ '\\'? }
+    token line_of_music { <barline>? <bar>+ '\\'? }
     
-    regex interior_header_field_name { < K M L > }
-    regex interior_header_field_data { \N* }
-    regex interior_header_field { ^^ <interior_header_field_name> ':' \s* <interior_header_field_data> $$ }
+    token interior_header_field_name { < K M L > }
+    token interior_header_field_data { \N* }
+    token interior_header_field { ^^ <interior_header_field_name> ':' \s* <interior_header_field_data> $$ }
     
-    regex music { [[<line_of_music> | <interior_header_field>] \s*]+ }
+    token music { [[<line_of_music> | <interior_header_field>] \s*]+ }
     
-    regex tune { <header> <music> }
+    token tune { <header> <music> }
     
-    regex tune_file { \s* [<tune> \s*]+ }
+    token tune_file { \s* [<tune> \s*]+ }
     
-    regex key_sig { <basenote> ('#' | 'b')? \h* (\w*) }
+    token key_sig { <basenote> ('#' | 'b')? \h* (\w*) }
     
     our sub key_signature($key_signature_name) is export
     {
