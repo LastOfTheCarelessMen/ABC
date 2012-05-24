@@ -12,8 +12,8 @@ or
 
 This will generate the a wedding.ly file which can be fed to Lilypond.
 
-If you install the module using panda, then if your paths are correctly set up
-you should be able to simply say
+If you install the module using panda and your paths are correctly set up, you
+should be able to simply say
 
     abc2ly wedding.abc
 
