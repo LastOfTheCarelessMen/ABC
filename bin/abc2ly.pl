@@ -393,8 +393,9 @@ class TuneConvertor {
 }
 
 sub TuneStreamToLilypondStream($in, $out) {
-    my $match = ABC::Grammar.parse($in.slurp, :rule<tune_file>, :actions(ABC::Actions.new));
-    die "Did not match ABC grammar" unless $match;
+    my $actions = ABC::Actions.new;
+    my $match = ABC::Grammar.parse($in.slurp, :rule<tune_file>, :$actions);
+    die "Did not match ABC grammar: last tune understood:\n { $actions.current-tune }" unless $match;
 
     $out.say: '\\version "2.12.3"';
     $out.say: "#(set-default-paper-size \"{$paper-size}\")";

@@ -12,9 +12,12 @@ use ABC::LongRest;
 use ABC::GraceNotes;
 
 class ABC::Actions {
+    has $.current-tune = "";
+    
     method header_field($/) {
         if $<header_field_name> eq "T" {
             $*ERR.say: "Parsing " ~ $<header_field_data>;
+            $.current-tune = $<header_field_data> ~ "\n";
         }
         
         make ~$<header_field_name> => ~$<header_field_data>;
@@ -153,6 +156,7 @@ class ABC::Actions {
     }
     
     method bar($/) {
+        $.current-tune ~= ~$/;
         my @bar = @( $<element> )>>.ast;
         if $<barline> {
             @bar.push($<barline>>>.ast);
@@ -172,6 +176,7 @@ class ABC::Actions {
             }
         }
         @line.push("endline" => "");
+        $.current-tune ~= "\n";
         make @line;
     }
     
