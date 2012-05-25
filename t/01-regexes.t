@@ -338,6 +338,20 @@ for ':|:', '|:', '|', ':|', '::', '|]'
 }
 
 {
+    my $match = ABC::Grammar.parse(" % this is a comment", :rule<comment_line>);
+    isa_ok $match, Match, 'Got a match';
+    ok $match, 'comment line recognized';
+    is $match, " % this is a comment", "Entire string was matched";
+}
+
+{
+    my $match = ABC::Grammar.parse("% this is a comment", :rule<comment_line>);
+    isa_ok $match, Match, 'Got a match';
+    ok $match, 'comment line recognized';
+    is $match, "% this is a comment", "Entire string was matched";
+}
+
+{
     my $line = "g>ecg ec e/f/g/e/ | d/c/B/A/ [K:F] Gd BG B/c/d/B/ |";
     my $match = ABC::Grammar.parse($line, :rule<line_of_music>);
     isa_ok $match, Match, 'Got a match';
@@ -392,7 +406,8 @@ for ':|:', '|:', '|', ':|', '::', '|]'
 }
 
 {
-    my $music = q«X:64
+    my $music = q«% Comment
+X:64
 T:Cuckold Come Out o' the Amrey
 S:Northumbrian Minstrelsy
 M:4/4

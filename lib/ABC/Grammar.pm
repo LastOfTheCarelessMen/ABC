@@ -3,10 +3,12 @@ use v6;
 
 grammar ABC::Grammar
 {
+    regex comment_line { ^^ \h* '%' \N* $$ }
+    
     token header_field_name { \w }
     token header_field_data { \N* }
     token header_field { ^^ <header_field_name> ':' \s* <header_field_data> $$ }
-    token header { [<header_field> \v+]+ }
+    token header { [[<header_field> | <comment_line>] \v+]+ }
 
     token basenote { <[a..g]+[A..G]> }
     token octave { "'"+ | ","+ }
@@ -80,8 +82,8 @@ grammar ABC::Grammar
     token interior_header_field_name { < K M L > }
     token interior_header_field_data { \N* }
     token interior_header_field { ^^ <interior_header_field_name> ':' \s* <interior_header_field_data> $$ }
-    
-    token music { [[<line_of_music> | <interior_header_field>] \s*]+ }
+
+    token music { [[<line_of_music> | <interior_header_field> | <comment_line> ] \s*]+ }
     
     token tune { <header> <music> }
     
