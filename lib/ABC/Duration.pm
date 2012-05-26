@@ -18,7 +18,15 @@ role ABC::Duration {
             when 1 { ""; }
             when 1/2 { "/"; }
             when Int { .Str; }
-            when Rat { $_.denominator == 1 ?? ~$_.numerator !! $_.numerator ~ "/" ~ $_.denominator; }
+            when Rat { 
+                if $_.denominator == 1 { 
+                    ~$_.numerator;
+                } elsif $_.numerator == 1 {
+                    "/" ~ $_.denominator;
+                } else {
+                    $_.numerator ~ "/" ~ $_.denominator; 
+                }
+            }
             die "Duration must be Int or Rat, but it's { .WHAT }";
         }
     }

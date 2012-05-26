@@ -14,7 +14,7 @@ use ABC::LongRest;
 use ABC::GraceNotes;
 use ABC::Actions;
 
-my @simple-cases = ("a", "B,", "c'''", );
+my @simple-cases = ("a", "B,", "c'''", "^D2", "_E,,/", "^^f/4", "=G3");
 
 for @simple-cases -> $test-case {
     my $match = ABC::Grammar.parse($test-case, :rule<element>, :actions(ABC::Actions.new));
