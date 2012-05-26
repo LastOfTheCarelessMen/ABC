@@ -429,7 +429,7 @@ M:4/4
 L:1/8
 K:D
 A/B/c/A/ +trill+c>d e>deg | GG +trill+B>c d/B/A/G/ B/c/d/B/ |
-A/B/c/A/ c>d e>deg | dB/A/ gB +trill+A2 +trill+e2 ::
+A/B/c/A/ c>d e>deg | dB/A/ gB +trill+A2 +trill+e2 :: % test comment
 g>ecg ec e/f/g/e/ | d/c/B/A/ Gd BG B/c/d/B/ | 
 g/f/e/d/ c/d/e/f/ gc e/f/g/e/ | dB/A/ gB +trill+A2 +trill+e2 :|
 »;

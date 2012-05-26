@@ -3,7 +3,8 @@ use v6;
 
 grammar ABC::Grammar
 {
-    regex comment_line { ^^ \h* '%' \N* $$ }
+    regex comment { \h* '%' \N* $$ }
+    regex comment_line { ^^ <comment> }
     
     token header_field_name { \w }
     token header_field_data { \N* }
@@ -77,11 +78,11 @@ grammar ABC::Grammar
     
     token bar { <element>+ <barline>? }
         
-    token line_of_music { <barline>? <bar>+ '\\'? }
+    token line_of_music { <barline>? <bar>+ '\\'? <comment>? $$ }
     
     token interior_header_field_name { < K M L > }
     token interior_header_field_data { \N* }
-    token interior_header_field { ^^ <interior_header_field_name> ':' \s* <interior_header_field_data> $$ }
+    token interior_header_field { ^^ <interior_header_field_name> ':' \h* <interior_header_field_data> $$ }
 
     token music { [[<line_of_music> | <interior_header_field> | <comment_line> ] \s*]+ }
     
