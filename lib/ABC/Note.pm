@@ -21,6 +21,6 @@ class ABC::Note does ABC::Duration {
     }
 
     method perl() {
-        "ABC::Note.new({ $.pitch.perl }, { $.ticks.perl }, { $.is-tie.perl })";
+        "ABC::Note.new({ $.accidental.perl }, { $.basenote.perl }, { $.octave.perl } { $.ticks.perl }, { $.is-tie.perl })";
     }
 }
