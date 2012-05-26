@@ -8,4 +8,8 @@ class ABC::GraceNotes {
         die "GraceNotes must have at least one note" if +@notes == 0;
         self.bless(*, :$acciaccatura, :@notes);
     }
+
+    method Str() {
+        '{' ~ ($.acciaccatura ?? '/' !! '') ~ @.notes.join('') ~ '}';
+    }
 }

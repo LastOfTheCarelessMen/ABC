@@ -15,9 +15,11 @@ use ABC::GraceNotes;
 use ABC::Actions;
 
 my @simple-cases = ("a", "B,", "c'''", "^D2-", "_E,,/", "^^f/4", "=G3",
+                    "z3", "y/3", "x", "Z10",
                     "[ceg]", "[D3/2d3/2]", "[A,2F2]",
                     "(3abc", "(5A/B/C/D/E/",
                     "a>b", "^c/4<B,,/4",
+                    '{cdc}', '{/d}',
                     "(", ")");
 
 for @simple-cases -> $test-case {
