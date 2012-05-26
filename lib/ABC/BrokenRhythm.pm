@@ -46,5 +46,9 @@ class ABC::BrokenRhythm does ABC::Duration {
         new-rhythm($.stem2, self.broken-direction-forward ?? $.stem2.ticks * self.broken-factor
                                                           !! $.stem2.ticks * (2 - self.broken-factor));
     }
-    
+
+    method Str() {
+        # Handle gracings here, too
+        $.stem1 ~ $.broken-rhythm ~ $.stem2;
+    }
 }
