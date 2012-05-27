@@ -46,8 +46,8 @@ grammar ABC::Grammar
     token broken_rhythm { <stem> <g1=b_elem>* <broken_rhythm_bracket> <g2=b_elem>* <stem> }
     
     token t_elem { <gracing> | <grace_notes> | <broken_rhythm> | <slur_begin> | <slur_end> }
-    # next line should work, but is NYI in Rakudo/Niecza
     token tuplet { '('(<digit>+) {} [<t_elem>* <stem>] ** { +$0 } <slur_end>? }
+    # If the previous line fails, you can use the next rule to get the most common cases
     # next block makes the most common cases work
     # token tuplet { ['(3' [<t_elem>* <stem>] ** 3 <slur_end>? ] 
     #              | ['(4' [<t_elem>* <stem>] ** 4 <slur_end>? ]
