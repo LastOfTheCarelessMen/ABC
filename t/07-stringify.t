@@ -20,12 +20,15 @@ my @simple-cases = ("a", "B,", "c'''", "^D2-", "_E,,/", "^^f/4", "=G3",
                     "(3abc", "(5A/B/C/D/E/",
                     "a>b", "^c/4<B,,/4",
                     '{cdc}', '{/d}',
-                    "(", ")");
+                    "(", ")", 
+                    " ", "\t ",
+                    "[2", "]");
 
 my @tricky-cases = ('"A"', '"A/B"', '"Am/Bb"',
                     '"^this goes up"', '"_This goes down"',
                     "+trill+", "+accent+",
-                    ".", "~");
+                    ".", "~",
+                    "[K:Amin]", "[M:3/4]", "[L:1/2]");
 
 for @simple-cases -> $test-case {
     my $match = ABC::Grammar.parse($test-case, :rule<element>, :actions(ABC::Actions.new));
@@ -43,10 +46,8 @@ sub ElementToStr($element-pair) {
                 '+' ~ $element-pair.value ~ '+';
             }
         }
-        when "nth_repeat" {}
-        when "end_nth_repeat" {} 
-        when "inline_field" {}
-        when "chord_or_text" { '"' ~ $element-pair.value ~ '"' }
+        when "inline_field" { '[' ~ $element-pair.value.key ~ ':' ~ $element-pair.value.value ~ ']'; }
+        when "chord_or_text" { '"' ~ $element-pair.value ~ '"'; }
         ~$element-pair.value;
     }
 }
