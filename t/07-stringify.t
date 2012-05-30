@@ -22,6 +22,11 @@ my @simple-cases = ("a", "B,", "c'''", "^D2-", "_E,,/", "^^f/4", "=G3",
                     '{cdc}', '{/d}',
                     "(", ")");
 
+my @tricky-cases = ('"A"', '"A/B"', '"Am/Bb"',
+                    '"^this goes up"', '"_This goes down"',
+                    "+trill+", "+accent+",
+                    ".", "~");
+
 for @simple-cases -> $test-case {
     my $match = ABC::Grammar.parse($test-case, :rule<element>, :actions(ABC::Actions.new));
     ok $match, "$test-case parsed";
@@ -30,7 +35,27 @@ for @simple-cases -> $test-case {
     is ~$object, $test-case, "Stringified version matches";
 }
 
+sub ElementToStr($element-pair) { 
+    given $element-pair.key {
+        when "gracing" {
+            given $element-pair.value {
+                when '.' | '~' { $element-pair.value; }
+                '+' ~ $element-pair.value ~ '+';
+            }
+        }
+        when "nth_repeat" {}
+        when "end_nth_repeat" {} 
+        when "inline_field" {}
+        when "chord_or_text" { '"' ~ $element-pair.value ~ '"' }
+        ~$element-pair.value;
+    }
+}
 
+for @simple-cases, @tricky-cases -> $test-case {
+    my $match = ABC::Grammar.parse($test-case, :rule<element>, :actions(ABC::Actions.new));
+    ok $match, "$test-case parsed";
+    is ElementToStr($match.ast), $test-case, "ElementToStr version matches";
+}
 
 
 done;
