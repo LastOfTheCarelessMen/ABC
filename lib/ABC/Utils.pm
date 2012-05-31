@@ -9,6 +9,7 @@ package ABC::Utils {
             }
             when "inline_field" { '[' ~ $element-pair.value.key ~ ':' ~ $element-pair.value.value ~ ']'; }
             when "chord_or_text" { '"' ~ $element-pair.value ~ '"'; }
+            when "endline" { "\n"; }
             ~$element-pair.value;
         }
     }
