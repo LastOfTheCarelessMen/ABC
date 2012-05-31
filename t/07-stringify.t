@@ -13,6 +13,7 @@ use ABC::Chord;
 use ABC::LongRest;
 use ABC::GraceNotes;
 use ABC::Actions;
+use ABC::Utils;
 
 my @simple-cases = ("a", "B,", "c'''", "^D2-", "_E,,/", "^^f/4", "=G3",
                     "z3", "y/3", "x", "Z10",
@@ -36,20 +37,6 @@ for @simple-cases -> $test-case {
     my $object = $match.ast.value;
     # say $object.perl;
     is ~$object, $test-case, "Stringified version matches";
-}
-
-sub ElementToStr($element-pair) { 
-    given $element-pair.key {
-        when "gracing" {
-            given $element-pair.value {
-                when '.' | '~' { $element-pair.value; }
-                '+' ~ $element-pair.value ~ '+';
-            }
-        }
-        when "inline_field" { '[' ~ $element-pair.value.key ~ ':' ~ $element-pair.value.value ~ ']'; }
-        when "chord_or_text" { '"' ~ $element-pair.value ~ '"'; }
-        ~$element-pair.value;
-    }
 }
 
 for @simple-cases, @tricky-cases -> $test-case {
