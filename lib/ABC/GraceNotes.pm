@@ -1,6 +1,8 @@
 use v6;
 
-class ABC::GraceNotes {
+use ABC::Pitched;
+
+class ABC::GraceNotes does ABC::Pitched {
     has $.acciaccatura;
     has @.notes;
     
@@ -11,5 +13,9 @@ class ABC::GraceNotes {
 
     method Str() {
         '{' ~ ($.acciaccatura ?? '/' !! '') ~ @.notes.join('') ~ '}';
+    }
+
+    method transpose($pitch-changer) {
+        ABC::GraceNotes.new($.acciaccatura, @.notes>>.transpose($pitch-changer));
     }
 }

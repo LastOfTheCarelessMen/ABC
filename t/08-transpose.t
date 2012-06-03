@@ -39,6 +39,10 @@ is transpose("a''2", &up-octave), "a'''2", "Octave bump to a'' yields a'''";
 is transpose("A,-", &up-octave), "A-", "Octave bump to A, yields A";
 is transpose("A,,", &up-octave), "A,", "Octave bump to A,, yields A,";
 is transpose("[C,Eg]", &up-octave), "[Ceg']", "Octave bump to [C,Eg] yields [Ceg']";
+is transpose("[C,Eg]", &up-octave), "[Ceg']", "Octave bump to [C,Eg] yields [Ceg']";
+is transpose("(3C,Eg", &up-octave), "(3Ceg'", "Octave bump to (3C,Eg yields (3Ceg'";
+is transpose("A<a", &up-octave), "a<a'", "Octave bump to A<a yields a<a'";
+is transpose('{Bc}', &up-octave), '{bc\'}', "Octave bump to Bc yields bc'";
 
 
 done;

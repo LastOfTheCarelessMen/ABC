@@ -1,10 +1,11 @@
 use v6;
 
 use ABC::Duration;
+use ABC::Pitched;
 use ABC::Note;
 use ABC::Stem;
 
-class ABC::BrokenRhythm does ABC::Duration {
+class ABC::BrokenRhythm does ABC::Duration does ABC::Pitched {
     has $.stem1;
     has $.gracing1;
     has $.broken-rhythm;
@@ -50,5 +51,13 @@ class ABC::BrokenRhythm does ABC::Duration {
     method Str() {
         # Handle gracings here, too
         $.stem1 ~ $.broken-rhythm ~ $.stem2;
+    }
+
+    method transpose($pitch-changer) {
+        ABC::BrokenRhythm.new($.stem1.transpose($pitch-changer), 
+                              $.gracing1,
+                              $.broken-rhythm,
+                              $.gracing2,
+                              $.stem2.transpose($pitch-changer));
     }
 }

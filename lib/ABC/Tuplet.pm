@@ -1,8 +1,9 @@
 use v6;
 
 use ABC::Duration;
+use ABC::Pitched;
 
-class ABC::Tuplet does ABC::Duration {
+class ABC::Tuplet does ABC::Duration does ABC::Pitched {
     has $.tuple;
     has @.notes;
     
@@ -13,5 +14,9 @@ class ABC::Tuplet does ABC::Duration {
 
     method Str() {
         "(" ~ $.tuple ~ @.notes.join("");
+    }
+
+    method transpose($pitch-changer) {
+        ABC::Tuplet.new($.tuple, @.notes>>.transpose($pitch-changer));
     }
 }
