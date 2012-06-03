@@ -14,8 +14,8 @@ sub print-header($out, $header) {
     }
 }
 
-sub print-music($out, $tune) {
-    for $tune.music -> $element {
+sub print-music($out, @music) {
+    for @music -> $element {
         print ElementToStr($element);
     }
 }
@@ -34,7 +34,7 @@ sub Transpose($in, $out) {
         # my $meter = $tune.header.get-first-value("M");
         # my $length = $tune.header.get-first-value("L") // "1/8";
 
-        print-music($out, $tune);
+        print-music($out, $tune.music);
     }
 }
 

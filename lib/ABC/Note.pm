@@ -23,4 +23,9 @@ class ABC::Note does ABC::Duration {
     method perl() {
         "ABC::Note.new({ $.accidental.perl }, { $.basenote.perl }, { $.octave.perl } { $.ticks.perl }, { $.is-tie.perl })";
     }
+
+    method transpose($pitch-changer) {
+        my ($new-accidental, $new-basenote, $new-octave) = $pitch-changer($.accidental, $.basenote, $.octave);
+        ABC::Note.new($new-accidental, $new-basenote, $new-octave, self, $.is-tie);
+    }
 }
