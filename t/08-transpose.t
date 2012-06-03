@@ -35,9 +35,10 @@ sub up-octave($accidental, $basenote, $octave) {
 
 is transpose("A", &up-octave), "a", "Octave bump to A yields a";
 is transpose("a", &up-octave), "a'", "Octave bump to a yields a'";
-is transpose("a''", &up-octave), "a'''", "Octave bump to a'' yields a'''";
-is transpose("A,", &up-octave), "A", "Octave bump to A, yields A";
+is transpose("a''2", &up-octave), "a'''2", "Octave bump to a'' yields a'''";
+is transpose("A,-", &up-octave), "A-", "Octave bump to A, yields A";
 is transpose("A,,", &up-octave), "A,", "Octave bump to A,, yields A,";
+is transpose("[C,Eg]", &up-octave), "[Ceg']", "Octave bump to [C,Eg] yields [Ceg']";
 
 
 done;

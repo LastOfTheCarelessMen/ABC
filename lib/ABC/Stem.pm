@@ -1,8 +1,9 @@
 use v6;
 
 use ABC::Duration;
+use ABC::Pitched;
 
-class ABC::Stem does ABC::Duration {
+class ABC::Stem does ABC::Duration does ABC::Pitched {
     has @.notes;
     has $.is-tie;
     
@@ -13,5 +14,9 @@ class ABC::Stem does ABC::Duration {
 
     method Str() {
         "[" ~ @.notes.join("") ~ "]" ~ ($.is-tie ?? "-" !! "");
+    }
+
+    method transpose($pitch-changer) {
+        ABC::Stem.new(@.notes>>.transpose($pitch-changer), self, $.is-tie);
     }
 }

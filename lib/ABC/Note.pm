@@ -1,8 +1,9 @@
 use v6;
 
 use ABC::Duration;
+use ABC::Pitched;
 
-class ABC::Note does ABC::Duration {
+class ABC::Note does ABC::Duration does ABC::Pitched {
     has $.accidental;
     has $.basenote;
     has $.octave;
