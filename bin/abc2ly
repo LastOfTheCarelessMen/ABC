@@ -6,6 +6,7 @@ use ABC::Actions;
 use ABC::Duration; #OK
 use ABC::Note;
 use ABC::LongRest;
+use ABC::Utils;
 
 my $paper-size = "letter"; # or switch to "a4" for European paper
 
@@ -23,14 +24,6 @@ my %octave-map = ( -1 => "",
 
 my %unrecognized_gracings;
                 
-sub is-a-power-of-two($n) {
-    if $n ~~ Rat {
-        is-a-power-of-two($n.numerator) && is-a-power-of-two($n.denominator);
-    } else {
-        !($n +& ($n - 1));
-    }
-}
-                    
 class Context {
     has $.key-name;
     has %.key;

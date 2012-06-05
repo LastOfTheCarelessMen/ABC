@@ -1,6 +1,7 @@
 use v6;
+use ABC::Pitched;
 
-class ABC::Chord {
+class ABC::Chord does ABC::Pitched {
     has $.main-note;
     has $.main-accidental;
     has $.main-type;
@@ -17,5 +18,29 @@ class ABC::Chord {
 
     method perl() {
         "ABC::Chord.new({ $.main-note.perl }, { $.main-accidental.perl }, { $.main-type.perl }, { $.bass-note.perl }, { $.bass-accidental.perl })";
+    }
+
+    method transpose($pitch-changer) {
+        sub change-chord($note, $accidental) {
+            my $note-accidental;
+            given $accidental {
+                when '#' { $note-accidental = '^' }
+                when 'b' { $note-accidental = '_' }
+                when '=' { $note-accidental = '=' }
+            }
+            my ($new-accidental, $new-note, $new-octave) = $pitch-changer($note-accidental, $note, "");
+            given $new-accidental {
+                when '^' { $new-accidental = '#' } 
+                when '_' { $new-accidental = 'b' } 
+                when '=' { $new-accidental = '=' } 
+                when ''  { $new-accidental = ''  }
+                die "Unable to handle $new-accidental in a chord name";
+            }
+            ($new-accidental, $new-note.uc);
+        }
+        
+        my ($main-note, $main-accidental) = change-chord($.main-note, $.main-accidental);
+        my ($bass-note, $bass-accidental) = change-chord($.bass-note, $.bass-accidental);
+        ABC::Chord.new($main-note, $main-accidental, $.main-type, $bass-note, $bass-accidental);
     }
 }
