@@ -11,7 +11,12 @@ package ABC::Utils {
                 }
             }
             when "inline_field" { '[' ~ $element-pair.value.key ~ ':' ~ $element-pair.value.value ~ ']'; }
-            when "chord_or_text" { '"' ~ $element-pair.value ~ '"'; }
+            when "chord_or_text" { 
+                $element-pair.value.map({
+                    when Str { '"' ~ $_ ~ '"'; }
+                    ~$_; 
+                }).join('') ; 
+            }
             when "endline" { "\n"; }
             ~$element-pair.value;
         }

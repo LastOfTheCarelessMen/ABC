@@ -13,7 +13,11 @@ class ABC::Chord does ABC::Pitched {
     }
 
     method Str() {
-        $.main-note ~ $.main-accidental ~ $.main-type ~ ($.bass-note ?? '/' ~ $.bass-note ~ $.bass-accidental !! "");
+        '"' ~ $.main-note 
+            ~ $.main-accidental 
+            ~ $.main-type 
+            ~ ($.bass-note ?? '/' ~ $.bass-note ~ $.bass-accidental !! "")
+            ~ '"';
     }
 
     method perl() {
@@ -26,17 +30,17 @@ class ABC::Chord does ABC::Pitched {
             given $accidental {
                 when '#' { $note-accidental = '^' }
                 when 'b' { $note-accidental = '_' }
-                when '=' { $note-accidental = '=' }
+                $note-accidental = '=';
             }
             my ($new-accidental, $new-note, $new-octave) = $pitch-changer($note-accidental, $note, "");
             given $new-accidental {
                 when '^' { $new-accidental = '#' } 
                 when '_' { $new-accidental = 'b' } 
-                when '=' { $new-accidental = '=' } 
+                when '=' { $new-accidental = ''  } 
                 when ''  { $new-accidental = ''  }
                 die "Unable to handle $new-accidental in a chord name";
             }
-            ($new-accidental, $new-note.uc);
+            ($new-note.uc, $new-accidental);
         }
         
         my ($main-note, $main-accidental) = change-chord($.main-note, $.main-accidental);

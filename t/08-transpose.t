@@ -19,7 +19,11 @@ use ABC::Pitched;
 sub transpose(Str $test, $pitch-changer) {
     my $match = ABC::Grammar.parse($test, :rule<element>, :actions(ABC::Actions.new));
     if $match {
-        $match.ast.value.transpose($pitch-changer);
+        given $match.ast.value {
+            when Positional { $_>>.transpose($pitch-changer); }
+            when ABC::Pitched { $_.transpose($pitch-changer); }
+            die "Don't know how to transpose { $_.WHAT }";
+        }
     }
 }
 
@@ -43,7 +47,7 @@ is transpose("[C,Eg]", &up-octave), "[Ceg']", "Octave bump to [C,Eg] yields [Ceg
 is transpose("(3C,Eg", &up-octave), "(3Ceg'", "Octave bump to (3C,Eg yields (3Ceg'";
 is transpose("A<a", &up-octave), "a<a'", "Octave bump to A<a yields a<a'";
 is transpose('{Bc}', &up-octave), '{bc\'}', "Octave bump to Bc yields bc'";
-# is transpose('"Amin/F"', &up-octave), '"Amin/F"', "Octave bump to chord yields no change";
+is transpose('"Amin/F"', &up-octave), '"Amin/F"', "Octave bump to chord yields no change";
 
 sub pitch2ordinal(%key, $test) {
     my $match = ABC::Grammar.parse($test, :rule<mnote>, :actions(ABC::Actions.new));
@@ -134,7 +138,8 @@ is transpose("[EGB]", &e-flat-to-d), "[DFA]", "Eb to D on [EGB] yields [DFA]";
 is transpose("(3C,Eg", &e-flat-to-d), "(3B,,Df", "Eb to D on (3C,Eg yields (3B,,Df";
 is transpose("=A<a", &e-flat-to-d), "^G<g", "Eb to D on =A<a yields ^G<g";
 is transpose('{Bc}', &e-flat-to-d), '{AB}', "Eb to D on Bc yields AB";
-# is transpose('"Amin/F"', &e-flat-to-d), '"Amin/F"', "Eb to D on chord yields no change";
+is transpose('"Amin/F"', &e-flat-to-d), '"G#min/E"', "Eb to D on Amin/F yields G#min/E";
+is transpose('"Abmin/F"', &e-flat-to-d), '"Gmin/E"', "Eb to D on Abmin/F yields Gmin/E";
 
 
 done;
