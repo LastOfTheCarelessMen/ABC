@@ -282,7 +282,7 @@ class TuneConvertor {
                 when "chord_or_text" {
                     for @($element.value) -> $chord_or_text {
                         if $chord_or_text ~~ ABC::Chord {
-                            $suffix ~= '^"' ~ $chord_or_text ~ '"';
+                            $suffix ~= '^' ~ $chord_or_text ~ " ";
                         } else {
                             given $element.value {
                                 when /^ '^'(.*)/ { $suffix ~= '^"' ~ $0 ~ '" ' }
