@@ -223,6 +223,7 @@ class TuneConvertor {
                         when "segno" { $lilypond ~= '\\mark \\markup { \\musicglyph #"scripts.segno" }'; }
                         when "coda"  { $lilypond ~= '\\mark \\markup { \\musicglyph #"scripts.coda" }'; }
                         when "D.C."  { $lilypond ~= '\\mark "D.C."'}
+                        when "D.S."  { $lilypond ~= '\\mark "D.S."'}
                         when "crescendo(" | "<("  { $suffix ~= "\\<"; }
                         when "crescendo)" | "<)"  { $suffix ~= "\\!"; }
                         when "diminuendo(" | ">(" { $suffix ~= "\\>"; }
