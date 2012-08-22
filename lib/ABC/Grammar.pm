@@ -74,7 +74,7 @@ grammar ABC::Grammar
                     | <gracing> | <grace_notes> | <nth_repeat> | <end_nth_repeat>
                     | <spacing> | <inline_field> | <chord_or_text> }
     
-    token barline { '||' | '|]' | ':|:' | '|:' | '|' | ':|' | '::' | '||:' }
+    token barline { '||' | '|]' | ':|:' | '|:' | '|' | ':|' | '::' | '||:' | '&' }
     
     token bar { <element>+ <barline>? }
         

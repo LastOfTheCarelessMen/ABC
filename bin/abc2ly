@@ -416,20 +416,23 @@ multi sub MAIN() {
     TuneStreamToLilypondStream($*IN, $*OUT);
 }
 
-multi sub MAIN($abc-file) {
-    my $ly-file = $abc-file ~ ".ly";
-    if $abc-file ~~ /^(.*) ".abc"/ {
-        $ly-file = $0 ~ ".ly";
+multi sub MAIN($first-abc-file, *@other-abc-files) {
+    my @abc-files = $first-abc-file, @other-abc-files;
+    for @abc-files -> $abc-file {
+        my $ly-file = $abc-file ~ ".ly";
+        if $abc-file ~~ /^(.*) ".abc"/ {
+            $ly-file = $0 ~ ".ly";
+        }
+        $*ERR.say: "Reading $abc-file, writing $ly-file";
+    
+        my $in = open $abc-file, :r or die "Unable to open $abc-file";
+        my $out = open $ly-file, :w or die "Unable to open $ly-file";
+    
+        TuneStreamToLilypondStream($in, $out);
+    
+        $out.close;
+        $in.close;
     }
-    $*ERR.say: "Reading $abc-file, writing $ly-file";
-    
-    my $in = open $abc-file, :r or die "Unable to open $abc-file";
-    my $out = open $ly-file, :w or die "Unable to open $ly-file";
-    
-    TuneStreamToLilypondStream($in, $out);
-    
-    $out.close;
-    $in.close;
     
     $*ERR.say: "Unrecognized gracings: " ~ %unrecognized_gracings.keys.join(", ") if %unrecognized_gracings;
 }

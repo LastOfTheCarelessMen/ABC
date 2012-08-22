@@ -141,5 +141,30 @@ is transpose('{Bc}', &e-flat-to-d), '{AB}', "Eb to D on Bc yields AB";
 is transpose('"Amin/F"', &e-flat-to-d), '"G#min/E"', "Eb to D on Amin/F yields G#min/E";
 is transpose('"Abmin/F"', &e-flat-to-d), '"Gmin/E"', "Eb to D on Abmin/F yields Gmin/E";
 
+class Transposer {
+    has %.key-changes;
+    has $.half-step-shift;
+    has $.pitch-name-shift;
+    has %.current-from;
+    has %.current-to;
+
+    multi method new(%key-changes, $half-step-shift) {
+        self.bless(*, :%key-changes, :$half-step-shift);
+    }
+
+    method set-key($new-key) {
+        %.current-from = key_signature($new-key);
+        %.current-to = key_signature(%.key-changes{$new-key});
+        # $.pitch-name-shift = $new-key.
+        
+    }
+
+    method postcircumfix:<( )>($accidental, $basenote, $octave) {
+        my $ordinal = pitch-to-ordinal(%.current-from, $accidental, $basenote, $octave);
+        my $basenote-in-new-key = "A".ord + ($basenote.uc.ord - "A".ord + $.pitch-name-shift) % 7;
+        ordinal-to-pitch(%.current-to, $basenote-in-new-key, $ordinal + $.half-step-shift);
+    }
+}
+
 
 done;
