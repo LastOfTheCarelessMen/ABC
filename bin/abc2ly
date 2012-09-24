@@ -161,10 +161,10 @@ class TuneConvertor {
             ~ " ";
     }
     
-    method WrapBar($lilypond-bar, $duration) {
+    method WrapBar($lilypond-bar, $duration, :$beginning?) {
         my $ticks-in-measure = $.context.ticks-in-measure;
         my $result = "";
-        if $duration % $ticks-in-measure != 0 {
+        if $beginning && $duration % $ticks-in-measure != 0 {
             my $note-length = 1 / $.context.length;
             my $count = $duration % $ticks-in-measure;
             if $count ~~ Rat {
@@ -181,7 +181,8 @@ class TuneConvertor {
         $result ~ $lilypond-bar; 
     }
     
-    method SectionToLilypond(@elements, $out) {
+    method SectionToLilypond(@elements, $out, :$beginning?) {
+        my $first-time = $beginning // False;
         my $notes = "";
         my $lilypond = "";
         my $duration = 0;
@@ -235,7 +236,8 @@ class TuneConvertor {
                     }
                 }
                 when "barline" {
-                    $notes ~= self.WrapBar($lilypond, $duration);
+                    $notes ~= self.WrapBar($lilypond, $duration, :beginning($first-time));
+                    $first-time = False;
                     if $element.value eq "||" {
                         $notes ~= ' \\bar "||"';
                     } else {
@@ -313,7 +315,8 @@ class TuneConvertor {
         }
     
         $out.say: "\{";
-        $notes ~= self.WrapBar($lilypond, $duration);
+        $notes ~= self.WrapBar($lilypond, $duration, :beginning($first-time));
+        $first-time = False;
         $out.say: $notes;
         $out.say: " \}";
     }
@@ -334,7 +337,7 @@ class TuneConvertor {
                    || @elements[$i].value eq ':|:' | ':|' | '::' {
                     $out.print: "\\repeat volta 2 "; # 2 is abitrarily chosen here!
                 }
-                self.SectionToLilypond(@elements[$start-of-section ..^ $i], $out);
+                self.SectionToLilypond(@elements[$start-of-section ..^ $i], $out, :beginning);
                 $start-of-section = $i + 1;
                 given @elements[$i].value {
                     when '||' { $out.say: '\\bar "||"'; }
@@ -375,7 +378,7 @@ class TuneConvertor {
             if @elements[*-1].value eq ':|:' | ':|' | '::' {
                 $out.print: "\\repeat volta 2 "; # 2 is abitrarily chosen here!
             }
-            self.SectionToLilypond(@elements[$start-of-section ..^ +@elements], $out);
+            self.SectionToLilypond(@elements[$start-of-section ..^ +@elements], $out, :beginning);
             if @elements[*-1].value eq '|]' {
                 $out.say: '\\bar "|."';
             }
@@ -429,6 +432,10 @@ multi sub MAIN($first-abc-file, *@other-abc-files) {
         my $out = open $ly-file, :w or die "Unable to open $ly-file";
     
         TuneStreamToLilypondStream($in, $out);
+    
+        # $out.say: '\markup {';
+        # $out.say: '    "For more information on these tunes, please see http://midlandceltic.org/ws2011/"';
+        # $out.say: '}';
     
         $out.close;
         $in.close;
