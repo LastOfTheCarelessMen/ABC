@@ -17,7 +17,7 @@ class ABC::Actions {
     method header_field($/) {
         if $<header_field_name> eq "T" {
             $*ERR.say: "Parsing " ~ $<header_field_data>;
-            $.current-tune = $<header_field_data> ~ "\n";
+            $!current-tune = $<header_field_data> ~ "\n";
         }
         
         make ~$<header_field_name> => ~$<header_field_data>;
@@ -37,7 +37,11 @@ class ABC::Actions {
     
     method note_length($/) {
         if $<note_length_denominator> {
-            make duration-from-parse($<top>, $<note_length_denominator><bottom>);
+            if $<note_length_denominator> ~~ Parcel {
+                make duration-from-parse($<top>, $<note_length_denominator>[0]<bottom>);
+            } else {
+                make duration-from-parse($<top>, $<note_length_denominator><bottom>);
+            }
         } else {
             make duration-from-parse($<top>);
         }
@@ -156,7 +160,7 @@ class ABC::Actions {
     }
     
     method bar($/) {
-        $.current-tune ~= ~$/;
+        $!current-tune ~= ~$/;
         my @bar = @( $<element> )>>.ast;
         if $<barline> {
             @bar.push($<barline>>>.ast);
@@ -176,7 +180,7 @@ class ABC::Actions {
             }
         }
         @line.push("endline" => "");
-        $.current-tune ~= "\n";
+        $!current-tune ~= "\n";
         make @line;
     }
     
