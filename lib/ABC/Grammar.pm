@@ -110,8 +110,6 @@ grammar ABC::Grammar
     token phrygian { "phr" ["y" ["g" ["i" ["a" ["n"]?]?]?]?]? } # minor with flat 2nd
     token locrian { "loc" ["r" ["i" ["a" ["n"]?]?]?]? } # minor with flat 2nd and 5th
     token global-accidental { <accidental> <basenote> } # e.g. ^f =c _b
-    
-    token key_sig { <basenote> ('#' | 'b')? \h* (\w*) }
 }
 
 sub header_hash($header_match) #OK
