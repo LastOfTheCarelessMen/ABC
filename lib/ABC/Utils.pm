@@ -38,7 +38,7 @@ package ABC::Utils {
         # say :$match.perl;
         die "Illegal key signature\n" unless $match;
         fail unless $match<key-def>;
-        say $match<key-def>.perl;
+        # say $match<key-def>.perl;
         my $lookup = $match<key-def><basenote>.uc;
         # say :$lookup.perl;
         my $sharps = %keys{$match<key-def><basenote>.uc};
@@ -74,7 +74,6 @@ package ABC::Utils {
 
         if $match<key-def><global-accidental> {
             for $match<key-def><global-accidental> -> $ga {
-                say $ga<basenote>.uc, " huh ", ~$ga<accidental>;
                 %hash{$ga<basenote>.uc} = ~$ga<accidental>;
             }
         }
