@@ -91,6 +91,26 @@ grammar ABC::Grammar
     
     token tune_file { \s* [<tune> \s*]+ }
     
+    token clef { [ ["clef=" [<clef-note> | <clef-name>]] | <clef-name>] <clef-line>? ["+8" | "-8"]? [\w+ <clef-middle>]? }
+    token clef-note { "G" | "C" | "F" | "P" }
+    token clef-name { "treble" | "alto" | "tenor" | "baritone" | "bass" | "mezzo" | "soprano" | "perc" | "none" }
+    token clef-line { <[1..5]> }
+    token clef-middle { "middle=" <basenote> <octave> }
+
+    token key { [<key-def> [\w+ <clef>]?] | <clef> | "HP" | "Hp" }
+    token key-def { <basenote> ["#" | "b"]? [<mode>]? [\w+ <global-accidental>]* }
+    token mode { <minor> | <major> | <lydian> | <ionian> | <mixolydian> | <dorian> | <aeolian> | <phrygian> | <locrian> }
+    token minor { "m" ["in" ["o" ["r"]?]?]? } # m, min, mino, minor - all modes are case insensitive
+    token major { "maj" ["o" ["r"]?]? }
+    token lydian { "lyd" ["i" ["a" ["n"]?]?]? } # major with sharp 4th
+    token ionian { "ion" ["i" ["a" ["n"]?]?]? } # =major
+    token mixolydian { "mix" ["o" ["l" ["y" ["d" ["i" ["a" ["n"]?]?]?]?]?]?]? } # major with flat 7th
+    token dorian { "dor" ["i" ["a" ["n"]?]?]? } # minor with sharp 6th
+    token aeolian { "aeo" ["l" ["i" ["a" ["n"]?]?]?]? } # =minor
+    token phrygian { "phr" ["y" ["g" ["i" ["a" ["n"]?]?]?]?]? } # minor with flat 2nd
+    token locrian { "loc" ["r" ["i" ["a" ["n"]?]?]?]? } # minor with flat 2nd and 5th
+    token global-accidental { <accidental> <basenote> } # e.g. ^f =c _b
+    
     token key_sig { <basenote> ('#' | 'b')? \h* (\w*) }
 }
 
