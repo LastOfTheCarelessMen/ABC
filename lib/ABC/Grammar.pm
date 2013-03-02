@@ -91,14 +91,14 @@ grammar ABC::Grammar
     
     token tune_file { \s* [<tune> \s*]+ }
     
-    token clef { [ ["clef=" [<clef-note> | <clef-name>]] | <clef-name>] <clef-line>? ["+8" | "-8"]? [\w+ <clef-middle>]? }
+    token clef { [ ["clef=" [<clef-note> | <clef-name>]] | <clef-name>] <clef-line>? ["+8" | "-8"]? [\h+ <clef-middle>]? }
     token clef-note { "G" | "C" | "F" | "P" }
     token clef-name { "treble" | "alto" | "tenor" | "baritone" | "bass" | "mezzo" | "soprano" | "perc" | "none" }
     token clef-line { <[1..5]> }
     token clef-middle { "middle=" <basenote> <octave> }
 
-    token key { [<key-def> [\w+ <clef>]?] | <clef> | "HP" | "Hp" }
-    token key-def { <basenote> ["#" | "b"]? [<mode>]? [\w+ <global-accidental>]* }
+    token key { [<key-def> [\h+ <clef>]?] | <clef> | "HP" | "Hp" }
+    token key-def { <basenote> <chord_accidental>? <mode>? [\h+ <global-accidental>]* }
     token mode { <minor> | <major> | <lydian> | <ionian> | <mixolydian> | <dorian> | <aeolian> | <phrygian> | <locrian> }
     token minor { "m" ["in" ["o" ["r"]?]?]? } # m, min, mino, minor - all modes are case insensitive
     token major { "maj" ["o" ["r"]?]? }

@@ -31,41 +31,36 @@ package ABC::Utils {
             'A' => 3,
             'E' => 4,
             'B' => 5,
-            'F#' => 6,
-            'C#' => 7,
             'F' => -1,
-            'Bb' => -2,
-            'Eb' => -3,
-            'Ab' => -4,
-            'Db' => -5,
-            'Gb' => -6,
-            'Cb' => -7
         );
-        
-        # say :$key_signature_name.perl;
 
-        my $match = ABC::Grammar.parse($key_signature_name, :rule<key_sig>);
+        my $match = ABC::Grammar.parse($key_signature_name, :rule<key>);
         # say :$match.perl;
         die "Illegal key signature\n" unless $match;
-        my $lookup = $match<basenote>.uc ~ ($match[0] // "");
+        fail unless $match<key-def>;
+        say $match<key-def>.perl;
+        my $lookup = $match<key-def><basenote>.uc;
         # say :$lookup.perl;
-        my $sharps = %keys{$lookup};
+        my $sharps = %keys{$match<key-def><basenote>.uc};
+        if $match<key-def><chord_accidental> {
+            given ~$match<key-def><chord_accidental> {
+                when "#" { $sharps += 7; }
+                when "b" { $sharps -= 7; }
+            }
+        }
 
-        # say :$sharps.perl;
-
-        if ($match[1].defined) {
-            given ~($match[1]) {
-                when ""     { }
-                when /^maj/ { }
-                when /^ion/ { }
-                when /^mix/ { $sharps -= 1; }
-                when /^dor/ { $sharps -= 2; }
-                when /^m/   { $sharps -= 3; }
-                when /^aeo/ { $sharps -= 3; }
-                when /^phr/ { $sharps -= 4; }
-                when /^loc/ { $sharps -= 5; }
-                when /^lyd/ { $sharps += 1; }
-                default     { die "Unknown mode {$match[1]} requested"; }
+        if $match<key-def><mode> {
+            given $match<key-def><mode>[0] {
+                when so .<major>      { }
+                when so .<ionian>     { }
+                when so .<mixolydian> { $sharps -= 1; }
+                when so .<dorian>     { $sharps -= 2; }
+                when so .<minor>      { $sharps -= 3; }
+                when so .<aeolian>    { $sharps -= 3; }
+                when so .<phrygian>   { $sharps -= 4; }
+                when so .<locrian>    { $sharps -= 5; }
+                when so .<lydian>     { $sharps += 1; }
+                default { die "Unknown mode $_ requested"; }
             }
         }
 
@@ -75,6 +70,13 @@ package ABC::Utils {
         given $sharps {
             when 1..7   { for ^$sharps -> $i { %hash{@sharp_notes[$i]} = "^"; } }
             when -7..-1 { for ^(-$sharps) -> $i { %hash{@sharp_notes[6-$i]} = "_"; } }
+        }
+
+        if $match<key-def><global-accidental> {
+            for $match<key-def><global-accidental> -> $ga {
+                say $ga<basenote>.uc, " huh ", ~$ga<accidental>;
+                %hash{$ga<basenote>.uc} = ~$ga<accidental>;
+            }
         }
         
         return %hash;

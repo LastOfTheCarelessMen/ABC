@@ -61,6 +61,13 @@ use ABC::Utils;
 }
 
 {
+    my %key = key_signature("C ^f _b");
+    is %key.elems, 2, "C ^f _b has two thingees";
+    is %key<F>, "^", "F is sharp";
+    is %key<B>, "_", "B is flat";
+}
+
+{
     my %key = key_signature("C#m");
     is apply_key_signature(%key, ABC::Grammar.parse("f", :rule<pitch>)), "^f", "f => ^f";
     is apply_key_signature(%key, ABC::Grammar.parse("C", :rule<pitch>)), "^C", "C => ^C";
