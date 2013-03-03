@@ -15,6 +15,7 @@ use ABC::GraceNotes;
 use ABC::Actions;
 use ABC::Utils;
 use ABC::Pitched;
+use ABC::KeyInfo;
 
 sub transpose(Str $test, $pitch-changer) {
     my $match = ABC::Grammar.parse($test, :rule<element>, :actions(ABC::Actions.new));
@@ -57,7 +58,7 @@ sub pitch2ordinal(%key, $test) {
 }
 
 {
-    my %key = key_signature("C");
+    my %key = ABC::KeyInfo.new("C").key;
     is pitch2ordinal(%key, "C"), 0,  "C ==> 0";
     is pitch2ordinal(%key, "D"), 2,  "D ==> 2";
     is pitch2ordinal(%key, "E"), 4,  "E ==> 4";
@@ -74,7 +75,7 @@ sub pitch2ordinal(%key, $test) {
     is pitch2ordinal(%key, "^^G,,,"), -27, "^^G,,, ==> -27";
     is pitch2ordinal(%key, "d'''"), 50, "d''' ==> 50";
     
-    %key = key_signature("Ab");
+    %key = ABC::KeyInfo.new("Ab").key;
     is pitch2ordinal(%key, "C"), 0,  "C ==> 0";
     is pitch2ordinal(%key, "D"), 1,  "D ==> 1";
     is pitch2ordinal(%key, "E"), 3,  "E ==> 3";
@@ -91,7 +92,7 @@ sub pitch2ordinal(%key, $test) {
     is pitch2ordinal(%key, "^^G,,,"), -27, "^^G,,, ==> -27";
     is pitch2ordinal(%key, "d'''"), 49, "d''' ==> 49";
    
-    %key = key_signature("C");
+    %key = ABC::KeyInfo.new("C").key;
     is ordinal-to-pitch(%key, "C", 0), " C ", "0/C => C";
     is ordinal-to-pitch(%key, "D", 0), "__ D ", "0/D => __D";
     is ordinal-to-pitch(%key, "B", 0), "^ B ,", "0/B => ^B,";
@@ -122,8 +123,8 @@ sub pitch2ordinal(%key, $test) {
 }
 
 sub e-flat-to-d($accidental, $basenote, $octave) {
-    my %e-flat = key_signature("Eb");
-    my %d = key_signature("D");
+    my %e-flat = ABC::KeyInfo.new("Eb").key;
+    my %d = ABC::KeyInfo.new("D").key;
     my $ordinal = pitch-to-ordinal(%e-flat, $accidental, $basenote, $octave);
     my $basenote-in-d = $basenote.uc eq "A" ?? "G" !! ($basenote.ord - 1).chr.uc;
     ordinal-to-pitch(%d, $basenote-in-d, $ordinal - 1);
@@ -153,8 +154,8 @@ class Transposer {
     }
 
     method set-key($new-key) {
-        %.current-from = key_signature($new-key);
-        %.current-to = key_signature(%.key-changes{$new-key});
+        %.current-from = ABC::KeyInfo.new($new-key).key;
+        %.current-to = ABC::KeyInfo.new(%.key-changes{$new-key}).key;
         # $.pitch-name-shift = $new-key.
         
     }

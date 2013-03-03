@@ -9,6 +9,7 @@ use ABC::Duration; #OK
 use ABC::Note;
 use ABC::LongRest;
 use ABC::Utils;
+use ABC::KeyInfo;
 
 my $paper-size = "letter"; # or switch to "a4" for European paper
 
@@ -28,13 +29,13 @@ my %unrecognized_gracings;
                 
 class Context {
     has $.key-name;
-    has %.key;
+    has $.key-info;
     has $.meter;
     has $.length;
     
     method new($key-name, $meter, $length) {
         self.bless(*, :$key-name, 
-                      :key(key_signature($key-name)), 
+                      :key-info(KeyInfo.new($key-name)), 
                       :$meter, 
                       :$length);
     }
@@ -94,7 +95,7 @@ class Context {
     }
     
     method key-to-string() {
-        my $sf = %.key.map({ "{.key}{.value}" }).sort.Str.lc;
+        my $sf = $.key-info.key.map({ "{.key}{.value}" }).sort.Str.lc;
         my $major-key-name;
         given $sf {
             when ""                     { $major-key-name = "c"; }

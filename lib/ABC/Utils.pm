@@ -22,64 +22,6 @@ package ABC::Utils {
         }
     }
 
-    sub key_signature($key_signature_name) is export
-    {
-        my %keys = (
-            'C' => 0,
-            'G' => 1,
-            'D' => 2,
-            'A' => 3,
-            'E' => 4,
-            'B' => 5,
-            'F' => -1,
-        );
-
-        my $match = ABC::Grammar.parse($key_signature_name, :rule<key>);
-        # say :$match.perl;
-        die "Illegal key signature\n" unless $match;
-        fail unless $match<key-def>;
-        # say $match<key-def>.perl;
-        my $lookup = $match<key-def><basenote>.uc;
-        # say :$lookup.perl;
-        my $sharps = %keys{$match<key-def><basenote>.uc};
-        if $match<key-def><chord_accidental> {
-            given ~$match<key-def><chord_accidental> {
-                when "#" { $sharps += 7; }
-                when "b" { $sharps -= 7; }
-            }
-        }
-
-        if $match<key-def><mode> {
-            given $match<key-def><mode>[0] {
-                when so .<major>      { }
-                when so .<ionian>     { }
-                when so .<mixolydian> { $sharps -= 1; }
-                when so .<dorian>     { $sharps -= 2; }
-                when so .<minor>      { $sharps -= 3; }
-                when so .<aeolian>    { $sharps -= 3; }
-                when so .<phrygian>   { $sharps -= 4; }
-                when so .<locrian>    { $sharps -= 5; }
-                when so .<lydian>     { $sharps += 1; }
-                default { die "Unknown mode $_ requested"; }
-            }
-        }
-
-        my @sharp_notes = <F C G D A E B>;
-        my %hash;
-
-        given $sharps {
-            when 1..7   { for ^$sharps -> $i { %hash{@sharp_notes[$i]} = "^"; } }
-            when -7..-1 { for ^(-$sharps) -> $i { %hash{@sharp_notes[6-$i]} = "_"; } }
-        }
-
-        if $match<key-def><global-accidental> {
-            for $match<key-def><global-accidental> -> $ga {
-                %hash{$ga<basenote>.uc} = ~$ga<accidental>;
-            }
-        }
-        
-        return %hash;
-    }
 
     sub apply_key_signature(%key_signature, $pitch) is export
     {
