@@ -70,7 +70,7 @@ class ABC::KeyInfo {
         }
         
         if $match<clef> {
-            say $match<clef>.perl;
+            $clef-info = ~($match<clef>[0]<clef-name> // $match<clef>[0]<clef-note>);
         }
         
         self.bless(*, :key(%key-info), :clef($clef-info));

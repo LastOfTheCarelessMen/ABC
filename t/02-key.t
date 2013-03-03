@@ -9,6 +9,15 @@ use ABC::KeyInfo;
     is $key.key.elems, 2, "D has two sharps";
     is $key.key<F>, "^", "F is sharp";
     is $key.key<C>, "^", "C is sharp";
+    nok $key.clef.defined, "no clef defined";
+}
+
+{
+    my $key = ABC::KeyInfo.new("D bass");
+    is $key.key.elems, 2, "D has two sharps";
+    is $key.key<F>, "^", "F is sharp";
+    is $key.key<C>, "^", "C is sharp";
+    is $key.clef, "bass", "Recognized bass clef";
 }
 
 {
