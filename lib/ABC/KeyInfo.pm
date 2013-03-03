@@ -6,6 +6,7 @@ class ABC::KeyInfo {
     has $.clef;
     
     method new($key-field, :$current-key-info) {
+        # say "K: $key-field";
         my $match = ABC::Grammar.parse($key-field, :rule<key>);
         # say :$match.perl;
         die "Illegal key signature\n" unless $match;
