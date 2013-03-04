@@ -1,6 +1,10 @@
 use v6;
 use ABC::Grammar;
 
+sub parcel-first-if-needed($a) {
+    $a ~~ Parcel ?? $a[0] !! $a;
+}
+
 class ABC::KeyInfo {
     has %.key;
     has $.clef;
@@ -31,7 +35,7 @@ class ABC::KeyInfo {
             );
 
             # say $match<key-def>.perl;
-            my $lookup = $match<key-def><basenote>.uc;
+            # my $lookup = $match<key-def><basenote>.uc;
             # say :$lookup.perl;
             my $sharps = %keys{$match<key-def><basenote>.uc};
             if $match<key-def><chord_accidental> {
@@ -42,7 +46,7 @@ class ABC::KeyInfo {
             }
 
             if $match<key-def><mode> {
-                given $match<key-def><mode>[0] {
+                given parcel-first-if-needed($match<key-def><mode>) {
                     when so .<major>      { }
                     when so .<ionian>     { }
                     when so .<mixolydian> { $sharps -= 1; }
@@ -64,14 +68,15 @@ class ABC::KeyInfo {
             }
 
             if $match<key-def><global-accidental> {
-                for $match<key-def><global-accidental> -> $ga {
+                for $match<key-def><global-accidental>.list -> $ga {
                     %key-info{$ga<basenote>.uc} = ~$ga<accidental>;
                 }
             }
         }
         
         if $match<clef> {
-            $clef-info = ~($match<clef>[0]<clef-name> // $match<clef>[0]<clef-note>);
+            my $clef = parcel-first-if-needed($match<clef>);
+            $clef-info = ~($clef<clef-name> // $clef<clef-note>);
         }
         
         self.bless(*, :key(%key-info), :clef($clef-info));
