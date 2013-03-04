@@ -20,7 +20,9 @@ my %accidental-map = ( ''  => "",
                        '_'  => "es",
                        '__' => "eses" );
 
-my %octave-map = ( -1 => "",
+my %octave-map = ( -3 => ",,",
+                   -2 => ",",
+                   -1 => "",
                     0 => "'",
                     1 => "''",
                     2 => "'''" );
@@ -49,6 +51,10 @@ class Context {
             when /\,/ { $octave -= $abc-pitch.octave.chars }
             when /\'/ { $octave += $abc-pitch.octave.chars }
         }
+        # say $octave;
+        # say $abc-pitch.basenote.lc;
+        # say %accidental-map{$real-accidental};
+        # say %octave-map{$octave};
         
         $abc-pitch.basenote.lc ~ %accidental-map{$real-accidental} ~ %octave-map{$octave};
     }
