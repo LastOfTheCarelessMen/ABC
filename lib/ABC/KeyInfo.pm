@@ -13,7 +13,7 @@ class ABC::KeyInfo {
         # say "K: $key-field";
         my $match = ABC::Grammar.parse($key-field, :rule<key>);
         # say :$match.perl;
-        die "Illegal key signature\n" unless $match;
+        die "Illegal key signature $key-field\n" unless $match;
 
         my %key-info;
         my $clef-info;
