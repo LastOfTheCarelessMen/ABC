@@ -11,101 +11,101 @@ use ABC::LongRest;
 use ABC::Utils;
 use ABC::KeyInfo;
 
-class Context {
-    has $.key-name;
-    has $.key-info;
-    has $.meter;
-    has $.length;
-    
-    method new($key-name, $meter, $length, :$current-key-info) {
-        self.bless(*, :$key-name, 
-                      :key-info(ABC::KeyInfo.new($key-name, :$current-key-info)), 
-                      :$meter, 
-                      :$length);
-    }
-
-    my %note-to-pitch = (
-        "C" => 60,
-        "D" => 62,
-        "E" => 64,
-        "F" => 65,
-        "G" => 67,
-        "A" => 69,
-        "B" => 71,
-        "c" => 72,
-        "d" => 74,
-        "e" => 76,
-        "f" => 77,
-        "g" => 79,
-        "a" => 81,
-        "b" => 83
-    );
-    
-    my %pitch-to-fingering = (
-        61 => (1,1,1,1,1,1), # hack, please remove before real use!!!!!
-        62 => (1,1,1,1,1,1),
-        64 => (1,1,1,1,1,0),
-        66 => (1,1,1,1,0,0),
-        67 => (1,1,1,0,0,0),
-        69 => (1,1,0,0,0,0),
-        71 => (1,0,0,0,0,0),
-        72 => (0,1,1,0,0,0),
-        73 => (0,0,0,0,0,0),
-        74 => (0,1,1,1,1,1),
-    );
-
-    method get-pitch-number(ABC::Note $abc-pitch) {
-        my $real-accidental = $abc-pitch.accidental || ($.key-info.key{$abc-pitch.basenote.uc} // "");
-        
-        my $pitch-number = %note-to-pitch{$abc-pitch.basenote};
-        
-        given $real-accidental {
-            when "^^" { $pitch-number += 2 }
-            when "^"  { $pitch-number += 1 }
-            when "_"  { $pitch-number -= 1 }
-            when "__" { $pitch-number -= 2 }
-        }
-        
-        my $octave = 0;
-        given $abc-pitch.octave {
-            when !*.defined { } # skip if no additional octave info
-            when /\,/ { $octave -= $abc-pitch.octave.chars }
-            when /\'/ { $octave += $abc-pitch.octave.chars }
-        }
-        
-        $pitch-number + $octave * 12;
-    }
-
-    method ConvertStemPitch($stem, $out) {
-        my $pitch = self.get-pitch-number($stem);
-        $out.say: $pitch ~ "," ~ $stem.ticks ~ "," ~ %pitch-to-fingering{$pitch}.join(",");
-    }
-}
-
-class TuneConvertor {
-    has $.context;
-
-    method new($key, $meter, $length) {
-        self.bless(*, :context(Context.new($key, $meter, $length)));
-    }
-
-
-    method Convert(@elements, $out) {
-        for @elements -> $element {
-            given $element.key {
-                when "stem" {
-                    given $element.value {
-                        when ABC::Note {
-                            $.context.ConvertStemPitch($element.value, $out);
-                        }
-                        die "Cannot handle stem type { $element.value.WHAT }";
-                    }
-                }
-            }
-        
-        }
-    }
-}
+# class Context {
+#     has $.key-name;
+#     has $.key-info;
+#     has $.meter;
+#     has $.length;
+#     
+#     method new($key-name, $meter, $length, :$current-key-info) {
+#         self.bless(*, :$key-name, 
+#                       :key-info(ABC::KeyInfo.new($key-name, :$current-key-info)), 
+#                       :$meter, 
+#                       :$length);
+#     }
+# 
+#     my %note-to-pitch = (
+#         "C" => 60,
+#         "D" => 62,
+#         "E" => 64,
+#         "F" => 65,
+#         "G" => 67,
+#         "A" => 69,
+#         "B" => 71,
+#         "c" => 72,
+#         "d" => 74,
+#         "e" => 76,
+#         "f" => 77,
+#         "g" => 79,
+#         "a" => 81,
+#         "b" => 83
+#     );
+#     
+#     my %pitch-to-fingering = (
+#         61 => (1,1,1,1,1,1), # hack, please remove before real use!!!!!
+#         62 => (1,1,1,1,1,1),
+#         64 => (1,1,1,1,1,0),
+#         66 => (1,1,1,1,0,0),
+#         67 => (1,1,1,0,0,0),
+#         69 => (1,1,0,0,0,0),
+#         71 => (1,0,0,0,0,0),
+#         72 => (0,1,1,0,0,0),
+#         73 => (0,0,0,0,0,0),
+#         74 => (0,1,1,1,1,1),
+#     );
+# 
+#     method get-pitch-number(ABC::Note $abc-pitch) {
+#         my $real-accidental = $abc-pitch.accidental || ($.key-info.key{$abc-pitch.basenote.uc} // "");
+#         
+#         my $pitch-number = %note-to-pitch{$abc-pitch.basenote};
+#         
+#         given $real-accidental {
+#             when "^^" { $pitch-number += 2 }
+#             when "^"  { $pitch-number += 1 }
+#             when "_"  { $pitch-number -= 1 }
+#             when "__" { $pitch-number -= 2 }
+#         }
+#         
+#         my $octave = 0;
+#         given $abc-pitch.octave {
+#             when !*.defined { } # skip if no additional octave info
+#             when /\,/ { $octave -= $abc-pitch.octave.chars }
+#             when /\'/ { $octave += $abc-pitch.octave.chars }
+#         }
+#         
+#         $pitch-number + $octave * 12;
+#     }
+# 
+#     method ConvertStemPitch($stem, $out) {
+#         my $pitch = self.get-pitch-number($stem);
+#         $out.say: $pitch ~ "," ~ $stem.ticks ~ "," ~ %pitch-to-fingering{$pitch}.join(",");
+#     }
+# }
+# 
+# class TuneConvertor {
+#     has $.context;
+# 
+#     method new($key, $meter, $length) {
+#         self.bless(*, :context(Context.new($key, $meter, $length)));
+#     }
+# 
+# 
+#     method Convert(@elements, $out) {
+#         for @elements -> $element {
+#             given $element.key {
+#                 when "stem" {
+#                     given $element.value {
+#                         when ABC::Note {
+#                             $.context.ConvertStemPitch($element.value, $out);
+#                         }
+#                         die "Cannot handle stem type { $element.value.WHAT }";
+#                     }
+#                 }
+#             }
+#         
+#         }
+#     }
+# }
 
 
 sub TuneStreamToCSV($in, $out) {
@@ -116,15 +116,12 @@ sub TuneStreamToCSV($in, $out) {
     for @( $match.ast ) -> $tune {
         $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
         # say ~$tune.music;
-
-        $out.say: "pitch,duration,T1,T2,T3,B1,B2,B3";
-
-        my $key = $tune.header.get-first-value("K");
-        my $meter = $tune.header.get-first-value("M");
-        my $length = $tune.header.get-first-value("L") // "1/8";
-
-        my $convertor = TuneConvertor.new($key, $meter, $length);
-        $convertor.Convert($tune.music, $out);
+        
+        my @notes := stream-of-notes($tune);
+        for @notes -> $note {
+            say ~$note;
+        }
+        # my $convertor = TuneConvertor.new($key, $meter, $length);
     }
 }
 

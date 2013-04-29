@@ -7,11 +7,18 @@ class ABC::Context {
     has $.length;
     has %.accidentals;
     
-    method new($key-name, $meter, $length, :$current-key-info) {
+    multi method new($key-name, $meter, $length, :$current-key-info) {
         self.bless(*, :$key-name, 
                       :key-info(ABC::KeyInfo.new($key-name, :$current-key-info)), 
                       :$meter, 
                       :$length);
+    }
+    
+    multi method new(ABC::Context $other) {
+        self.bless(*, :key-name($other.key-name),
+                      :key-info(ABC::KeyInfo.new($other.key-name)),
+                      :meter($other.meter),
+                      :length($other.length));
     }
     
     method bar-line () {

@@ -1,5 +1,7 @@
 use v6;
 use ABC::Grammar;
+use ABC::Context;
+use ABC::Note;
 
 package ABC::Utils {
     sub ElementToStr($element-pair) is export { 
@@ -110,6 +112,37 @@ package ABC::Utils {
             ($working-accidental, $basenote.lc, "'" x ($octave - 1));
         } else {
             ($working-accidental, $basenote.uc, "," x -$octave);
+        }
+    }
+
+    sub stream-of-notes($tune) is export {
+        my $key = $tune.header.get-first-value("K");
+        my $meter = $tune.header.get-first-value("M");
+        my $length = $tune.header.get-first-value("L") // "1/8";
+    
+        my $context = ABC::Context.new($key, $meter, $length);
+        my @elements = $tune.music;
+        
+        my $repeat_position = 0;
+        my $repeat_context = ABC::Context.new($context);
+        my $i = 0;
+        gather while ($i < @elements) {
+            given @elements[$i].key {
+                when "stem" {
+                    my $stem = @elements[$i].value;
+                    my $accidental = $context.working-accidental($stem);
+                    my $real-note = ABC::Note.new($context.working-accidental($stem),
+                                                  $stem.basenote, 
+                                                  $stem.octave,
+                                                  $stem, 
+                                                  $stem.is-tie);
+                    take $real-note;
+                }
+                when "chord_or_text" { }
+                when "spacing" { }
+                take @elements[$i].key;
+            }
+            $i++;
         }
     }
 }
