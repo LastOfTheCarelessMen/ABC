@@ -11,77 +11,61 @@ use ABC::LongRest;
 use ABC::Utils;
 use ABC::KeyInfo;
 
-# class Context {
-#     has $.key-name;
-#     has $.key-info;
-#     has $.meter;
-#     has $.length;
-#     
-#     method new($key-name, $meter, $length, :$current-key-info) {
-#         self.bless(*, :$key-name, 
-#                       :key-info(ABC::KeyInfo.new($key-name, :$current-key-info)), 
-#                       :$meter, 
-#                       :$length);
-#     }
-# 
-#     my %note-to-pitch = (
-#         "C" => 60,
-#         "D" => 62,
-#         "E" => 64,
-#         "F" => 65,
-#         "G" => 67,
-#         "A" => 69,
-#         "B" => 71,
-#         "c" => 72,
-#         "d" => 74,
-#         "e" => 76,
-#         "f" => 77,
-#         "g" => 79,
-#         "a" => 81,
-#         "b" => 83
-#     );
-#     
-#     my %pitch-to-fingering = (
-#         61 => (1,1,1,1,1,1), # hack, please remove before real use!!!!!
-#         62 => (1,1,1,1,1,1),
-#         64 => (1,1,1,1,1,0),
-#         66 => (1,1,1,1,0,0),
-#         67 => (1,1,1,0,0,0),
-#         69 => (1,1,0,0,0,0),
-#         71 => (1,0,0,0,0,0),
-#         72 => (0,1,1,0,0,0),
-#         73 => (0,0,0,0,0,0),
-#         74 => (0,1,1,1,1,1),
-#     );
-# 
-#     method get-pitch-number(ABC::Note $abc-pitch) {
-#         my $real-accidental = $abc-pitch.accidental || ($.key-info.key{$abc-pitch.basenote.uc} // "");
-#         
-#         my $pitch-number = %note-to-pitch{$abc-pitch.basenote};
-#         
-#         given $real-accidental {
-#             when "^^" { $pitch-number += 2 }
-#             when "^"  { $pitch-number += 1 }
-#             when "_"  { $pitch-number -= 1 }
-#             when "__" { $pitch-number -= 2 }
-#         }
-#         
-#         my $octave = 0;
-#         given $abc-pitch.octave {
-#             when !*.defined { } # skip if no additional octave info
-#             when /\,/ { $octave -= $abc-pitch.octave.chars }
-#             when /\'/ { $octave += $abc-pitch.octave.chars }
-#         }
-#         
-#         $pitch-number + $octave * 12;
-#     }
-# 
-#     method ConvertStemPitch($stem, $out) {
-#         my $pitch = self.get-pitch-number($stem);
-#         $out.say: $pitch ~ "," ~ $stem.ticks ~ "," ~ %pitch-to-fingering{$pitch}.join(",");
-#     }
-# }
-# 
+my %note-to-pitch = (
+    "C" => 60,
+    "D" => 62,
+    "E" => 64,
+    "F" => 65,
+    "G" => 67,
+    "A" => 69,
+    "B" => 71,
+    "c" => 72,
+    "d" => 74,
+    "e" => 76,
+    "f" => 77,
+    "g" => 79,
+    "a" => 81,
+    "b" => 83
+);
+
+my %pitch-to-fingering = (
+    61 => (1,1,1,1,1,1), # hack, please remove before real use!!!!!
+    62 => (1,1,1,1,1,1),
+    64 => (1,1,1,1,1,0),
+    66 => (1,1,1,1,0,0),
+    67 => (1,1,1,0,0,0),
+    69 => (1,1,0,0,0,0),
+    71 => (1,0,0,0,0,0),
+    72 => (0,1,1,0,0,0),
+    73 => (0,0,0,0,0,0),
+    74 => (0,1,1,1,1,1),
+);
+
+sub get-pitch-number(ABC::Note $abc-pitch) {
+    my $pitch-number = %note-to-pitch{$abc-pitch.basenote};
+    
+    given $abc-pitch.accidental {
+        when "^^" { $pitch-number += 2 }
+        when "^"  { $pitch-number += 1 }
+        when "_"  { $pitch-number -= 1 }
+        when "__" { $pitch-number -= 2 }
+    }
+    
+    my $octave = 0;
+    given $abc-pitch.octave {
+        when !*.defined { } # skip if no additional octave info
+        when /\,/ { $octave -= $abc-pitch.octave.chars }
+        when /\'/ { $octave += $abc-pitch.octave.chars }
+    }
+    
+    $pitch-number + $octave * 12;
+}
+
+sub ConvertStemPitch($stem, $out) {
+    my $pitch = get-pitch-number($stem);
+    $out.say: $pitch ~ "," ~ $stem.ticks ~ "," ~ %pitch-to-fingering{$pitch}.join(",");
+}
+
 # class TuneConvertor {
 #     has $.context;
 # 
@@ -107,7 +91,6 @@ use ABC::KeyInfo;
 #     }
 # }
 
-
 sub TuneStreamToCSV($in, $out) {
     my $actions = ABC::Actions.new;
     my $match = ABC::Grammar.parse($in.slurp, :rule<tune_file>, :$actions);
@@ -115,16 +98,16 @@ sub TuneStreamToCSV($in, $out) {
 
     for @( $match.ast ) -> $tune {
         $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
-        # say ~$tune.music;
         
         my @notes := stream-of-notes($tune);
         for @notes -> $note {
+            given $note {
+                when ABC::Note { ConvertStemPitch($note, $out); }
+            }
             say ~$note;
         }
-        # my $convertor = TuneConvertor.new($key, $meter, $length);
     }
 }
-
 
 multi sub MAIN($input-abc-file, $output-csv-file) {
     my $in = open $input-abc-file, :r or die "Unable to open $input-abc-file";
