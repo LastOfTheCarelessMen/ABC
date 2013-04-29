@@ -125,21 +125,43 @@ package ABC::Utils {
         
         my $repeat_position = 0;
         my $repeat_context = ABC::Context.new($context);
+        my $in-repeat = False;
         my $i = 0;
         gather while ($i < @elements) {
             given @elements[$i].key {
                 when "stem" {
                     my $stem = @elements[$i].value;
-                    my $accidental = $context.working-accidental($stem);
-                    my $real-note = ABC::Note.new($context.working-accidental($stem),
-                                                  $stem.basenote, 
-                                                  $stem.octave,
-                                                  $stem, 
-                                                  $stem.is-tie);
-                    take $real-note;
+                    take ABC::Note.new($context.working-accidental($stem),
+                                       $stem.basenote, 
+                                       $stem.octave,
+                                       $stem, 
+                                       $stem.is-tie);
+                }
+                when "barline" {
+                    given @elements[$i].value {
+                        when ":|" | ":|:" {
+                            if !$in-repeat {
+                                $context = ABC::Context.new($repeat_context);
+                                $i = $repeat_position;
+                                $in-repeat = True;
+                            } else {
+                                $in-repeat = False;
+                                # treat :| as :|: because it is sometimes used as such by mistake
+                                $repeat_context = ABC::Context.new($context);
+                                $repeat_position = $i;
+                            }
+                        }
+                        when "|:" {
+                            $repeat_context = ABC::Context.new($context);
+                            $repeat_position = $i;
+                            $in-repeat = False;
+                        }
+                    }
+                    $context.bar-line;
                 }
                 when "chord_or_text" { }
                 when "spacing" { }
+                when "endline" { }
                 take @elements[$i].key;
             }
             $i++;
