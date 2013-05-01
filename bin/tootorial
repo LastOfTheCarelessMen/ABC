@@ -29,6 +29,7 @@ my %note-to-pitch = (
 );
 
 my %pitch-to-fingering = (
+    60 => (1,1,1,1,1,1), # hack, please remove before real use!!!!!
     61 => (1,1,1,1,1,1), # hack, please remove before real use!!!!!
     62 => (1,1,1,1,1,1),
     64 => (1,1,1,1,1,0),
