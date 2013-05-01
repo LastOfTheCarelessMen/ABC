@@ -23,12 +23,12 @@ my @simple-cases = ("a", "B,", "c'''", "^D2-", "_E,,/", "^^f/4", "=G3",
                     '{cdc}', '{/d}',
                     "(", ")", 
                     " ", "\t ",
-                    "[2", "]");
+                    "]");
 
 my @tricky-cases = ('"A"', '"A/B"', '"Am/Bb"',
                     '"^this goes up"', '"_This goes down"',
                     "+trill+", "+accent+",
-                    ".", "~",
+                    "[2", ".", "~",
                     "[K:Amin]", "[M:3/4]", "[L:1/2]");
 
 for @simple-cases -> $test-case {
