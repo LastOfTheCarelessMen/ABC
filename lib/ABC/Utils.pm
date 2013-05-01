@@ -127,9 +127,10 @@ package ABC::Utils {
         my $context = ABC::Context.new($key, $meter, $length);
         my @elements = $tune.music;
         
-        my $repeat_position = 0;
-        my $repeat_context = ABC::Context.new($context);
-        my $in-repeat = False;
+        my $repeat-position = 0;
+        my $repeat-context = ABC::Context.new($context);
+        my $repeat-count = 1;
+        my $in-nth-repeat = False;
         my $i = 0;
         gather while ($i < @elements) {
             given @elements[$i].key {
@@ -141,24 +142,38 @@ package ABC::Utils {
                                        $stem, 
                                        $stem.is-tie);
                 }
+                when "nth_repeat" {
+                    $in-nth-repeat = True;
+                    if $repeat-count !(elem) @elements[$i].value {
+                        # this is an ending for some other repeat, skip it
+                        $i++ while ($i < @elements 
+                                    && !(@elements[$i].key eq "barline"
+                                         && @elements[$i].value eq ":|" | ":|:"));
+                    }
+                }
+                when "end_nth_repeat" {
+                    $in-nth-repeat = False;
+                }
                 when "barline" {
                     given @elements[$i].value {
                         when ":|" | ":|:" {
-                            if !$in-repeat {
-                                $context = ABC::Context.new($repeat_context);
-                                $i = $repeat_position;
-                                $in-repeat = True;
+                            if $in-nth-repeat || $repeat-count == 1 {
+                                $context = ABC::Context.new($repeat-context);
+                                $i = $repeat-position;
+                                $repeat-count++;
                             } else {
-                                $in-repeat = False;
                                 # treat :| as :|: because it is sometimes used as such by mistake
-                                $repeat_context = ABC::Context.new($context);
-                                $repeat_position = $i;
+                                $repeat-context = ABC::Context.new($context);
+                                $repeat-position = $i;
+                                $repeat-count = 1;
                             }
+                            $in-nth-repeat = False;
                         }
                         when "|:" {
-                            $repeat_context = ABC::Context.new($context);
-                            $repeat_position = $i;
-                            $in-repeat = False;
+                            $repeat-context = ABC::Context.new($context);
+                            $repeat-position = $i;
+                            $repeat-count = 1;
+                            $in-nth-repeat = False;
                         }
                     }
                     $context.bar-line;
