@@ -20,6 +20,10 @@ package ABC::Utils {
                 }).join('') ; 
             }
             when "endline" { "\n"; }
+            when "nth_repeat" { 
+                $element-pair.value ~~ Set ?? "[" ~ $element-pair.value.keys.join(",")
+                                           !! "[" ~ $element-pair.value.perl;
+            }
             ~$element-pair.value;
         }
     }
