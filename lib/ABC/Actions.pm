@@ -74,7 +74,16 @@ class ABC::Actions {
     method tuplet($/) {
         make ABC::Tuplet.new(+@( $<stem> ), @( $<stem> )>>.ast);
     }
-    
+
+    method nth_repeat_num($/) {
+        my @nums = $/.subst("-", "..").eval;
+        make Set.new(@nums);
+    }
+
+    method nth_repeat($/) {
+        make ($<nth_repeat_num> // $<nth_repeat_text>).ast;
+    }
+
     method broken_rhythm($/) {
         make ABC::BrokenRhythm.new($<stem>[0].ast, 
                                    ~$<g1>, 
@@ -149,7 +158,7 @@ class ABC::Actions {
         # say :$ast.perl;
         # say $/{$type}.ast.perl;
         # say $/{$type}.ast.WHAT;
-        if $/{$type}.ast ~~ ABC::Duration | ABC::LongRest | ABC::GraceNotes | Pair | Str | List {
+        if $/{$type}.ast ~~ ABC::Duration | ABC::LongRest | ABC::GraceNotes | Pair | Str | List | Set {
             $ast = $type => $/{$type}.ast;
         }
         make $ast;
