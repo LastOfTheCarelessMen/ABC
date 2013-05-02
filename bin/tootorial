@@ -40,6 +40,11 @@ my %pitch-to-fingering = (
     72 => (0,1,1,0,0,0),
     73 => (0,0,0,0,0,0),
     74 => (0,1,1,1,1,1),
+    76 => (1,1,1,1,1,0),
+    78 => (1,1,1,1,0,0),
+    79 => (1,1,1,0,0,0),
+    81 => (1,1,0,0,0,0),
+    83 => (1,0,0,0,0,0),
 );
 
 sub get-pitch-number(ABC::Note $abc-pitch) {
@@ -100,6 +105,7 @@ sub TuneStreamToCSV($in, $out) {
     for @( $match.ast ) -> $tune {
         $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
         
+        $out.say: "pitch,duration,T1,T2,T3,B1,B2,B3";
         my @notes := stream-of-notes($tune);
         for @notes -> $note {
             given $note {
