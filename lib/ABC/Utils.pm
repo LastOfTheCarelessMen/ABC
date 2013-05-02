@@ -142,6 +142,26 @@ package ABC::Utils {
                                        $stem, 
                                        $stem.is-tie);
                 }
+                when "tuplet" {
+                    my $tuplet = @elements[$i].value;
+                    for $tuplet.notes -> $note {
+                        take ABC::Note.new($context.working-accidental($note),
+                                           $note.basenote,
+                                           $note.octave,
+                                           ABC::Duration.new(:ticks(2 / $tuplet.tuple * $note.ticks)),
+                                           $note.is-tie);
+                    }
+                }
+                when "broken_rhythm" {
+                    my $br = @elements[$i].value;
+                    for ($br.effective-stem1, $br.effective-stem2) -> $stem {
+                        take ABC::Note.new($context.working-accidental($stem),
+                                           $stem.basenote, 
+                                           $stem.octave,
+                                           $stem, 
+                                           $stem.is-tie);
+                    }
+                }
                 when "nth_repeat" {
                     $in-nth-repeat = True;
                     if $repeat-count !(elem) @elements[$i].value {
