@@ -10,6 +10,7 @@ use ABC::Note;
 use ABC::LongRest;
 use ABC::Utils;
 use ABC::KeyInfo;
+use ABC::Context;
 
 my $paper-size = "letter"; # or switch to "a4" for European paper
 
@@ -29,21 +30,17 @@ my %octave-map = ( -3 => ",,",
 
 my %unrecognized_gracings;
                 
-class Context {
-    has $.key-name;
-    has $.key-info;
-    has $.meter;
-    has $.length;
+class LilypondContext {
+    has ABC::Context $.context;
     
     method new($key-name, $meter, $length, :$current-key-info) {
-        self.bless(*, :$key-name, 
-                      :key-info(ABC::KeyInfo.new($key-name, :$current-key-info)), 
-                      :$meter, 
-                      :$length);
+        self.bless(*, context => ABC::Context.new($key-name, $meter, $length, :$current-key-info));
     }
 
+    method bar-line { $.context.bar-line; }
+
     method get-Lilypond-pitch(ABC::Note $abc-pitch) {
-        my $real-accidental = $abc-pitch.accidental || ($.key-info.key{$abc-pitch.basenote.uc} // "");
+        my $real-accidental = $.context.working-accidental($abc-pitch);
         
         my $octave = +($abc-pitch.basenote ~~ 'a'..'z');
         given $abc-pitch.octave {
@@ -51,16 +48,12 @@ class Context {
             when /\,/ { $octave -= $abc-pitch.octave.chars }
             when /\'/ { $octave += $abc-pitch.octave.chars }
         }
-        # say $octave;
-        # say $abc-pitch.basenote.lc;
-        # say %accidental-map{$real-accidental};
-        # say %octave-map{$octave};
         
         $abc-pitch.basenote.lc ~ %accidental-map{$real-accidental} ~ %octave-map{$octave};
     }
 
     method get-Lilypond-duration(ABC::Duration $abc-duration) {
-        my $ticks = $abc-duration.ticks.Rat * $.length;
+        my $ticks = $abc-duration.ticks.Rat * $.context.length;
         my $dots = "";
         given $ticks.numerator {
             when 3 { $dots = ".";  $ticks *= 2/3; }
@@ -78,22 +71,22 @@ class Context {
     }
     
     method meter-to-string() {
-        given $.meter {
+        given $.context.meter {
             when "C"  { "\\time 4/4" }
             when "C|" { "\\time 2/2" }
-            "\\time $.meter ";
+            "\\time { $.context.meter } ";
         }
     }
 
     method ticks-in-measure() {
-        given $.meter {
-            when "C" | "C|" { 1 / $.length; }
-            $.meter / $.length;
+        given $.context.meter {
+            when "C" | "C|" { 1 / $.context.length; }
+            $.context.meter / $.context.length;
         }
     }
 
     method get-Lilypond-measure-length() {
-        given $.meter {
+        given $.context.meter {
             when "C" | "C|" | "4/4" { "1" }
             when "3/4" | 6/8 { "2." }
             when "2/4" { "2" }
@@ -101,7 +94,7 @@ class Context {
     }
     
     method key-to-string() {
-        my $sf = $.key-info.key.map({ "{.key}{.value}" }).sort.Str.lc;
+        my $sf = $.context.key-info.key.map({ "{.key}{.value}" }).sort.Str.lc;
         my $major-key-name;
         given $sf {
             when ""                     { $major-key-name = "c"; }
@@ -125,9 +118,9 @@ class Context {
     
     method clef-to-string() {
         my $lilypond-clef = "treble";
-        given $.key-info.clef {
+        given $.context.key-info.clef {
             when not .defined { }
-            when "treble" | "alto" | "tenor" | "bass" { $lilypond-clef = ~$.key-info.clef; }
+            when "treble" | "alto" | "tenor" | "bass" { $lilypond-clef = ~$.context.key-info.clef; }
         }
         "\\clef $lilypond-clef";
     }
@@ -149,7 +142,7 @@ class TuneConvertor {
     has $.context;
 
     method new($key, $meter, $length) {
-        self.bless(*, :context(Context.new($key, $meter, $length)));
+        self.bless(*, :context(LilypondContext.new($key, $meter, $length)));
     }
 
     # MUST: this is context dependent too
@@ -183,7 +176,7 @@ class TuneConvertor {
         my $ticks-in-measure = $.context.ticks-in-measure;
         my $result = "";
         if $beginning && $duration % $ticks-in-measure != 0 {
-            my $note-length = 1 / $.context.length;
+            my $note-length = 1 / $.context.context.length;
             my $count = $duration % $ticks-in-measure;
             if $count ~~ Rat {
                 die "Strange partial measure found: $lilypond-bar" unless is-a-power-of-two($count.denominator);
@@ -263,27 +256,28 @@ class TuneConvertor {
                     }
                     $lilypond = "";
                     $duration = 0;
+                    $.context.bar-line;
                 }
                 when "inline_field" {
                     given $element.value.key {
                         when "K" { 
-                            $!context = Context.new($element.value.value, 
-                                                    $!context.meter, 
-                                                    $!context.length,
-                                                    :current-key-info($!context.key-info)); 
+                            $!context = LilypondContext.new($element.value.value, 
+                                                            $!context.context.meter, 
+                                                            $!context.context.length,
+                                                            :current-key-info($!context.key-info)); 
                             $lilypond ~= $!context.key-to-string;
                             $lilypond ~= $!context.clef-to-string;
                         }
                         when "M" {
-                            $!context = Context.new($!context.key-name,
-                                                    $element.value.value,
-                                                    $!context.length);
+                            $!context = LilypondContext.new($!context.context.key-name,
+                                                            $element.value.value,
+                                                            $!context.context.length);
                             $lilypond ~= $!context.meter-to-string;
                         }
                         when "L" {
-                            $!context = Context.new($!context.key-name,
-                                                    $!context.meter,
-                                                    $element.value.value);
+                            $!context = LilypondContext.new($!context.context.key-name,
+                                                            $!context.context.meter,
+                                                            $element.value.value);
                         }
                     }
                 }
