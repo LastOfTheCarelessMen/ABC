@@ -13,7 +13,7 @@ role ABC::Duration {
         ABC::Duration.new(:ticks(($top ?? +~$top !! 1).Int / ($bottom ?? +~$bottom !! 2).Int));
     }
     
-    our method duration-to-str() {
+    method duration-to-str() {
         given $.ticks {
             when 1 { ""; }
             when 1/2 { "/"; }

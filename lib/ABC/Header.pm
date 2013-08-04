@@ -3,20 +3,20 @@ use v6;
 class ABC::Header {
     has @.lines; # array of Pairs representing each line of the ABC header
     
-    our method add-line($name, $data) {
+    method add-line($name, $data) {
         self.lines.push($name => $data);
     }
     
-    our method get($name) {
+    method get($name) {
         self.lines.grep({ .key eq $name });
     }
 
-    our method get-first-value($name) {
+    method get-first-value($name) {
         my $pair = self.lines.first({ .key eq $name });
         $pair ?? $pair.value !! Any;
     }
     
-    our method is-valid() {
+    method is-valid() {
         self.lines.elems > 1 
         && self.lines[0].key eq "X"
         && self.get("T").elems > 0
