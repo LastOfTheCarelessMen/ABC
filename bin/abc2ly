@@ -449,7 +449,7 @@ multi sub MAIN($first-abc-file, *@other-abc-files) {
         TuneStreamToLilypondStream($in, $out);
     
         # $out.say: '\markup {';
-        # $out.say: '    "For more information on these tunes, please see http://midlandceltic.org/ws2011/"';
+        # $out.say: '    \fill-line { "For more information on these tunes, please see http://midlandceltic.org/ws2011/" }';
         # $out.say: '}';
     
         $out.close;
