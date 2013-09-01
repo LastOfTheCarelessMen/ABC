@@ -86,7 +86,7 @@ sub ConvertStemPitch($stem, $out) {
 #     has $.context;
 # 
 #     method new($key, $meter, $length) {
-#         self.bless(*, :context(Context.new($key, $meter, $length)));
+#         self.bless(:context(Context.new($key, $meter, $length)));
 #     }
 # 
 # 

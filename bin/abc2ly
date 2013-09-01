@@ -34,7 +34,7 @@ class LilypondContext {
     has ABC::Context $.context;
     
     method new($key-name, $meter, $length, :$current-key-info) {
-        self.bless(*, context => ABC::Context.new($key-name, $meter, $length, :$current-key-info));
+        self.bless(context => ABC::Context.new($key-name, $meter, $length, :$current-key-info));
     }
 
     method bar-line { $.context.bar-line; }
@@ -142,7 +142,7 @@ class TuneConvertor {
     has $.context;
 
     method new($key, $meter, $length) {
-        self.bless(*, :context(LilypondContext.new($key, $meter, $length)));
+        self.bless(:context(LilypondContext.new($key, $meter, $length)));
     }
 
     # MUST: this is context dependent too
