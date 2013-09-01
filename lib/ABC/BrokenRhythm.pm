@@ -13,7 +13,7 @@ class ABC::BrokenRhythm does ABC::Duration does ABC::Pitched {
     has $.stem2;
     
     method new($stem1, $gracing1, $broken-rhythm, $gracing2, $stem2) {
-        self.bless(*, :$stem1, :$gracing1, :$broken-rhythm, :$gracing2, :$stem2, 
+        self.bless(:$stem1, :$gracing1, :$broken-rhythm, :$gracing2, :$stem2, 
                    :ticks($stem1.ticks + $stem2.ticks));
     }
 

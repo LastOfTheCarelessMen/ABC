@@ -150,7 +150,7 @@ class Transposer {
     has %.current-to;
 
     multi method new(%key-changes, $half-step-shift) {
-        self.bless(*, :%key-changes, :$half-step-shift);
+        self.bless(:%key-changes, :$half-step-shift);
     }
 
     method set-key($new-key) {

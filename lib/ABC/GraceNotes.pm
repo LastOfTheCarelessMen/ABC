@@ -8,7 +8,7 @@ class ABC::GraceNotes does ABC::Pitched {
     
     method new($acciaccatura, @notes) {
         die "GraceNotes must have at least one note" if +@notes == 0;
-        self.bless(*, :$acciaccatura, :@notes);
+        self.bless(:$acciaccatura, :@notes);
     }
 
     method Str() {

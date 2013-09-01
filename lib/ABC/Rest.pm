@@ -6,7 +6,7 @@ class ABC::Rest does ABC::Duration {
     has $.type;
 
     method new($type, ABC::Duration $duration) {
-        self.bless(*, :$type, :ticks($duration.ticks));
+        self.bless(:$type, :ticks($duration.ticks));
     }
 
     method Str() {

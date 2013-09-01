@@ -79,7 +79,7 @@ class ABC::KeyInfo {
             $clef-info = ~($clef<clef-name> // $clef<clef-note>);
         }
         
-        self.bless(*, :key(%key-info), :clef($clef-info));
+        self.bless(:key(%key-info), :clef($clef-info));
     }
     
 }

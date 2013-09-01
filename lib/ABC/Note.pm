@@ -10,7 +10,7 @@ class ABC::Note does ABC::Duration does ABC::Pitched {
     has $.is-tie;
     
     method new($accidental, $basenote, $octave, ABC::Duration $duration, $is-tie) {
-        self.bless(*, :$accidental, :$basenote, :$octave, :ticks($duration.ticks), :$is-tie);
+        self.bless(:$accidental, :$basenote, :$octave, :ticks($duration.ticks), :$is-tie);
     }
 
     method pitch() {

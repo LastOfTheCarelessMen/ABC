@@ -9,7 +9,7 @@ class ABC::Tuplet does ABC::Duration does ABC::Pitched {
     
     method new($tuple, @notes) {
         die "Tuplet must have at least one note" if +@notes == 0;
-        self.bless(*, :$tuple, :@notes, :ticks(2/$tuple * [+] @notes>>.ticks));
+        self.bless(:$tuple, :@notes, :ticks(2/$tuple * [+] @notes>>.ticks));
     }
 
     method Str() {

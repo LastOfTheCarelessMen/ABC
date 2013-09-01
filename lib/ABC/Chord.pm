@@ -9,7 +9,7 @@ class ABC::Chord does ABC::Pitched {
     has $.bass-accidental;
 
     method new($main-note, $main-accidental, $main-type, $bass-note, $bass-accidental) {
-        self.bless(*, :$main-note, :$main-accidental, :$main-type, :$bass-note, :$bass-accidental);
+        self.bless(:$main-note, :$main-accidental, :$main-type, :$bass-note, :$bass-accidental);
     }
 
     method Str() {

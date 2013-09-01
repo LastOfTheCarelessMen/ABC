@@ -7,7 +7,7 @@ class ABC::Tune {
     has @.music;
     
     multi method new(ABC::Header $header, @music) {
-        self.bless(*, :$header, :@music);
+        self.bless(:$header, :@music);
     }
     
     method transpose(Int $steps-up) {
