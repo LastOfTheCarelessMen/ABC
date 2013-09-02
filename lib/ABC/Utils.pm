@@ -4,6 +4,11 @@ use ABC::Context;
 use ABC::Note;
 
 package ABC::Utils {
+    sub str-to-stem($note) is export {
+        my $match = ABC::Grammar.parse($note, :rule<stem>, :actions(ABC::Actions.new));
+        $match.ast;
+    }
+    
     sub ElementToStr($element-pair) is export { 
         given $element-pair.key {
             when "gracing" {

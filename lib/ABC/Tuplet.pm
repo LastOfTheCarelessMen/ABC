@@ -9,13 +9,7 @@ class ABC::Tuplet does ABC::Duration does ABC::Pitched {
     has @.notes;
     
     multi method new($p, @notes) {
-        my $q;
-        given $p {
-            when 3 | 6     { $q = 2; }
-            when 2 | 4 | 8 { $q = 3; }
-            default        { $q = 2; } # really need to know the time signature for this!
-        }
-        self.new($p, $q, @notes);
+        self.new($p, default-q($p), @notes);
     }
 
     multi method new($p, $q, @notes) {
@@ -23,10 +17,22 @@ class ABC::Tuplet does ABC::Duration does ABC::Pitched {
         self.bless(:$p, :$q, :@notes, :ticks($q/$p * [+] @notes>>.ticks));
     }
 
+    sub default-q($p) {
+        given $p {
+            when 3 | 6     { 2; }
+            when 2 | 4 | 8 { 3; }
+            default        { 2; } # really need to know the time signature for this!
+        }
+    }
+
     method Str() {
-        # MUST: factor in $q when that has non-default values
-        @.notes == $.p ?? "(" ~ $.p ~ @.notes.join("")
-                       !! "(" ~ $.p ~ "::" ~ +@.notes ~ @.notes.join(""); 
+        my $q = $.q != default-q($.p) ?? $.q !! "";
+        my $r = @.notes != $.p ?? +@.notes !! "";
+        if $q eq "" && $r eq "" {
+            "(" ~ $.p ~ @.notes.join("");
+        } else {
+            "(" ~ $.p ~ ":" ~ $q ~ ":" ~ $r ~ @.notes.join("");
+        }
     }
 
     method transpose($pitch-changer) {
