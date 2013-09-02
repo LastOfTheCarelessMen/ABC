@@ -42,7 +42,7 @@ for @simple-cases -> $test-case {
 for @simple-cases, @tricky-cases -> $test-case {
     my $match = ABC::Grammar.parse($test-case, :rule<element>, :actions(ABC::Actions.new));
     ok $match, "$test-case parsed";
-    is ElementToStr($match.ast), $test-case, "ElementToStr version matches";
+    is element-to-str($match.ast), $test-case, "element-to-str version matches";
 }
 
 my @notes = <a b2 c/ d e f g3>.map({ str-to-stem($_) });

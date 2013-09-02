@@ -9,7 +9,7 @@ package ABC::Utils {
         $match.ast;
     }
     
-    sub ElementToStr($element-pair) is export { 
+    sub element-to-str($element-pair) is export { 
         given $element-pair.key {
             when "gracing" {
                 given $element-pair.value {
