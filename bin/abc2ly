@@ -264,7 +264,7 @@ class TuneConvertor {
                             $!context = LilypondContext.new($element.value.value, 
                                                             $!context.context.meter, 
                                                             $!context.context.length,
-                                                            :current-key-info($!context.key-info)); 
+                                                            :current-key-info($!context.context.key-info)); 
                             $lilypond ~= $!context.key-to-string;
                             $lilypond ~= $!context.clef-to-string;
                         }
