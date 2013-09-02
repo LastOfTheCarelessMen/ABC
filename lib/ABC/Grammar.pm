@@ -50,7 +50,8 @@ grammar ABC::Grammar
     # If the previous line fails, you can use the next rule to get the most common cases
     # next block makes the most common cases work
     # token tuplet { '(' (<digit>+) {} (<t_elem>* <stem>)*? <?{ say $1.perl; say $0.perl; $1.elems == $0 }> <slur_end>? }
-    token tuplet { ['(3' [<t_elem>* <stem>] ** 3 <slur_end>? ] 
+    token tuplet { ['(2' [<t_elem>* <stem>] ** 2 <slur_end>? ] 
+                 | ['(3' [<t_elem>* <stem>] ** 3 <slur_end>? ]
                  | ['(4' [<t_elem>* <stem>] ** 4 <slur_end>? ]
                  | ['(5' [<t_elem>* <stem>] ** 5 <slur_end>? ] }
     
