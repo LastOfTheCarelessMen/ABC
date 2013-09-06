@@ -262,7 +262,8 @@ BAB G2G|G2g gdB|c2a B2g|A2=f fcA:|
     # say $match.ast[28].WHAT;
     # say $match.ast[28].perl;
     is $match.ast[22].key, "nth_repeat", "21st is nth_repeat";
-    is $match.ast[22].value, "2", "21st is '2'";
+    isa_ok $match.ast[22].value, Set, "21st value is a Set";
+    ok $match.ast[22].value ~~ (set 2), "21st is '2'";
     is $match.ast[30].key, "endline", "29th is endline";
     is $match.ast[*-1].key, "endline", "Last is endline";
 }

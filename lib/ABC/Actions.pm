@@ -77,7 +77,7 @@ class ABC::Actions {
 
     method nth_repeat_num($/) {
         my @nums = $/.subst("-", "..").eval;
-        make Set.new(@nums);
+        make @nums.Set;
     }
 
     method nth_repeat($/) {

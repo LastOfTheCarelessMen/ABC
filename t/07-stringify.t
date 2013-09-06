@@ -45,9 +45,9 @@ for @simple-cases, @tricky-cases -> $test-case {
     is element-to-str($match.ast), $test-case, "element-to-str version matches";
 }
 
-my @notes = <a b2 c/ d e f g3>.map({ str-to-stem($_) });
-is ABC::Tuplet.new(3, 2, @notes[^2]), "(3::2ab2", "triplet with only two notes";
-is ABC::Tuplet.new(3, 2, @notes[^4]), "(3::4ab2c/d", "triplet with four notes";
-is ABC::Tuplet.new(3, 3, @notes[^4]), "(3:3:4ab2c/d", "triplet with four notes and a weird rhythm";
+# my @notes = <a b2 c/ d e f g3>.map({ str-to-stem($_) });
+# is ABC::Tuplet.new(3, 2, @notes[^2]), "(3::2ab2", "triplet with only two notes";
+# is ABC::Tuplet.new(3, 2, @notes[^4]), "(3::4ab2c/d", "triplet with four notes";
+# is ABC::Tuplet.new(3, 3, @notes[^4]), "(3:3:4ab2c/d", "triplet with four notes and a weird rhythm";
 
 done;
