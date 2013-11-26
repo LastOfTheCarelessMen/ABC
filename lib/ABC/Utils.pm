@@ -43,7 +43,7 @@ package ABC::Utils {
         }
         else
         {
-            if %key_signature.exists($pitch<basenote>.uc) {
+            if %key_signature{$pitch<basenote>.uc}:exists {
                 $resulting_note ~= %key_signature{$pitch<basenote>.uc};
             }
         }
