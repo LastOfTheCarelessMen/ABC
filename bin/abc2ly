@@ -435,12 +435,17 @@ multi sub MAIN() {
     TuneStreamToLilypondStream($*IN, $*OUT);
 }
 
-multi sub MAIN($first-abc-file, *@other-abc-files, :x($index)?) {
+multi sub MAIN($first-abc-file, *@other-abc-files, :x($index)?, :$o?) {
     my @abc-files = $first-abc-file, @other-abc-files;
     for @abc-files -> $abc-file {
-        my $ly-file = $abc-file ~ ".ly";
-        if $abc-file ~~ /^(.*) ".abc"/ {
-            $ly-file = $0 ~ ".ly";
+        my $ly-file;
+        if $o {
+            $ly-file = $o;
+        } else {
+            $ly-file = $abc-file ~ ".ly";
+            if $abc-file ~~ /^(.*) ".abc"/ {
+                $ly-file = $0 ~ ".ly";
+            }
         }
         $*ERR.say: "Reading $abc-file, writing $ly-file";
     
