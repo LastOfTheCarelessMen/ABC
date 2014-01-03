@@ -405,7 +405,7 @@ class TuneConvertor {
     
 }
 
-sub TuneStreamToLilypondStream($in, $out) {
+sub TuneStreamToLilypondStream($in, $out, $filter = True) {
     my $actions = ABC::Actions.new;
     my $match = ABC::Grammar.parse($in.slurp, :rule<tune_file>, :$actions);
     die "Did not match ABC grammar: last tune understood:\n { $actions.current-tune }" unless $match;
@@ -413,7 +413,7 @@ sub TuneStreamToLilypondStream($in, $out) {
     $out.say: '\\version "2.12.3"';
     $out.say: "#(set-default-paper-size \"{$paper-size}\")";
     
-    for @( $match.ast ) -> $tune {
+    for @( $match.ast ).grep($filter) -> $tune {
         $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
         $out.say: "\\score \{";
 
@@ -435,7 +435,7 @@ multi sub MAIN() {
     TuneStreamToLilypondStream($*IN, $*OUT);
 }
 
-multi sub MAIN($first-abc-file, *@other-abc-files) {
+multi sub MAIN($first-abc-file, *@other-abc-files, :x($index)?) {
     my @abc-files = $first-abc-file, @other-abc-files;
     for @abc-files -> $abc-file {
         my $ly-file = $abc-file ~ ".ly";
@@ -447,7 +447,11 @@ multi sub MAIN($first-abc-file, *@other-abc-files) {
         my $in = open $abc-file, :r or die "Unable to open $abc-file";
         my $out = open $ly-file, :w or die "Unable to open $ly-file";
     
-        TuneStreamToLilypondStream($in, $out);
+        if $index {
+            TuneStreamToLilypondStream($in, $out, -> $tune { $tune.header.get-first-value("X") == $index });
+        } else {
+            TuneStreamToLilypondStream($in, $out);
+        }
     
         # $out.say: '\markup {';
         # $out.say: '    \fill-line { "For more information on these tunes, please see http://midlandceltic.org/ws2011/" }';
