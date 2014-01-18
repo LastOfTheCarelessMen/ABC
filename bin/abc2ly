@@ -421,7 +421,7 @@ sub TuneStreamToLilypondStream($in, $out, $filter = True) {
 
         my $key = $tune.header.get-first-value("K");
         my $meter = $tune.header.get-first-value("M");
-        my $length = $tune.header.get-first-value("L") // "1/8";
+        my $length = $tune.header.get-first-value("L") // default-length-from-meter($meter);
 
         my $convertor = TuneConvertor.new($key, $meter, $length);
         $convertor.BodyToLilypond($tune.music, $out);

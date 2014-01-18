@@ -211,6 +211,14 @@ package ABC::Utils {
             $i++;
         }
     }
+
+    sub default-length-from-meter($meter) is export {
+        if $meter ~~ m{(\d+ '/' \d+)} {
+            $0.Rat < 3/4 ?? "1/16" !! "1/8";
+        } else {
+            "1/8";
+        }
+    }
 }
 
 
