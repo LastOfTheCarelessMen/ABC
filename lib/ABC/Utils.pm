@@ -124,6 +124,23 @@ package ABC::Utils {
         }
     }
 
+    sub to-note-and-number($basenote, $octave-symbol) is export {
+        my $octave = $basenote ~~ /<[A..G]>/ ?? 5 !! 6;
+        for $octave-symbol.comb {
+            when "," { $octave-- }
+            when "'" { $octave++ }
+        }
+        ($basenote.uc, $octave);
+    }
+
+    sub from-note-and-number($basenote, $octave-number) is export {
+        if $octave-number <= 5 {
+            ($basenote.uc, "," x (5 - $octave-number));
+        } else {
+            ($basenote.lc, "'" x ($octave-number - 6))
+        }
+    }
+
     sub stream-of-notes($tune) is export {
         my $key = $tune.header.get-first-value("K");
         my $meter = $tune.header.get-first-value("M");

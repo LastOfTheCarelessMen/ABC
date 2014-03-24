@@ -14,48 +14,44 @@ sub print-header($out, $header) {
     }
 }
 
-sub up-octave($accidental, $basenote is copy, $octave is copy) {
-    given $octave {
-        when /','/ { $octave.=subst(/','/, '') }
-        when /"'"/ { $octave ~= "'" }
-        if $basenote ~~ /<[A..G]>/ {
-            $basenote.=lc;
-        } else {
-            $octave ~= "'";
-        }
-    }
-
-    ($accidental, $basenote, $octave);
+sub up-octave($accidental, $basenote, $octave) {
+    my ($note, $number) = to-note-and-number($basenote, $octave);
+    my ($new-note, $new-octave) = from-note-and-number($note, $number + 1);
+    ($accidental, $new-note, $new-octave);
 }
 
-sub print-music($out, @music) {
+sub down-octave($accidental, $basenote, $octave) {
+    my ($note, $number) = to-note-and-number($basenote, $octave);
+    my ($new-note, $new-octave) = from-note-and-number($note, $number - 1);
+    ($accidental, $new-note, $new-octave);
+}
+
+sub print-music($out, @music, &shifter) {
     for @music -> $element {
         if $element.key eq 'endline' {
             say "";
             next;
         }
-        print $element.value ~~ ABC::Pitched ?? ~$element.value.transpose(&up-octave) !! $element.value;
+        print $element.value ~~ ABC::Pitched ?? ~$element.value.transpose(&shifter) !! $element.value;
     }
 }
 
-sub Transpose($in, $out) {
+sub Transpose($in, $out, :$up) {
     my $actions = ABC::Actions.new;
     my $match = ABC::Grammar.parse($in.slurp, :rule<tune_file>, :$actions);
     die "Did not match ABC grammar: last tune understood:\n { $actions.current-tune }" unless $match;
 
     for @( $match.ast ) -> $tune {
         $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
-        
         print-header($out, $tune.header);
-
-        # my $key = $tune.header.get-first-value("K");
-        # my $meter = $tune.header.get-first-value("M");
-        # my $length = $tune.header.get-first-value("L") // "1/8";
-
-        print-music($out, $tune.music);
+        print-music($out, $tune.music, $up ?? &up-octave !! &down-octave);
     }
 }
 
-multi sub MAIN() {
+multi sub MAIN("up") {
+    Transpose($*IN, $*OUT, :up);
+}
+
+multi sub MAIN("down") {
     Transpose($*IN, $*OUT);
 }
