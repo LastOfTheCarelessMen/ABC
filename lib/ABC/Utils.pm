@@ -77,6 +77,23 @@ package ABC::Utils {
         b => 23
     );
     
+    sub to-note-and-number($basenote, $octave-symbol) is export {
+        my $octave = $basenote ~~ /<[A..G]>/ ?? 5 !! 6;
+        for $octave-symbol.comb {
+            when "," { $octave-- }
+            when "'" { $octave++ }
+        }
+        ($basenote.uc, $octave);
+    }
+
+    sub from-note-and-number($basenote, $octave-number) is export {
+        if $octave-number <= 5 {
+            ($basenote.uc, "," x (5 - $octave-number));
+        } else {
+            ($basenote.lc, "'" x ($octave-number - 6))
+        }
+    }
+
     sub pitch-to-ordinal(%key, $accidental, $basenote, $octave) is export {
         my $ord = %notename-to-ordinal{$basenote};
         given $accidental || %key{$basenote.uc} || "" {
@@ -121,23 +138,6 @@ package ABC::Utils {
             ($working-accidental, $basenote.lc, "'" x ($octave - 1));
         } else {
             ($working-accidental, $basenote.uc, "," x -$octave);
-        }
-    }
-
-    sub to-note-and-number($basenote, $octave-symbol) is export {
-        my $octave = $basenote ~~ /<[A..G]>/ ?? 5 !! 6;
-        for $octave-symbol.comb {
-            when "," { $octave-- }
-            when "'" { $octave++ }
-        }
-        ($basenote.uc, $octave);
-    }
-
-    sub from-note-and-number($basenote, $octave-number) is export {
-        if $octave-number <= 5 {
-            ($basenote.uc, "," x (5 - $octave-number));
-        } else {
-            ($basenote.lc, "'" x ($octave-number - 6))
         }
     }
 
