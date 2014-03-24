@@ -14,30 +14,41 @@ sub print-header($out, $header) {
     }
 }
 
-sub print-music($out, @music) {
+sub print-music($out, @music, &shifter) {
     for @music -> $element {
-        print ElementToStr($element);
+        if $element.key eq 'endline' {
+            say "";
+            next;
+        }
+        print $element.value ~~ ABC::Pitched ?? ~$element.value.transpose(&shifter) !! $element.value;
     }
 }
 
-sub Transpose($in, $out) {
+sub Transpose($in, $out, %old-key, %new-key, %shift, $shift) {
+    sub transpose($accidental, $basenote, $octave) {
+        my $ordinal = pitch-to-ordinal(%old-key, $accidental, $basenote, $octave);
+        ordinal-to-pitch(%new-key, %shift{$basenote}, $ordinal + shift);
+    }
+
     my $actions = ABC::Actions.new;
     my $match = ABC::Grammar.parse($in.slurp, :rule<tune_file>, :$actions);
     die "Did not match ABC grammar: last tune understood:\n { $actions.current-tune }" unless $match;
 
     for @( $match.ast ) -> $tune {
         $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
-        
         print-header($out, $tune.header);
-
-        # my $key = $tune.header.get-first-value("K");
-        # my $meter = $tune.header.get-first-value("M");
-        # my $length = $tune.header.get-first-value("L") // "1/8";
-
-        print-music($out, $tune.music);
+        print-music($out, $tune.music, &shift-octave);
     }
 }
 
 multi sub MAIN() {
-    Transpose($*IN, $*OUT);
+    Transpose($*IN, $*OUT, {}, {"F" => "^", "C" => "^"}, +2);
+}
+
+multi sub MAIN("down") {
+    Transpose($*IN, $*OUT, - 1);
+}
+
+multi sub MAIN(Int $shift) {
+    Transpose($*IN, $*OUT, $shift);
 }
