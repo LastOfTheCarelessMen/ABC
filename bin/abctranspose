@@ -27,9 +27,11 @@ sub print-music($out, @music, &shifter) {
 sub Transpose($in, $out, %old-key, %new-key, %shift, $shift) {
     sub transpose($accidental, $basenote, $octave) {
         my $ordinal = pitch-to-ordinal(%old-key, $accidental, $basenote, $octave);
-        ordinal-to-pitch(%new-key, %shift{$basenote}, $ordinal + shift);
+        ordinal-to-pitch(%new-key, %shift{$basenote.uc}, $ordinal + $shift);
     }
 
+    say :%shift.perl;
+    
     my $actions = ABC::Actions.new;
     my $match = ABC::Grammar.parse($in.slurp, :rule<tune_file>, :$actions);
     die "Did not match ABC grammar: last tune understood:\n { $actions.current-tune }" unless $match;
@@ -37,12 +39,12 @@ sub Transpose($in, $out, %old-key, %new-key, %shift, $shift) {
     for @( $match.ast ) -> $tune {
         $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
         print-header($out, $tune.header);
-        print-music($out, $tune.music, &shift-octave);
+        print-music($out, $tune.music, &transpose);
     }
 }
 
 multi sub MAIN() {
-    Transpose($*IN, $*OUT, {}, {"F" => "^", "C" => "^"}, +2);
+    Transpose($*IN, $*OUT, {}, {"F" => "^", "C" => "^"}, ("A".."G" Z=> "B".."G", "A").hash, +2);
 }
 
 multi sub MAIN("down") {
