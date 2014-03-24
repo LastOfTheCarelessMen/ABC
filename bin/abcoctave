@@ -14,18 +14,6 @@ sub print-header($out, $header) {
     }
 }
 
-sub up-octave($accidental, $basenote, $octave) {
-    my ($note, $number) = to-note-and-number($basenote, $octave);
-    my ($new-note, $new-octave) = from-note-and-number($note, $number + 1);
-    ($accidental, $new-note, $new-octave);
-}
-
-sub down-octave($accidental, $basenote, $octave) {
-    my ($note, $number) = to-note-and-number($basenote, $octave);
-    my ($new-note, $new-octave) = from-note-and-number($note, $number - 1);
-    ($accidental, $new-note, $new-octave);
-}
-
 sub print-music($out, @music, &shifter) {
     for @music -> $element {
         if $element.key eq 'endline' {
@@ -36,7 +24,13 @@ sub print-music($out, @music, &shifter) {
     }
 }
 
-sub Transpose($in, $out, :$up) {
+sub Transpose($in, $out, $shift) {
+    sub shift-octave($accidental, $basenote, $octave) {
+        my ($note, $number) = to-note-and-number($basenote, $octave);
+        my ($new-note, $new-octave) = from-note-and-number($note, $number + $shift);
+        ($accidental, $new-note, $new-octave);
+    }
+
     my $actions = ABC::Actions.new;
     my $match = ABC::Grammar.parse($in.slurp, :rule<tune_file>, :$actions);
     die "Did not match ABC grammar: last tune understood:\n { $actions.current-tune }" unless $match;
@@ -44,14 +38,18 @@ sub Transpose($in, $out, :$up) {
     for @( $match.ast ) -> $tune {
         $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
         print-header($out, $tune.header);
-        print-music($out, $tune.music, $up ?? &up-octave !! &down-octave);
+        print-music($out, $tune.music, &shift-octave);
     }
 }
 
 multi sub MAIN("up") {
-    Transpose($*IN, $*OUT, :up);
+    Transpose($*IN, $*OUT, +1);
 }
 
 multi sub MAIN("down") {
-    Transpose($*IN, $*OUT);
+    Transpose($*IN, $*OUT, - 1);
+}
+
+multi sub MAIN(Int $shift) {
+    Transpose($*IN, $*OUT, $shift);
 }
