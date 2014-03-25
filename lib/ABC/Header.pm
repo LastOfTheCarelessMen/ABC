@@ -6,6 +6,17 @@ class ABC::Header {
     method add-line($name, $data) {
         self.lines.push($name => $data);
     }
+
+    method set-key($new-key) {
+        my $found = False;
+        for self.lines <-> $line {
+            if $line.key eq "K" {
+                $line.value = $new-key;
+                $found = True;
+            }
+        }
+        self.lines.push("K" => $new-key) unless $found;
+    }
     
     method get($name) {
         self.lines.grep({ .key eq $name });

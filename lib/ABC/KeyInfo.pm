@@ -8,6 +8,7 @@ sub parcel-first-if-needed($a) {
 class ABC::KeyInfo {
     has %.key;
     has $.clef;
+    has $.basenote;
     
     method new($key-field, :$current-key-info) {
         # say "K: $key-field";
@@ -79,7 +80,11 @@ class ABC::KeyInfo {
             $clef-info = ~($clef<clef-name> // $clef<clef-note>);
         }
         
-        self.bless(:key(%key-info), :clef($clef-info));
+        self.bless(:key(%key-info), :clef($clef-info), :basenote($match<key-def><basenote>.uc));
+    }
+
+    method scale-names is export {
+        ($.basenote .. "G", "A".."G")[^7];
     }
     
 }
