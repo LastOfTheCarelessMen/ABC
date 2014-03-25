@@ -17,11 +17,11 @@ sub print-header($out, $header) {
 
 sub print-music($out, @music, &shifter) {
     for @music -> $element {
-        if $element.key eq 'endline' {
-            say "";
-            next;
+        given $element.key {
+            when 'endline' { say ""; }
+            when 'inline_field' { print "[{$element.value.key}:{$element.value.value}]"; }
+            print $element.value ~~ ABC::Pitched ?? ~$element.value.transpose(&shifter) !! $element.value;
         }
-        print $element.value ~~ ABC::Pitched ?? ~$element.value.transpose(&shifter) !! $element.value;
     }
 }
 
