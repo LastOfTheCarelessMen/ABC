@@ -24,7 +24,7 @@ class ABC::KeyInfo {
         }
         
         if $match<key-def> {
-            %key-info = {};
+            %key-info = ();
             my %keys = (
                 'C' => 0,
                 'G' => 1,

@@ -22,7 +22,7 @@ class ABC::Context {
     }
     
     method bar-line () {
-        %.accidentals = { };
+        %.accidentals = ();
     }
 
     method working-accidental($abc-pitch) {
