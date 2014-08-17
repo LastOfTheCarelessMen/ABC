@@ -405,7 +405,7 @@ class TuneConvertor {
     
 }
 
-sub TuneStreamToLilypondStream($in, $out, $filter = True) {
+sub TuneStreamToLilypondStream($in, $out, $filter = { True }) {
     my $actions = ABC::Actions.new;
     my $match = ABC::Grammar.parse($in.slurp, :rule<tune_file>, :$actions);
     die "Did not match ABC grammar: last tune understood:\n { $actions.current-tune }" unless $match;
