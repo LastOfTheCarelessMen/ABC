@@ -435,7 +435,7 @@ multi sub MAIN() {
     TuneStreamToLilypondStream($*IN, $*OUT);
 }
 
-multi sub MAIN($first-abc-file, *@other-abc-files, :x($index)?, :$o?) {
+multi sub MAIN($first-abc-file, *@other-abc-files, :x($index)?, :$o?, :$mc?) {
     my @abc-files = $first-abc-file, @other-abc-files;
     for @abc-files -> $abc-file {
         my $ly-file;
@@ -458,9 +458,11 @@ multi sub MAIN($first-abc-file, *@other-abc-files, :x($index)?, :$o?) {
             TuneStreamToLilypondStream($in, $out);
         }
     
-        # $out.say: '\markup {';
-        # $out.say: '    \fill-line { "For more information on these tunes, please see http://midlandceltic.org/ws2011/" }';
-        # $out.say: '}';
+        if $mc {
+            $out.say: '\markup {';
+            $out.say: '    \fill-line { "For more information on these tunes, please see http://midlandceltic.org/ws2011/" }';
+            $out.say: '}';
+        }
     
         $out.close;
         $in.close;
