@@ -199,7 +199,7 @@ class ABC::Actions {
         for @( $/.caps ) {
             # $*ERR.say: ~$_.key ~ " => " ~ ~$_.value;
             when *.key eq "line_of_music" {
-                for $_.value.ast.list {
+                for $_.value.ast {
                     @music.push($_);
                 }
             }
