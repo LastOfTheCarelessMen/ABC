@@ -34,7 +34,8 @@ sub Transpose($in, $out, $new-key-name, %old-key, %new-key, %shift, $shift) {
     }
 
     my $actions = ABC::Actions.new;
-    my $match = ABC::Grammar.parse($in.slurp, :rule<tune_file>, :$actions);
+
+    my $match = ABC::Grammar.parse($in.slurp-rest, :rule<tune_file>, :$actions);
     die "Did not match ABC grammar: last tune understood:\n { $actions.current-tune }" unless $match;
 
     for @( $match.ast ) -> $tune {
