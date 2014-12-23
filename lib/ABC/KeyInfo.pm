@@ -84,7 +84,7 @@ class ABC::KeyInfo {
     }
 
     method scale-names is export {
-        ($.basenote .. "G", "A".."G")[^7];
+        ($.basenote .. "G", "A".."G").flat[^7];
     }
     
 }
