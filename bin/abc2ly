@@ -94,7 +94,7 @@ class LilypondContext {
     }
     
     method key-to-string() {
-        my $sf = $.context.key-info.key.map({ "{.key}{.value}" }).sort.Str.lc;
+        my $sf = $.context.key-info.key.for({ "{.key}{.value}" }).sort.Str.lc;
         my $major-key-name;
         given $sf {
             when ""                     { $major-key-name = "c"; }
@@ -157,7 +157,7 @@ class TuneConvertor {
             }
 
             when ABC::Stem {
-                "<" ~ $stem.notes.map({ $.context.get-Lilypond-pitch($_) }).join(' ') ~ ">"
+                "<" ~ $stem.notes.for({ $.context.get-Lilypond-pitch($_) }).join(' ') ~ ">"
             }
 
             die "Unrecognized alleged stem: " ~ $stem.perl;

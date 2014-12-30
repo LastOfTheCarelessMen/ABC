@@ -261,7 +261,7 @@ for ':|:', '|:', '|', ':|', '::', '|]'
     isa_ok $match, Match, 'Got a match';
     ok $match, 'bar recognized';
     is $match, "g>ecgece/f/g/e/|", "Entire bar was matched";
-    is $match<element>.map(~*), "g>e c g e c e/ f/ g/ e/", "Each element was matched";
+    is $match<element>.for(~*), "g>e c g e c e/ f/ g/ e/", "Each element was matched";
     is $match<barline>, "|", "Barline was matched";
 }
 
@@ -270,7 +270,7 @@ for ':|:', '|:', '|', ':|', '::', '|]'
     isa_ok $match, Match, 'Got a match';
     ok $match, 'bar recognized';
     is $match, "g>ecg ec e/f/g/e/ |", "Entire bar was matched";
-    is $match<element>.map(~*), "g>e c g   e c   e/ f/ g/ e/  ", "Each element was matched";
+    is $match<element>.for(~*), "g>e c g   e c   e/ f/ g/ e/  ", "Each element was matched";
     is $match<barline>, "|", "Barline was matched";
 }
 
@@ -418,7 +418,7 @@ K:D
     isa_ok $match, Match, 'Got a match';
     ok $match, 'header recognized';
     is $match<header_field>.elems, 6, "Six fields matched";
-    is $match<header_field>.map({ .<header_field_name> }), "X T S M L K", "Got the right field names";
+    is $match<header_field>.for({ .<header_field_name> }), "X T S M L K", "Got the right field names";
 }
 
 {
@@ -439,7 +439,7 @@ g/f/e/d/ c/d/e/f/ gc e/f/g/e/ | dB/A/ gB +trill+A2 +trill+e2 :|
     given $match<header>
     {
         is .<header_field>.elems, 6, "Six fields matched";
-        is .<header_field>.map({ .<header_field_name> }), "X T S M L K", "Got the right field names";
+        is .<header_field>.for({ .<header_field_name> }), "X T S M L K", "Got the right field names";
     }
     is $match<music><line_of_music>.elems, 4, "Four lines matched";
 }
