@@ -142,8 +142,8 @@ class ABC::Actions {
     }
     
     method chord_or_text($/) {
-        my @chords = $/<chord>.map({ $_.ast });
-        my @texts = $/<text_expression>.map({ ~$_ });
+        my @chords = $/<chord>.for({ $_.ast });
+        my @texts = $/<text_expression>.for({ ~$_ });
         make (@chords, @texts).flat;
     }
     

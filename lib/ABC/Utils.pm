@@ -19,7 +19,7 @@ package ABC::Utils {
             }
             when "inline_field" { '[' ~ $element-pair.value.key ~ ':' ~ $element-pair.value.value ~ ']'; }
             when "chord_or_text" { 
-                $element-pair.value.map({
+                $element-pair.value.for({
                     when Str { '"' ~ $_ ~ '"'; }
                     ~$_; 
                 }).join('') ; 
