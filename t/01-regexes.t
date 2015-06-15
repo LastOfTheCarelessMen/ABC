@@ -25,7 +25,7 @@ use ABC::Grammar;
     isa_ok $match, Match, 'Got a match';
     ok $match, '"_B" is a pitch';
     is $match<basenote>, "B", '"_B" has base note B';
-    is $match<octave>, "", '"_B" has octave ""';
+    is $match<octave>, Nil, '"_B" has no octave';
     is $match<accidental>, "_", '"_B" has accidental "_"';
 }
 
@@ -35,7 +35,7 @@ use ABC::Grammar;
     ok $match, '"note" is a pitch';
     is $match<basenote>, "C", '"note" has base note C';
     is $match<octave>, "''", '"note" has octave two-upticks';
-    is $match<accidental>, "", '"note" has accidental ""';
+    is $match<accidental>, Nil, '"note" has no accidental';
 }
 
 {
@@ -59,7 +59,7 @@ use ABC::Grammar;
     isa_ok $match, Match, 'Got a match';
     ok $match, '"^^e2" is a note';
     is $match<pitch><basenote>, "e", '"^^e2" has base note e';
-    is $match<pitch><octave>, "", '"^^e2" has octave ""';
+    is $match<pitch><octave>, Nil, '"^^e2" has no octave';
     is $match<pitch><accidental>, "^^", '"^^e2" has accidental "^^"';
     is $match<note_length>, "2", '"^^e2" has note length 2';
 }
@@ -80,7 +80,7 @@ use ABC::Grammar;
     ok $match, '"G,2/3" is a note';
     is $match<pitch><basenote>, "G", '"G,2/3" has base note G';
     is $match<pitch><octave>, ",", '"G,2/3" has octave ","';
-    is $match<pitch><accidental>, "", '"G,2/3" has no accidental';
+    is $match<pitch><accidental>, Nil, '"G,2/3" has no accidental';
     is $match<note_length>, "2/3", '"G,2/3" has note length 2/3';
 }
 
@@ -159,8 +159,8 @@ use ABC::Grammar;
     isa_ok $match, Match, 'Got a match';
     ok $match, '"A>^C" is a broken rhythm';
     is $match<stem>[0]<mnote>[0]<pitch><basenote>, "A", 'first note is A';
-    is $match<stem>[0]<mnote>[0]<pitch><octave>, "", 'first note has no octave';
-    is $match<stem>[0]<mnote>[0]<pitch><accidental>, "", 'first note has no accidental';
+    is $match<stem>[0]<mnote>[0]<pitch><octave>, Nil, 'first note has no octave';
+    is $match<stem>[0]<mnote>[0]<pitch><accidental>, Nil, 'first note has no accidental';
     is $match<stem>[0]<mnote>[0]<note_length>, "", 'first note has no length';
     is $match<broken_rhythm_bracket>, ">", 'angle is >';
     is $match<stem>[1]<mnote>[0]<pitch><basenote>, "C", 'second note is C';
@@ -177,13 +177,13 @@ use ABC::Grammar;
     {
         is .<stem>[0]<mnote>[0]<pitch><basenote>, "d", 'first note is d';
         is .<stem>[0]<mnote>[0]<pitch><octave>, "'", 'first note has an octave tick';
-        is .<stem>[0]<mnote>[0]<pitch><accidental>, "", 'first note has no accidental';
+        is .<stem>[0]<mnote>[0]<pitch><accidental>, Nil, 'first note has no accidental';
         is .<stem>[0]<mnote>[0]<note_length>, "", 'first note has no length';
         is .<g1>[0], "+p+", 'first gracing is +p+';
         is .<broken_rhythm_bracket>, "<<<", 'angle is <<<';
         is .<g2>[0], "+accent+", 'second gracing is +accent+';
         is .<stem>[1]<mnote>[0]<pitch><basenote>, "B", 'second note is B';
-        is .<stem>[1]<mnote>[0]<pitch><octave>, "", 'second note has no octave';
+        is .<stem>[1]<mnote>[0]<pitch><octave>, Nil, 'second note has no octave';
         is .<stem>[1]<mnote>[0]<pitch><accidental>, "_", 'second note is flat';
         is .<stem>[1]<mnote>[0]<note_length>, "", 'second note has no length';
     }
