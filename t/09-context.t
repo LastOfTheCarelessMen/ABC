@@ -8,7 +8,7 @@ use ABC::Actions;
     my $context = ABC::Context.new("C", "4/4", "1/8");
     
     my $match = ABC::Grammar.parse("abcdefgab^c_dcd", :rule<bar>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'Got a match';
+    isa-ok $match, Match, 'Got a match';
     ok $match, 'bar recognized';
     
     # first run loads up C# and Db
@@ -36,7 +36,7 @@ use ABC::Actions;
     my $context = ABC::Context.new("C#", "4/4", "1/8");
     
     my $match = ABC::Grammar.parse("abcdefgab^c_dcd", :rule<bar>, :actions(ABC::Actions.new));
-    isa_ok $match, Match, 'Got a match';
+    isa-ok $match, Match, 'Got a match';
     ok $match, 'bar recognized';
     
     # first run loads up C# and Db
