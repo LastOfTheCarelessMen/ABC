@@ -401,6 +401,10 @@ class TuneConvertor {
                 $out.say: '\\bar "|."';
             }
         }
+
+        if @elements.grep({ $_.key eq "barline" })[*-1].value eq '|]' {
+            $out.say: '\\bar "|."';
+        }
     
         $out.say: "\}";
     }
