@@ -234,6 +234,7 @@ class TuneConvertor {
                     given $element.value {
                         when "~" { $suffix ~= "\\turn"; }
                         when "." { $suffix ~= "\\staccato"; }
+                        when "T" { $suffix ~= "\\trill"; }
                         when "segno"  { $lilypond ~= '\\mark \\markup { \\musicglyph #"scripts.segno" }'; }
                         when "coda"   { $lilypond ~= '\\mark \\markup { \\musicglyph #"scripts.coda" }'; }
                         when "D.C."   { $lilypond ~= '\\mark "D.C."'; }

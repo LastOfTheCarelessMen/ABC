@@ -37,7 +37,7 @@ grammar ABC::Grammar
     
     token long_gracing_text { [<alpha> | '.' | ')' | '(']+ }
     token long_gracing { '+' <long_gracing_text> '+' }
-    token gracing { '.' | '~' | <long_gracing> }
+    token gracing { '.' | '~' | 'T' | <long_gracing> }
     
     token spacing { \h+ }
     
