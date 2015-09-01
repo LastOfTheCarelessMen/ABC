@@ -8,7 +8,7 @@ grammar ABC::Grammar
     
     token header_field_name { \w }
     token header_field_data { <-[ % \v ]>* }
-    token header_field { ^^ <header_field_name> ':' \s* <header_field_data> <comment>? $$ }
+    token header_field { ^^ <header_field_name> ':' \h* <header_field_data> <comment>? $$ }
     token header { [[<header_field> | <comment_line>] \v+]+ }
 
     token basenote { <[a..g]+[A..G]> }
