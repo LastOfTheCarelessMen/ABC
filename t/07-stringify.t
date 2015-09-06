@@ -39,7 +39,7 @@ for @simple-cases -> $test-case {
     is ~$object, $test-case, "Stringified version matches";
 }
 
-for @simple-cases, @tricky-cases -> $test-case {
+for |@simple-cases, |@tricky-cases -> $test-case {
     my $match = ABC::Grammar.parse($test-case, :rule<element>, :actions(ABC::Actions.new));
     ok $match, "$test-case parsed";
     is element-to-str($match.ast), $test-case, "element-to-str version matches";

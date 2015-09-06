@@ -12,7 +12,7 @@ is default-length-from-meter("C|"),   "1/8",  "Cut time defaults to eighth note"
 is default-length-from-meter(""),     "1/8",  "No meter defaults to eighth note";
 is default-length-from-meter("none"), "1/8",  "No meter defaults to eighth note";
 
-for 'A'..'G' X 2..8 -> $note, $octave-number {
+for flat 'A'..'G' X 2..8 -> $note, $octave-number {
     my ($pitch, $symbol) = from-note-and-number($note, $octave-number);
     my ($computed-note, $computed-number) = to-note-and-number($pitch, $symbol);
     is $computed-note, $note, "Note is correct after round trip through note-and-symbol";
