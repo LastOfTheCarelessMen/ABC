@@ -33,4 +33,4 @@ is ordinal-to-pitch(%key, "C", 12), ("", "c", ""), "Third space C translates bac
 is ordinal-to-pitch(%key, "B", 12), ("^", "B", ""), "Middle line B-sharp translates back okay";
 is ordinal-to-pitch(%key, "D", 12), ("__", "d", ""), "Fourth line D-double-flat translates back okay";
 
-done;
+done-testing;

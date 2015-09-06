@@ -60,4 +60,4 @@ use ABC::Actions;
     }
 }
 
-done;
+done-testing;

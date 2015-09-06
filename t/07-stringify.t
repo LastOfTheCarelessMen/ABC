@@ -50,4 +50,4 @@ for @simple-cases, @tricky-cases -> $test-case {
 # is ABC::Tuplet.new(3, 2, @notes[^4]), "(3::4ab2c/d", "triplet with four notes";
 # is ABC::Tuplet.new(3, 3, @notes[^4]), "(3:3:4ab2c/d", "triplet with four notes and a weird rhythm";
 
-done;
+done-testing;
