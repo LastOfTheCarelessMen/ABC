@@ -42,7 +42,7 @@ class LilypondContext {
     method get-Lilypond-pitch(ABC::Note $abc-pitch) {
         my $real-accidental = $.context.working-accidental($abc-pitch);
         
-        my $octave = +($abc-pitch.basenote ~~ 'a'..'z');
+        my $octave = +($abc-pitch.basenote ~~ 'a'..'z') + $.context.key-info.octave-shift;
         given $abc-pitch.octave {
             when !*.defined { } # skip if no additional octave info
             when /\,/ { $octave -= $abc-pitch.octave.chars }
