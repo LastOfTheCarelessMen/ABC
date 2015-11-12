@@ -314,7 +314,7 @@ class TuneConvertor {
                 when "grace_notes" {
                     $*ERR.say: "Unused suffix in grace note code: $suffix" if $suffix;
                     
-                    $lilypond ~= "\\grace \{";
+                    $lilypond ~= $element.value.acciaccatura ?? "\\acciaccatura \{" !! "\\grace \{";
                     if $element.value.notes == 1 {
                         $lilypond ~= self.StemToLilypond($element.value.notes[0], ""); 
                     } else {
