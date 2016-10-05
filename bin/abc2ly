@@ -342,6 +342,7 @@ class TuneConvertor {
     method BodyToLilypond(@elements, $out) {
         $out.say: "\{";
         $out.print: $.context.key-to-string;
+        $out.say: "\\accidentalStyle modern-cautionary";
         $out.print: $.context.clef-to-string;
         $out.print: $.context.meter-to-string;
     
