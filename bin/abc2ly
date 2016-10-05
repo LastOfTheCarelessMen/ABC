@@ -129,7 +129,7 @@ class LilypondContext {
 sub HeaderToLilypond(ABC::Header $header, $out) {
     $out.say: "\\header \{";
     
-    my $title = $header.get-first-value("T");
+    my $title = $header.get-first-value("T") // "Untitled";
     $title .=subst('"', "'", :g);
     $out.say: "    title = \" $title \"";
     my @composers = $header.get("C")>>.value;
