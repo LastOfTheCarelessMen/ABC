@@ -345,6 +345,8 @@ class TuneConvertor {
         $out.say: "\\accidentalStyle modern-cautionary";
         $out.print: $.context.clef-to-string;
         $out.print: $.context.meter-to-string;
+        
+        my $first-time = True;
     
         my $start-of-section = 0;
         loop (my $i = 0; $i < +@elements; $i++) {
@@ -357,7 +359,8 @@ class TuneConvertor {
                    || @elements[$i].value eq ':|:' | ':|' | '::' {
                     $out.print: "\\repeat volta 2 "; # 2 is abitrarily chosen here!
                 }
-                self.SectionToLilypond(@elements[$start-of-section ..^ $i], $out, :beginning);
+                self.SectionToLilypond(@elements[$start-of-section ..^ $i], $out, :beginning($first-time));
+                $first-time = False;
                 $start-of-section = $i + 1;
                 given @elements[$i].value {
                     when '||' { $out.say: '\\bar "||"'; }
@@ -398,7 +401,8 @@ class TuneConvertor {
             if @elements[*-1].value eq ':|:' | ':|' | '::' {
                 $out.print: "\\repeat volta 2 "; # 2 is abitrarily chosen here!
             }
-            self.SectionToLilypond(@elements[$start-of-section ..^ +@elements], $out, :beginning);
+            self.SectionToLilypond(@elements[$start-of-section ..^ +@elements], $out, :beginning($first-time));
+            $first-time = False;
             if @elements[*-1].value eq '|]' {
                 $out.say: '\\bar "|."';
             }
