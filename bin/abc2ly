@@ -417,14 +417,27 @@ class TuneConvertor {
     
 }
 
-sub TuneStreamToLilypondStream($in, $out, $filter = *) {
+sub TuneStreamToLilypondStream($in, $out, $filter = *, :$fancy?) {
     my $actions = ABC::Actions.new;
     my $match = ABC::Grammar.parse($in.slurp-rest, :rule<tune_file>, :$actions);
     die "Did not match ABC grammar: last tune understood:\n { $actions.current-tune }" unless $match;
 
     $out.say: '\\version "2.12.3"';
     $out.say: "#(set-default-paper-size \"{$paper-size}\")";
-    $out.say: "\\paper \{ print-all-headers = ##t \}";
+    if $fancy {
+        $out.say: Q:to/END/;
+            \paper { 
+                print-all-headers = ##t
+                top-margin = 1\in
+                left-margin = 1\in
+                right-margin = 1\in
+                indent = 0
+                tagline = #ff
+            }
+        END
+    } else {
+        $out.say: "\\paper \{ print-all-headers = ##t \}";
+    }
     
     for @( $match.ast ).grep($filter) -> $tune {
         $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
@@ -449,7 +462,7 @@ multi sub MAIN() {
     TuneStreamToLilypondStream($*IN, $*OUT);
 }
 
-multi sub MAIN($first-abc-file, *@other-abc-files, :x($index)?, :$o?, :$mc?) {
+multi sub MAIN($first-abc-file, *@other-abc-files, :x($index)?, :$o?, :$mc?, :$fancy?) {
     my @abc-files = $first-abc-file, |@other-abc-files;
     for @abc-files -> $abc-file {
         my $ly-file;
@@ -467,9 +480,9 @@ multi sub MAIN($first-abc-file, *@other-abc-files, :x($index)?, :$o?, :$mc?) {
         my $out = open $ly-file, :w or die "Unable to open $ly-file";
     
         if $index {
-            TuneStreamToLilypondStream($in, $out, -> $tune { $tune.header.get-first-value("X") == $index });
+            TuneStreamToLilypondStream($in, $out, -> $tune { $tune.header.get-first-value("X") == $index }, :$fancy);
         } else {
-            TuneStreamToLilypondStream($in, $out);
+            TuneStreamToLilypondStream($in, $out, :$fancy);
         }
     
         if $mc {
