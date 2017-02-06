@@ -159,7 +159,7 @@ class TuneConvertor {
             }
 
             when ABC::Stem {
-                "<" ~ $stem.notes.for({ $.context.get-Lilypond-pitch($_) }).join(' ') ~ ">"
+                "<" ~ $stem.notes.map({ $.context.get-Lilypond-pitch($_) }).join(' ') ~ ">"
             }
 
             die "Unrecognized alleged stem: " ~ $stem.perl;
