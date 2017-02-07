@@ -1,6 +1,8 @@
 use v6;
 # use Grammar::Tracer;
 
+# Originally based on https://web.archive.org/web/20120201072612/http://www.norbeck.nu/abc/bnf/abc20bnf.htm
+
 grammar ABC::Grammar
 {
     regex comment { \h* '%' \N* $$ }
