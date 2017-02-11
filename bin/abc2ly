@@ -214,8 +214,13 @@ class TuneConvertor {
                     $lilypond ~=  " r{ $.context.get-Lilypond-duration($element.value) }$suffix "; 
                     $suffix = ""; 
                 }
-                when "tuplet" { 
-                    $lilypond ~= " \\times 2/{ $element.value.tuple } \{";
+                when "tuplet" {
+                    given $element.value.tuple {
+                        when 2 { $lilypond ~= " \\times 3/2 \{"; }
+                        when 3 { $lilypond ~= " \\times 2/3 \{"; }
+                        when 4 { $lilypond ~= " \\times 3/4 \{"; }
+                        $lilypond ~= " \\times 2/{ $element.value.tuple } \{";
+                    }
                     $lilypond ~= self.StemToLilypond($element.value.notes[0], "[");
                     for 1..($element.value.notes - 2) -> $i {
                         $lilypond ~= self.StemToLilypond($element.value.notes[$i]);
