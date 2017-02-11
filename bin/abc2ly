@@ -459,7 +459,22 @@ sub TuneStreamToLilypondStream($in, $out, $filter = *, :$fancy?) {
         $convertor.BodyToLilypond($tune.music, $out);
         HeaderToLilypond($tune.header, $out);
 
-        $out.say: "}\n\n";    
+        $out.say: "}\n\n";
+        
+        if $tune.header.get-first-value("N") {
+            $out.say: "\\markuplist \{";
+            $out.say: "    \\wordwrap-lines \{";
+            for $tune.header.get("N") -> $note {
+                if $note.value ~~ / ^ \s* $ / {
+                    $out.say: '    } \wordwrap-lines {';
+                } else {
+                    $out.say: "        { $note.value.subst('"', '\char #34 ', :global) }";
+                }
+            }
+            $out.say: '    }';
+            $out.say: "    \\vspace #2";
+            $out.say: "}\n\n";
+        }
     }
 }
 
