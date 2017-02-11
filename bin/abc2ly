@@ -126,17 +126,32 @@ class LilypondContext {
     }
 }
 
+sub get-field-if-there($header, $field) {
+    my @things = $header.get($field)>>.value;
+    ?@things ?? @things[0] !! "";
+}
+
 sub HeaderToLilypond(ABC::Header $header, $out) {
     $out.say: "\\header \{";
     
     my $title = $header.get-first-value("T") // "Untitled";
     $title .=subst('"', "'", :g);
     $out.say: "    title = \" $title \"";
-    my @composers = $header.get("C")>>.value;
-    $out.say: "    composer = \"{ @composers[0] }\"" if ?@composers;
-    my @origins = $header.get("O")>>.value;
-    $out.say: "    dedication = \"{ @origins[0] }\"" if ?@origins && @origins[0] ~~ m:i/^for/;
-    
+    my $composer = get-field-if-there($header, "C");
+    my $origin = get-field-if-there($header, "O");
+    if $origin {
+        if $origin ~~ m:i/^for/ {
+            $out.say: qq/    dedication = "$origin"/;
+        } else {
+            if $composer {
+                $composer ~= " ($origin)";
+            } else {
+                $composer = $origin;
+            }
+        }
+    }
+    $out.say: qq/    composer = "$composer"/ if $composer;
+
     $out.say: "}";
 }
 
