@@ -468,7 +468,17 @@ sub TuneStreamToLilypondStream($in, $out, $filter = *, :$fancy?) {
                 if $note.value ~~ / ^ \s* $ / {
                     $out.say: '    } \wordwrap-lines {';
                 } else {
-                    $out.say: "        { $note.value.subst('"', '\char #34 ', :global) }";
+                    my $text = $note.value;
+                    # this is some goofy magic to make sure quotation marks come out correctly.
+                    $text .= subst(/ (\S*) '"' (\S*)/, 
+                                   {
+                                       my $prefix = $0;
+                                       my $postfix = $1;
+                                       $prefix .= subst('"', '" \\char #34 "', :global);
+                                       "\\concat \{ \"$prefix\" \\char #34 \"$postfix\" \} "
+                                   }, 
+                                   :global);
+                    $out.say: "        $text";
                 }
             }
             $out.say: '    }';
