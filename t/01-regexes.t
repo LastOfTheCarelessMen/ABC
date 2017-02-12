@@ -109,6 +109,20 @@ use ABC::Grammar;
 }
 
 {
+    my $match = ABC::Grammar.parse("v", :rule<element>);
+    isa-ok $match, Match, 'Got a match';
+    ok $match, '"v" is an element';
+    is $match<gracing>, "v", '"v" gracing is v';
+}
+
+{
+    my $match = ABC::Grammar.parse("T", :rule<element>);
+    isa-ok $match, Match, 'Got a match';
+    ok $match, '"T" is an element';
+    is $match<gracing>, "T", '"T" gracing is T';
+}
+
+{
     my $match = ABC::Grammar.parse("+trill+", :rule<element>);
     isa-ok $match, Match, 'Got a match';
     ok $match, '"+trill+" is an element';
