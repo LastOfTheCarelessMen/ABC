@@ -70,7 +70,7 @@ grammar ABC::Grammar
     token chord { <mainnote=basenote> <mainaccidental=chord_accidental>? <maintype=chord_type>? 
                   [ '/' <bassnote=basenote> <bass_accidental=chord_accidental>? ]? <non_quote>* } 
     token non_quote { <-["]> }
-    token text_expression { [ '^' | '<' | '>' | '_' | '@' ] <non_quote>+ }
+    token text_expression { [ '^' | '<' | '>' | '_' | '@' ]? <non_quote>+ }
     token chord_or_text { '"' [ <chord> | <text_expression> ] [ <chord_newline> [ <chord> | <text_expression> ] ]* '"' }
     
     token element { <broken_rhythm> | <stem> | <rest> | <tuplet> | <slur_begin> | <slur_end> 

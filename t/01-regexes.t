@@ -12,6 +12,13 @@ use ABC::Grammar;
 }
 
 {
+    my $match = ABC::Grammar.parse('"1"', :rule<chord_or_text>);
+    isa-ok $match, Match, 'Got a match';
+    ok $match,  '"1" is a chord or text';
+    is $match<text_expression>, "1", '"1" is text 1';
+}
+
+{
     my $match = ABC::Grammar.parse("^A,", :rule<pitch>);
     isa-ok $match, Match, 'Got a match';
     ok $match,  '"^A," is a pitch';
