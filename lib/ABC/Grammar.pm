@@ -84,7 +84,7 @@ grammar ABC::Grammar
         
     token line_of_music { <barline>? <bar>+ '\\'? <comment>? $$ }
     
-    token interior_header_field_name { < K M L w > }
+    token interior_header_field_name { < K M L w P > }
     token interior_header_field_data { <-[ % \v ]>* }
     token interior_header_field { ^^ <interior_header_field_name> ':' \h* <interior_header_field_data> <comment>? $$ }
 
