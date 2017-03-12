@@ -202,10 +202,8 @@ class TuneConvertor {
             
             my @chunks = $lilypond-bar.split($spacing-comment);
             for @chunks -> $chunk {
-                dd $chunk;
                 if $chunk !~~ /"["/ && $chunk.comb(/\d+/).grep(* > 4) > 1 {
                     $result ~= $chunk.subst(/<?after \S> \s/, { "[ " }) ~ "]";
-                    dd $result;
                 } else {
                     $result ~= $chunk;
                 }
