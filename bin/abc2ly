@@ -467,6 +467,14 @@ class TuneConvertor {
     
 }
 
+sub TuneBodyToLilypondStream($tune, $out) {
+    my $key = $tune.header.get-first-value("K");
+    my $meter = $tune.header.get-first-value("M");
+    my $length = $tune.header.get-first-value("L") // default-length-from-meter($meter);
+    my $convertor = TuneConvertor.new($key, $meter, $length);
+    $convertor.BodyToLilypond($tune.music, $out);
+}
+
 sub TuneStreamToLilypondStream($in, $out, $filter = *, :$fancy?) {
     my $actions = ABC::Actions.new;
     my $match = ABC::Grammar.parse($in.slurp-rest, :rule<tune_file>, :$actions);
@@ -493,16 +501,8 @@ sub TuneStreamToLilypondStream($in, $out, $filter = *, :$fancy?) {
         $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
         $out.say: "\\score \{";
 
-        # say ~$tune.music;
-
-        # dd $tune.header;
-        my $key = $tune.header.get-first-value("K");
-        my $meter = $tune.header.get-first-value("M");
-        my $length = $tune.header.get-first-value("L") // default-length-from-meter($meter);
-
-        my $convertor = TuneConvertor.new($key, $meter, $length);
-        $convertor.BodyToLilypond($tune.music, $out);
-        HeaderToLilypond($tune.header, $out);
+            TuneBodyToLilypondStream($tune, $out);
+            HeaderToLilypond($tune.header, $out);
 
         $out.say: "}\n\n";
         
@@ -533,11 +533,37 @@ sub TuneStreamToLilypondStream($in, $out, $filter = *, :$fancy?) {
     }
 }
 
+sub TunesStreamToScore($in, $out) {
+    my $actions = ABC::Actions.new;
+    my $match = ABC::Grammar.parse($in.slurp-rest, :rule<tune_file>, :$actions);
+    die "Did not match ABC grammar: last tune understood:\n { $actions.current-tune }" unless $match;
+    my @tunes = @( $match.ast );
+
+    $out.say: '\\version "2.12.3"';
+    $out.say: "#(set-default-paper-size \"{$paper-size}\")";
+    $out.say: "\\paper \{ print-all-headers = ##t \}";
+
+    $out.say: "\\score \{";
+    $out.say: '<<';
+
+    
+    for @tunes -> $tune {
+        $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
+
+        $out.say: "\\new Staff ";
+        TuneBodyToLilypondStream($tune, $out);
+    }
+
+    $out.say: '>>';
+    HeaderToLilypond(@tunes[0].header, $out);
+    $out.say: "}\n\n";
+}
+
 multi sub MAIN() {
     TuneStreamToLilypondStream($*IN, $*OUT);
 }
 
-multi sub MAIN($first-abc-file, *@other-abc-files, :x($index)?, :$o?, :$mc?, :$fancy?) {
+multi sub MAIN($first-abc-file, *@other-abc-files, :x($index)?, :$o?, :$mc?, :$fancy?, :$score?) {
     my @abc-files = $first-abc-file, |@other-abc-files;
     for @abc-files -> $abc-file {
         my $ly-file;
@@ -554,7 +580,9 @@ multi sub MAIN($first-abc-file, *@other-abc-files, :x($index)?, :$o?, :$mc?, :$f
         my $in = open $abc-file, :r or die "Unable to open $abc-file";
         my $out = open $ly-file, :w or die "Unable to open $ly-file";
     
-        if $index {
+        if $score {
+            TunesStreamToScore($in, $out);
+        } elsif $index {
             TuneStreamToLilypondStream($in, $out, -> $tune { $tune.header.get-first-value("X") == $index }, :$fancy);
         } else {
             TuneStreamToLilypondStream($in, $out, :$fancy);
