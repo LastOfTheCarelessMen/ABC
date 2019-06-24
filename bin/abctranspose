@@ -37,7 +37,7 @@ sub print-music($out, @music, &shifter) {
 sub Transpose($in, $out, $new-key-name, %old-key, %new-key, %shift, $shift) {
     sub transpose($accidental, $basenote, $octave) {
         my $ordinal = pitch-to-ordinal(%old-key, $accidental, $basenote, $octave);
-        ordinal-to-pitch(%new-key, %shift{$basenote.uc}, $ordinal + $shift);
+        ordinal-to-pitch(%new-key, %shift{$basenote.uc}, $ordinal + $shift, $accidental ne "");
     }
 
     my $actions = ABC::Actions.new;

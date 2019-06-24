@@ -109,7 +109,7 @@ package ABC::Utils {
         $ord;
     }
 
-    sub ordinal-to-pitch(%key, $basenote, $ordinal) is export {
+    sub ordinal-to-pitch(%key, $basenote, $ordinal, $keep-accidental = False) is export {
         my $octave = 0;
         my $working-ordinal = %notename-to-ordinal{$basenote.uc};
         while $ordinal + 5 < $working-ordinal {
@@ -131,7 +131,7 @@ package ABC::Utils {
             when 2  { $working-accidental = "^^"; }
             die "Too far away from note: $ordinal vs $working-ordinal";
         }
-        if $key-accidental eq $working-accidental {
+        if !$keep-accidental && ($key-accidental eq $working-accidental) {
             $working-accidental = "";
         }
         if $octave > 0 {
