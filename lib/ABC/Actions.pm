@@ -68,7 +68,7 @@ class ABC::Actions {
     }
 
     method multi_measure_rest($/) {
-        make ABC::LongRest.new(~$<number>);
+        make ABC::LongRest.new(~($<number> // 1));
     }
     
     method tuplet($/) {

@@ -27,7 +27,7 @@ grammar ABC::Grammar
     
     token rest_type { <[x..z]> }
     token rest { <rest_type> <note_length> }
-    token multi_measure_rest { 'Z' <number> }
+    token multi_measure_rest { 'Z' <number>? }
     
     token slur_begin { '(' }
     token slur_end { ')' }
