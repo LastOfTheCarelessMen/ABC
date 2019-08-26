@@ -267,6 +267,17 @@ use ABC::Grammar;
     ok ?$match<tie>, 'tied';
 }
 
+{
+    my $match = ABC::Grammar.parse("[A3 D3 ]", :rule<stem>);
+    isa-ok $match, Match, 'Got a match';
+    ok $match, '"[A3 D3 ]" is a stem';
+    is ~$match, "[A3 D3 ]", '"[A3 D3 ]" was the portion matched';
+    is +@( $match<mnote> ), 2, 'Two notes matched';
+    is $match<mnote>[0], "A3", 'first note is A3';
+    is $match<mnote>[1], "D3", 'second note is D3';
+    nok ?$match<tie>, 'not tied';
+}
+
 # (3 is the only case that works currently.  :(
 # {
 #     my $match = ABC::Grammar.parse("(2abcd", :rule<tuple>);

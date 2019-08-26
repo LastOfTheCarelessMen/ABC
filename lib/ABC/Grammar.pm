@@ -23,7 +23,7 @@ grammar ABC::Grammar
     token note_length_denominator { '/' <bottom=number>? }
     token note_length { <top=number>? <note_length_denominator>? }
     token mnote { <pitch> <note_length> <tie>? }
-    token stem { <mnote> | [ '[' <mnote>+ ']' <note_length> <tie>? ]  }
+    token stem { <mnote> | [ '[' \h* [<mnote> \h* ]+ ']' <note_length> <tie>? ]  }
     
     token rest_type { <[x..z]> }
     token rest { <rest_type> <note_length> }
