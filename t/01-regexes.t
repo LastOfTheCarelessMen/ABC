@@ -229,6 +229,17 @@ use ABC::Grammar;
 }
 
 {
+    my $match = ABC::Grammar.parse("(3 ab c", :rule<tuplet>);
+    isa-ok $match, Match, 'Got a match';
+    ok $match, '"(3 ab c" is a tuplet';
+    is ~$match, "(3 ab c", '"(3 ab c" was the portion matched';
+    is +@( $match<stem> ), 3, 'Three notes matched';
+    is $match<stem>[0], "a", 'first note is a';
+    is $match<stem>[1], "b", 'second note is b';
+    is $match<stem>[2], "c", 'third note is c';
+}
+
+{
     my $match = ABC::Grammar.parse("(5abcde", :rule<tuplet>);
     isa-ok $match, Match, 'Got a match';
     ok $match, '"(5abcde" is a tuplet';
