@@ -13,6 +13,7 @@ use ABC::KeyInfo;
 use ABC::Context;
 
 my $paper-size = "letter"; # or switch to "a4" for European paper
+my $use-ABC-line-breaks = True; # false will use Lilypond's judgment
 
 my %accidental-map = ( ''  => "",
                        '='  => "",
@@ -376,6 +377,7 @@ class TuneConvertor {
                     $suffix = "";
                 }
                 when "spacing" { $lilypond ~= $spacing-comment }
+                when "endline" { $lilypond ~= "\\break" if $use-ABC-line-breaks; }
                 # .say;
             }
         }
