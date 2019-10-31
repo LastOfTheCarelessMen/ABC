@@ -1,7 +1,7 @@
 {
     "perl"        : "6.*",
     "name"        : "ABC",
-    "version"     : "0.6.1",
+    "version"     : "0.6.2",
     "description" : "Toolkit for dealing with ABC music notation",
     "depends"     : [],
     "provides" : {
@@ -24,7 +24,8 @@
         "ABC::LongRest"     : "lib/ABC/LongRest.pm",
         "ABC::GraceNotes"   : "lib/ABC/GraceNotes.pm",
         "ABC::Context"      : "lib/ABC/Context.pm",
-        "ABC::Actions"      : "lib/ABC/Actions.pm"
+        "ABC::Actions"      : "lib/ABC/Actions.pm",
+        "ABC::ToLilypond"   : "lib/ABC/ToLilypond.pm"
     },
     "source-type"   : "git",
     "source-url"    : "git://github.com/colomon/ABC.git"
