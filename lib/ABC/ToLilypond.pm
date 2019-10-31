@@ -134,32 +134,6 @@ sub get-field-if-there($header, $field) {
     ?@things ?? @things[0] !! "";
 }
 
-sub HeaderToLilypond(ABC::Header $header, $out, :$title?) is export {
-    dd $title;
-    $out.say: "\\header \{";
-    
-    my $working-title = $title // $header.get-first-value("T") // "Unworking-titled";
-    dd $working-title;
-    $working-title .=subst('"', "'", :g);
-    $out.say: "    title = \" $working-title \"";
-    my $composer = get-field-if-there($header, "C");
-    my $origin = get-field-if-there($header, "O");
-    if $origin {
-        if $origin ~~ m:i/^for/ {
-            $out.say: qq/    dedication = "$origin"/;
-        } else {
-            if $composer {
-                $composer ~= " ($origin)";
-            } else {
-                $composer = $origin;
-            }
-        }
-    }
-    $out.say: qq/    composer = "$composer"/ if $composer;
-
-    $out.say: "}";
-}
-
 class TuneConvertor {
     has $.context;
 
@@ -477,6 +451,67 @@ sub TuneBodyToLilypondStream($tune, $out, :$prefix?) is export {
     my $length = $tune.header.get-first-value("L") // default-length-from-meter($meter);
     my $convertor = TuneConvertor.new($key, $meter, $length);
     $convertor.BodyToLilypond($tune.music, $out, :$prefix);
+}
+
+sub HeaderToLilypond(ABC::Header $header, $out, :$title?) is export {
+    dd $title;
+    $out.say: "\\header \{";
+    
+    my $working-title = $title // $header.get-first-value("T") // "Unworking-titled";
+    dd $working-title;
+    $working-title .=subst('"', "'", :g);
+    $out.say: "    title = \" $working-title \"";
+    my $composer = get-field-if-there($header, "C");
+    my $origin = get-field-if-there($header, "O");
+    if $origin {
+        if $origin ~~ m:i/^for/ {
+            $out.say: qq/    dedication = "$origin"/;
+        } else {
+            if $composer {
+                $composer ~= " ($origin)";
+            } else {
+                $composer = $origin;
+            }
+        }
+    }
+    $out.say: qq/    composer = "$composer"/ if $composer;
+
+    $out.say: "}";
+}
+
+sub tune-to-score($tune, $out) is export {
+    $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
+    $out.say: "\\score \{";
+
+        TuneBodyToLilypondStream($tune, $out);
+        HeaderToLilypond($tune.header, $out);
+
+    $out.say: "}\n\n";
+    
+    if $tune.header.get-first-value("N") {
+        $out.say: "\\markuplist \{";
+        $out.say: "    \\wordwrap-lines \{";
+        for $tune.header.get("N") -> $note {
+            if $note.value ~~ / ^ \s* $ / {
+                $out.say: '    } \wordwrap-lines {';
+            } else {
+                my $text = $note.value;
+                # this is some goofy magic to make sure quotation marks come out correctly.
+                $text .= subst(/ (\S*) '"' (\S*)/, 
+                               {
+                                   my $prefix = $0;
+                                   my $postfix = $1;
+                                   $prefix .= subst('"', '" \\char #34 "', :global);
+                                   "\\concat \{ \"$prefix\" \\char #34 \"$postfix\" \} "
+                               }, 
+                               :global);
+                $out.say: "        $text";
+            }
+        }
+        $out.say: '    }';
+        $out.say: "    \\vspace #2";
+        $out.say: "}\n\n";
+    }
 }
 
 sub GetUnrecognizedGracings () is export {

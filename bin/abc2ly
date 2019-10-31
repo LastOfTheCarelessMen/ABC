@@ -26,38 +26,7 @@ sub TunesToLilypondStream(@tunes, $out, :$fancy?) {
     }
     
     for @tunes -> $tune {
-        $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
-        $out.say: "\\score \{";
-
-            TuneBodyToLilypondStream($tune, $out);
-            HeaderToLilypond($tune.header, $out);
-
-        $out.say: "}\n\n";
-        
-        if $tune.header.get-first-value("N") {
-            $out.say: "\\markuplist \{";
-            $out.say: "    \\wordwrap-lines \{";
-            for $tune.header.get("N") -> $note {
-                if $note.value ~~ / ^ \s* $ / {
-                    $out.say: '    } \wordwrap-lines {';
-                } else {
-                    my $text = $note.value;
-                    # this is some goofy magic to make sure quotation marks come out correctly.
-                    $text .= subst(/ (\S*) '"' (\S*)/, 
-                                   {
-                                       my $prefix = $0;
-                                       my $postfix = $1;
-                                       $prefix .= subst('"', '" \\char #34 "', :global);
-                                       "\\concat \{ \"$prefix\" \\char #34 \"$postfix\" \} "
-                                   }, 
-                                   :global);
-                    $out.say: "        $text";
-                }
-            }
-            $out.say: '    }';
-            $out.say: "    \\vspace #2";
-            $out.say: "}\n\n";
-        }
+        tune-to-score($tune, $out);
     }
 }
 
