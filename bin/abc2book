@@ -1,0 +1,127 @@
+#!/usr/bin/env perl6
+
+use v6;
+use ABC::Grammar;
+use ABC::Actions;
+use ABC::ToLilypond;
+
+my $paper-size = "letter"; # or switch to "a4" for European paper
+
+sub TuneStreamToTunes($in) {
+    my $actions = ABC::Actions.new;
+    my $match = ABC::Grammar.parse($in.slurp-rest, :rule<tune_file>, :$actions);
+    die "Did not match ABC grammar: last tune understood:\n { $actions.current-tune }" unless $match;
+    @( $match.ast );
+}
+
+sub start-bookpart($out, $title-string) {
+    my ($title, $subtitle) = $title-string.trim.split(":").map(*.trim);
+    
+    $out.say: "\\bookpart \{";
+    $out.say: "\\header \{";
+    $out.say: "    title = \"{ sanitize-quotation-marks($title) }\"";
+    $out.say: "    subtitle = \"{ sanitize-quotation-marks($subtitle) }\"" if $subtitle;
+    $out.say: "\}";
+}
+
+sub read-block(@book) {
+    my @block;
+    
+    while +@book {
+        my $line = @book[0];
+        if $line ~~ / ^ \h+ \S / {
+            @block.push: $line.trim-leading;
+            @book.shift;
+        } else {
+            last;
+        }
+    }
+    
+    @block;
+}
+
+sub write-lyric($out, @lines) {
+    $out.say: "\\noPageBreak";
+    $out.say: "\\markuplist \{";
+    $out.say: "    \\column-lines \{";
+    for @lines -> $line {
+        $out.say: "         \\italic \\line \{ { sanitize-quotation-marks($line) } \}";
+    }
+    $out.say: "    }";
+    $out.say: "}";
+}
+
+sub write-text($out, @lines) {
+    $out.say: "\\noPageBreak";
+    $out.say: "\\markuplist \{";
+    $out.say: "    \\wordwrap-lines \{";
+    for @lines -> $line {
+        $out.say: "         { sanitize-quotation-marks($line) }";
+    }
+    $out.say: "    }";
+    $out.say: "}";
+}
+
+
+multi sub MAIN($abc-file, $book-file) {
+    my $ly-file;
+    $ly-file = $book-file ~ ".ly";
+    if $book-file ~~ /^(.*) ".book"/ {
+        $ly-file = $0 ~ ".ly";
+    }
+    $*ERR.say: "Reading $abc-file / $book-file, writing $ly-file";
+
+    my $abc-in = open $abc-file, :r or die "Unable to open $abc-file";
+    my @tunes = TuneStreamToTunes($abc-in);
+    $abc-in.close;
+
+    my %tunes-hash;
+    for @tunes -> $tune {
+        my $x = $tune.header.get-first-value("X");
+        %tunes-hash{$x} = $tune;
+    }
+
+    my $book-in = open $book-file, :r or die "Unable to open $book-file";
+    my $out = open $ly-file, :w or die "Unable to open $ly-file";
+    
+    $out.say: '\\version "2.19.83"';
+    $out.say: "#(set-default-paper-size \"{$paper-size}\")";
+    $out.say: "\\paper \{ print-all-headers = ##t \}";
+    
+    my @book = $book-in.lines;
+    my $in-part = False;
+    while +@book {
+        given @book.shift {
+            when /^ (\d+) / {
+                $out.say: "\\markup \{ \\vspace #2 \}";
+                tune-to-score(%tunes-hash{~$0}, $out);
+            }
+            
+            when /^ "Part:" (.*) / {
+                $out.say: "}" if $in-part;
+                start-bookpart($out, $0.trim);
+                $in-part = True;
+            }
+
+            when /^ "Lyric:" / {
+                write-lyric($out, read-block(@book));
+            }
+
+            when /^ "Text:" / {
+                write-text($out, read-block(@book));
+            }
+        }
+    }
+
+    $out.say: "}" if $in-part;
+
+    $out.close;
+    $book-in.close;
+    
+    qqx/lilypond $ly-file/;
+    
+    $*ERR.say: "Unrecognized gracings: " ~ GetUnrecognizedGracings().keys.join(", ") if GetUnrecognizedGracings();
+}
+
+
+

@@ -30,10 +30,11 @@ my %unrecognized_gracings;
 
 my $spacing-comment = '%{ spacing %}';
                 
-sub sanitize-quotation-marks($string) {
+sub sanitize-quotation-marks($string) is export {
     my $s = $string;
-    $s.=subst(/'"'(\S)/, {"“$0"}, :global);
-    $s.=subst(/(\S)'"'/, {"$0”"}, :global);
+    $s.=subst(/^^ '"' (\S)/, {"“$0"}, :global);
+    $s.=subst(/<?after \s> '"' (\S)/, {"“$0"}, :global);
+    $s.=subst(/'"'/, "”", :global);
     $s.=subst(/<!wb>"'"(\S)/, {"‘$0"}, :global);
     $s.=subst(/"'"/, "’", :global);
     $s;
@@ -357,7 +358,7 @@ class TuneConvertor {
                     $suffix = "";
                 }
                 when "spacing" { $lilypond ~= $spacing-comment }
-                when "endline" { $lilypond ~= "\\break" if $use-ABC-line-breaks; }
+                when "endline" { $lilypond ~= "\\break \\noPageBreak" if $use-ABC-line-breaks; }
                 # .say;
             }
         }
@@ -484,6 +485,7 @@ sub HeaderToLilypond(ABC::Header $header, $out, :$title?) is export {
         }
     }
     $out.say: qq/    composer = "$composer"/ if $composer;
+    $out.say: "    subtitle = ##f";
 
     $out.say: "}";
 }
@@ -498,27 +500,18 @@ sub tune-to-score($tune, $out) is export {
     $out.say: "}\n\n";
     
     if $tune.header.get-first-value("N") {
+        $out.say: "\\noPageBreak";
         $out.say: "\\markuplist \{";
         $out.say: "    \\wordwrap-lines \{";
         for $tune.header.get("N") -> $note {
             if $note.value ~~ / ^ \s* $ / {
                 $out.say: '    } \wordwrap-lines {';
             } else {
-                my $text = $note.value;
-                # this is some goofy magic to make sure quotation marks come out correctly.
-                $text .= subst(/ (\S*) '"' (\S*)/, 
-                               {
-                                   my $prefix = $0;
-                                   my $postfix = $1;
-                                   $prefix .= subst('"', '" \\char #34 "', :global);
-                                   "\\concat \{ \"$prefix\" \\char #34 \"$postfix\" \} "
-                               }, 
-                               :global);
-                $out.say: "        $text";
+                $out.say: "        " ~ sanitize-quotation-marks($note.value);
             }
         }
         $out.say: '    }';
-        $out.say: "    \\vspace #2";
+#         $out.say: "    \\vspace #2";
         $out.say: "}\n\n";
     }
 }

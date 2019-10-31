@@ -1,11 +1,12 @@
 {
     "perl"        : "6.*",
     "name"        : "ABC",
-    "version"     : "0.6.2",
+    "version"     : "0.6.3",
     "description" : "Toolkit for dealing with ABC music notation",
     "depends"     : [],
     "provides" : {
         "abc2ly"            : "bin/abc2ly",
+        "abc2book"          : "bin/abc2book",
         "abctranspose"      : "bin/abctranspose",
         "abcoctave"         : "bin/abcoctave",
         "ABC::Duration"     : "lib/ABC/Duration.pm",
