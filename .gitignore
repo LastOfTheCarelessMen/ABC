@@ -1,3 +1,5 @@
 *.pdf
 *.ly
 *.ps
+.precomp
+blib
