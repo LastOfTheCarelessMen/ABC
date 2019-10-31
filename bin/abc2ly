@@ -482,11 +482,7 @@ sub TuneBodyToLilypondStream($tune, $out, :$prefix?) {
     $convertor.BodyToLilypond($tune.music, $out, :$prefix);
 }
 
-sub TuneStreamToLilypondStream($in, $out, $filter = *, :$fancy?) {
-    my $actions = ABC::Actions.new;
-    my $match = ABC::Grammar.parse($in.slurp-rest, :rule<tune_file>, :$actions);
-    die "Did not match ABC grammar: last tune understood:\n { $actions.current-tune }" unless $match;
-
+sub TunesToLilypondStream(@tunes, $out, :$fancy?) {
     $out.say: '\\version "2.12.3"';
     $out.say: "#(set-default-paper-size \"{$paper-size}\")";
     if $fancy {
@@ -504,7 +500,7 @@ sub TuneStreamToLilypondStream($in, $out, $filter = *, :$fancy?) {
         $out.say: "\\paper \{ print-all-headers = ##t \}";
     }
     
-    for @( $match.ast ).grep($filter) -> $tune {
+    for @tunes -> $tune {
         $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
         $out.say: "\\score \{";
 
@@ -538,6 +534,18 @@ sub TuneStreamToLilypondStream($in, $out, $filter = *, :$fancy?) {
             $out.say: "}\n\n";
         }
     }
+}
+
+sub TuneStreamToTunes($in) {
+    my $actions = ABC::Actions.new;
+    my $match = ABC::Grammar.parse($in.slurp-rest, :rule<tune_file>, :$actions);
+    die "Did not match ABC grammar: last tune understood:\n { $actions.current-tune }" unless $match;
+    @( $match.ast );
+}
+
+sub TuneStreamToLilypondStream($in, $out, $filter = *, :$fancy?) {
+    my @tunes = TuneStreamToTunes($in);
+    TunesToLilypondStream(@tunes.grep($filter), $out, :$fancy);
 }
 
 # This is from https://rosettacode.org/wiki/Longest_common_prefix#Perl_6
