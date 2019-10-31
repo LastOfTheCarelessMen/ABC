@@ -1,16 +1,8 @@
 #!/usr/bin/env perl6
 
 use v6;
-use ABC::Header;
-use ABC::Tune;
 use ABC::Grammar;
 use ABC::Actions;
-use ABC::Duration; #OK
-use ABC::Note;
-use ABC::LongRest;
-use ABC::Utils;
-use ABC::KeyInfo;
-use ABC::Context;
 use ABC::ToLilypond;
 
 my $paper-size = "letter"; # or switch to "a4" for European paper
