@@ -27,6 +27,7 @@ my %octave-map = ( -3 => ",,",
                     2 => "'''" );
 
 my %unrecognized_gracings;
+my %substitutes;
 
 my $spacing-comment = '%{ spacing %}';
                 
@@ -37,6 +38,10 @@ sub sanitize-quotation-marks($string) is export {
     $s.=subst(/'"'/, "”", :global);
     $s.=subst(/<!wb>"'"(\S)/, {"‘$0"}, :global);
     $s.=subst(/"'"/, "’", :global);
+    
+    my @subs = %substitutes.keys;
+    $s.=subst(/ (@subs) /, { %substitutes{$0} }, :globlal);
+    
     $s;
 }
 
@@ -471,8 +476,8 @@ sub HeaderToLilypond(ABC::Header $header, $out, :$title?) is export {
     dd $working-title;
     $working-title = sanitize-quotation-marks($working-title);
     $out.say: "    title = \" $working-title \"";
-    my $composer = get-field-if-there($header, "C");
-    my $origin = get-field-if-there($header, "O");
+    my $composer = sanitize-quotation-marks(get-field-if-there($header, "C"));
+    my $origin = sanitize-quotation-marks(get-field-if-there($header, "O"));
     if $origin {
         if $origin ~~ m:i/^for/ {
             $out.say: qq/    dedication = "$origin"/;
@@ -484,7 +489,7 @@ sub HeaderToLilypond(ABC::Header $header, $out, :$title?) is export {
             }
         }
     }
-    $out.say: qq/    composer = "$composer"/ if $composer;
+    $out.say: qq/    composer = "{ sanitize-quotation-marks($composer) }"/ if $composer;
     $out.say: "    subtitle = ##f";
 
     $out.say: "}";
@@ -516,7 +521,11 @@ sub tune-to-score($tune, $out) is export {
     }
 }
 
-sub GetUnrecognizedGracings () is export {
+sub GetUnrecognizedGracings() is export {
     %unrecognized_gracings
+}
+
+sub add-substitute($look-for, $replace-with) is export {
+    %substitutes{$look-for} = $replace-with;
 }
 

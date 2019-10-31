@@ -110,6 +110,10 @@ multi sub MAIN($abc-file, $book-file) {
             when /^ "Text:" / {
                 write-text($out, read-block(@book));
             }
+            
+            when /^ "Substitute:" \s+ (\S+) \s+ (\S+)/ {
+                add-substitute(~$0, ~$1);
+            }
         }
     }
 
