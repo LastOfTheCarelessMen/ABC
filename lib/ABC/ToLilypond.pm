@@ -30,6 +30,15 @@ my %unrecognized_gracings;
 
 my $spacing-comment = '%{ spacing %}';
                 
+sub sanitize-quotation-marks($string) {
+    my $s = $string;
+    $s.=subst(/'"'(\S)/, {"“$0"}, :global);
+    $s.=subst(/(\S)'"'/, {"$0”"}, :global);
+    $s.=subst(/<!wb>"'"(\S)/, {"‘$0"}, :global);
+    $s.=subst(/"'"/, "’", :global);
+    $s;
+}
+
 class LilypondContext {
     has ABC::Context $.context;
     
@@ -459,7 +468,7 @@ sub HeaderToLilypond(ABC::Header $header, $out, :$title?) is export {
     
     my $working-title = $title // $header.get-first-value("T") // "Unworking-titled";
     dd $working-title;
-    $working-title .=subst('"', "'", :g);
+    $working-title = sanitize-quotation-marks($working-title);
     $out.say: "    title = \" $working-title \"";
     my $composer = get-field-if-there($header, "C");
     my $origin = get-field-if-there($header, "O");
