@@ -629,3 +629,16 @@ multi sub MAIN($first-abc-file, *@other-abc-files, :x($index)?, :$o?, :$mc?, :$f
     
     $*ERR.say: "Unrecognized gracings: " ~ %unrecognized_gracings.keys.join(", ") if %unrecognized_gracings;
 }
+
+# multi sub MAIN($abc-file, :$split, :$fancy?) {
+#     my $in = open $abc-file, :r or die "Unable to open $abc-file";
+#     my @tunes = TuneStreamToTunes($in);
+#
+#     for @tunes -> $tune {
+#         my $title = $_.header.get-first-value("T");
+# #        TunesToLilypondStream([$tune], $out, :$fancy);
+#     }
+#
+#     $*ERR.say: "Unrecognized gracings: " ~ %unrecognized_gracings.keys.join(", ") if %unrecognized_gracings;
+# }
+
