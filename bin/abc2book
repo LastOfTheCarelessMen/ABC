@@ -148,6 +148,16 @@ sub write-text($out, @lines) {
     $out.say: "}";
 }
 
+sub make-index-sorting-name($full-name) {
+    my $name = $full-name;
+    $name.=subst(/ ^ "(" /, "");
+    $name.=subst(/ ^ "A" \s+ /, "");
+    $name.=subst(/ ^ "The" \s+ /, "");
+    $name.=subst(/ ^ "La" \s+ /, "");
+    $name.=subst(/ ^ "Le" \s+ /, "");
+    $name.=subst(/ ^ "É" /, "E");
+    $name;
+}
 
 multi sub MAIN($abc-file, $book-file) {
     my $ly-file;
@@ -192,8 +202,9 @@ multi sub MAIN($abc-file, $book-file) {
                 $out.say: "\\markup \{ \\vspace #2 \}";
                 $out.say: qq{\\tocItem \\markup "@names[0]"} if @names;
                 for @names -> $name {
-                    $out.say: qq{\\indexItem #"$name" \\markup "$name"};
-                    %index-first-letters{substr($name, 0, 1)} = 1;
+                    my $index-sorting-name = make-index-sorting-name($name);
+                    $out.say: qq{\\indexItem #"$index-sorting-name" \\markup "$name"};
+                    %index-first-letters{substr($index-sorting-name, 0, 1)} = 1;
                 }
                 
                 tune-to-score($abc, $out);
