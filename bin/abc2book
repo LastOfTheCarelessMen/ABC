@@ -7,6 +7,89 @@ use ABC::ToLilypond;
 
 my $paper-size = "letter"; # or switch to "a4" for European paper
 
+sub write-index-snippet($out) {
+    $out.say: q:to/end-snippet/;
+        %% defined later, in a closure
+        #(define-public (add-index-item! markup-symbol text sorttext) #f)
+        #(define-public (index-items) #f)
+
+        #(let ((index-item-list (list)))
+           (set! add-index-item!
+           (lambda (markup-symbol text sorttext)
+             (let ((label (gensym "index")))
+               (set! index-item-list
+               ;; We insert index items sorted from the beginning on and do
+               ;; not sort them later - this saves pretty much computing time
+               (insert-alphabetical-sorted! (list label markup-symbol text sorttext)
+               index-item-list))
+               (make-music 'EventChord
+                 'page-marker #t
+                 'page-label label
+                 'elements (list (make-music 'LabelEvent
+                 'page-label label))))))
+           (set! index-items (lambda ()
+                 index-item-list)))
+
+        #(define (insert-alphabetical-sorted! iitem ilist)
+          (if
+            (null? ilist) (list iitem)
+            (if
+              (string-ci<? (cadddr iitem) (cadddr (car ilist))) (cons iitem ilist)
+              (cons (car ilist) (insert-alphabetical-sorted! iitem (cdr ilist)))
+            )
+          )
+        )
+
+        \paper {
+          indexTitleMarkup = \markup \column {
+            \fontsize #5 \sans \bold \fill-line { \null "Alphabetical Index" \null }
+            \hspace #1
+          }
+          indexItemMarkup = \markup \large \fill-line {
+            \fromproperty #'index:text
+            \fromproperty #'index:page
+          }
+          indexSectionMarkup = \markup \column {
+            \hspace #1
+            \fill-line { \sans \bold \fontsize #3 \fromproperty #'index:text }
+            \hspace #1
+          }
+
+        }
+
+        #(define-markup-list-command (index layout props) ()
+          ( _i "Outputs an alphabetical sorted index, using the paper
+          variable @code{indexTitleMarkup} for its title, then the list of
+          lines built using the @code{indexItem} music function
+          Usage: @code{\\\\markuplist \\\\index}" )
+          (cons (interpret-markup layout props
+                (ly:output-def-lookup layout 'indexTitleMarkup))
+          (space-lines (chain-assoc-get 'baseline-skip props)
+                (map (lambda (index-item)
+                 (let ((label (car index-item))
+                 (index-markup (cadr index-item))
+                 (text (caddr index-item)))
+                   (interpret-markup
+                     layout
+                     (cons (list (cons 'index:page
+                      (markup #:page-ref label "XXX" "?"))
+                     (cons 'index:text text))
+                     props)
+                     (ly:output-def-lookup layout index-markup))))
+               (index-items)))))
+
+        indexItem =
+        #(define-music-function (parser location sorttext text) (string? markup?)
+           "Add a line to the alphabetical index, using the @code{indexItemMarkup} paper variable markup."
+           (add-index-item! 'indexItemMarkup text sorttext))
+
+        indexSection =
+        #(define-music-function (parser location sorttext text) (string? markup?)
+           "Add a section line to the alphabetical index, using @code{indexSectionMarkup} paper variable markup. This can be used to divide the alphabetical index into different sections, for example one section for each first letter."
+           (add-index-item! 'indexSectionMarkup text sorttext))
+        end-snippet
+}
+
 sub TuneStreamToTunes($in) {
     my $actions = ABC::Actions.new;
     my $match = ABC::Grammar.parse($in.slurp-rest, :rule<tune_file>, :$actions);
@@ -22,6 +105,9 @@ sub start-bookpart($out, $title-string) {
     $out.say: "    title = \"{ sanitize-quotation-marks($title) }\"";
     $out.say: "    subtitle = \"{ sanitize-quotation-marks($subtitle) }\"" if $subtitle;
     $out.say: "\}";
+
+    my $full-title = sanitize-quotation-marks($title-string.trim);
+    $out.say: qq{\\tocItem \\markup \\bold "$full-title"};
 }
 
 sub read-block(@book) {
@@ -88,13 +174,29 @@ multi sub MAIN($abc-file, $book-file) {
     $out.say: "#(set-default-paper-size \"{$paper-size}\")";
     $out.say: "\\paper \{ print-all-headers = ##t \}";
     
+    $out.say: "\\markuplist \\table-of-contents";
+    $out.say: "\\pageBreak";
+
+    write-index-snippet($out);
+    
+    my %index-first-letters;
+    
     my @book = $book-in.lines;
     my $in-part = False;
     while +@book {
         given @book.shift {
             when /^ (\d+) / {
+                my $abc = %tunes-hash{~$0};
+                
+                my @names = $abc.header.get("T").map({ sanitize-quotation-marks($_.value) });
                 $out.say: "\\markup \{ \\vspace #2 \}";
-                tune-to-score(%tunes-hash{~$0}, $out);
+                $out.say: qq{\\tocItem \\markup "@names[0]"} if @names;
+                for @names -> $name {
+                    $out.say: qq{\\indexItem #"$name" \\markup "$name"};
+                    %index-first-letters{substr($name, 0, 1)} = 1;
+                }
+                
+                tune-to-score($abc, $out);
             }
             
             when /^ "Part:" (.*) / {
@@ -118,7 +220,12 @@ multi sub MAIN($abc-file, $book-file) {
     }
 
     $out.say: "}" if $in-part;
-
+    
+    $out.say: q{        \markuplist \index};
+    for %index-first-letters.keys -> $letter {
+        $out.say: qq{        \\indexSection #"$letter" \\markup { "$letter" }}
+    }
+    
     $out.close;
     $book-in.close;
     
