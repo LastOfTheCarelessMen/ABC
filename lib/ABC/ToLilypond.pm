@@ -40,7 +40,7 @@ sub sanitize-quotation-marks($string) is export {
     $s.=subst(/"'"/, "’", :global);
     
     my @subs = %substitutes.keys;
-    $s.=subst(/ (@subs) /, { %substitutes{$0} }, :globlal);
+    $s.=subst(/ (@subs) /, { %substitutes{$0} }, :global);
     
     $s;
 }
