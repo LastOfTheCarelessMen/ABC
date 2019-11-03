@@ -8,6 +8,10 @@ use ABC::ToLilypond;
 my $paper-size = "letter"; # or switch to "a4" for European paper
 my $index-external = True;
 
+# This program always uses the external program lilypond for 
+# generating music notation.
+# If $index-external is True, then it also uses pdftotext, latex, dvipdf, & qpdf.
+
 # The index code that follows is incorporated from the Lilypond
 # Snippet Repository, http://lsr.di.unimi.it/LSR/Item?id=763
 
@@ -171,7 +175,16 @@ sub make-latex-name($full-name) {
 }
 
 sub make-external-index($pdf-file, %tunes-hash) {
-    my $text = qqx/pdftotext -layout $pdf-file -/;
+    my $N = 0;
+    for 1..* -> $n {
+        my $text = qqx/pdftotext -layout -f $n -l $n $pdf-file -/;
+        if $text ~~ / "Alphabetical Index" / {
+            $N = $n;
+            last;
+        }
+    }
+    
+    my $text = qqx/pdftotext -layout -f $N $pdf-file -/;
     my @unsorted-index;
     for $text.comb(/ "ZYXXY" (\d+) "ZYXXY" \s+ (\d+) /, :match) -> $match {
         my $X = $match[0];
@@ -181,6 +194,8 @@ sub make-external-index($pdf-file, %tunes-hash) {
             @unsorted-index.push(make-index-sorting-name($name) => $name => $page-number);
         }
     }
+    
+    dd $N;
     
     my $out = "index.tex".IO.open(:w);
     $out.say: q:to/END/;
@@ -198,13 +213,13 @@ sub make-external-index($pdf-file, %tunes-hash) {
 
         \begin{multicols}{2}
         
-        \setcounter{page}{112}
-
         \begin{center}
         { \large \textbf{ Index of Tune Names } }
         \end{center}
 
         END
+        
+    $out.say: "\\setcounter\{page\}\{$N\}";
     
     my $last-first-letter = "";
     for @unsorted-index.sort({ $_.key }) -> $tune {
@@ -223,6 +238,11 @@ sub make-external-index($pdf-file, %tunes-hash) {
         \end{document}
         END
     $out.close;
+
+    run "latex", "index.tex";
+    run "dvipdf", "index.dvi";
+    $pdf-file.IO.move("temp.pdf");
+    run "qpdf", "--empty", $pdf-file, "--pages", "temp.pdf", "1-{$N-1}", "index.pdf", "--";
 }
 
 multi sub MAIN($abc-file, $book-file) {
@@ -267,7 +287,10 @@ multi sub MAIN($abc-file, $book-file) {
                 
                 my @names = $abc.header.get("T").map({ sanitize-quotation-marks($_.value) });
                 $out.say: "\\markup \{ \\vspace #2 \}";
-                $out.say: qq{\\tocItem \\markup "@names[0]"} if @names;
+                
+                # If you uncomment the next line, every tune will have
+                # a spot in the table of contents.
+#                $out.say: qq{\\tocItem \\markup "@names[0]"} if @names;
                 
                 for @names -> $name {
                     my $index-sorting-name = make-index-sorting-name($name);
@@ -302,6 +325,8 @@ multi sub MAIN($abc-file, $book-file) {
 
     $out.say: "}" if $in-part;
     
+    $out.say: qq{\\tocItem \\markup \\bold "Index of Tunes by Name"};
+    
     $out.say: q{        \markuplist \index};
     if !$index-external {
         for %index-first-letters.keys -> $letter {
@@ -312,12 +337,9 @@ multi sub MAIN($abc-file, $book-file) {
     $out.close;
     $book-in.close;
     
-    say "before lilypond";
     qqx/lilypond $ly-file/;
-    say "after lilypond";
 
     my $pdf-file = $ly-file.subst(/ ".ly" /, ".pdf");
-    dd $pdf-file;
 
     if $index-external {
         make-external-index($pdf-file, %tunes-hash);
