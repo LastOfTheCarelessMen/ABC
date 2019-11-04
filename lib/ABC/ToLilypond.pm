@@ -507,19 +507,26 @@ sub tune-to-score($tune, $out) is export {
     $out.say: "}\n\n";
     
     if $tune.header.get-first-value("N") {
-        $out.say: "\\noPageBreak";
-        $out.say: "\\markuplist \{";
-        $out.say: "    \\wordwrap-lines \{";
+        
         for $tune.header.get("N") -> $note {
-            if $note.value ~~ / ^ \s* $ / {
-                $out.say: '    } \wordwrap-lines {';
-            } else {
-                $out.say: "        " ~ sanitize-quotation-marks($note.value);
-            }
+            next if $note.value ~~ / ^ \s* $ /;
+            
+            $out.say: q:to/END/;
+                \noPageBreak
+                \markup \fill-line {
+                    \center-column \wordwrap-lines {
+                END
+                
+            $out.say: "        " ~ sanitize-quotation-marks($note.value);
+
+            $out.say: q:to/END/;
+                    }
+                }
+                
+                END
         }
-        $out.say: '    }';
+        
 #         $out.say: "    \\vspace #2";
-        $out.say: "}\n\n";
     }
 }
 
