@@ -29,6 +29,9 @@ sub print-music($out, @music, &shifter) {
                 }
             }
             when 'chord_or_text' { print qq/"{$element.value}"/; }
+            when 'nth_repeat' {
+                print '[' ~ $element.value;
+            }
             print $element.value ~~ ABC::Pitched ?? ~$element.value.transpose(&shifter) !! $element.value;
         }
     }
