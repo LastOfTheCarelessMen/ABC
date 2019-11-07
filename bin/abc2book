@@ -146,7 +146,6 @@ sub write-lyric($out, @lines) {
 }
 
 sub write-text($out, @lines) {
-    $out.say: "\\noPageBreak";
     $out.say: "\\markuplist \{";
     $out.say: "    \\wordwrap-lines \{";
     for @lines -> $line {
