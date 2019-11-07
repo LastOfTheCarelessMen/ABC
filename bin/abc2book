@@ -343,6 +343,10 @@ multi sub MAIN($abc-file, $book-file) {
             when /^ "Substitute:" \s+ (\S+) \s+ (\S+)/ {
                 add-substitute(~$0, ~$1);
             }
+            
+            when / ^ "Command:" \s+ (\S.*) $ / {
+                $out.say: ~$0;
+            }
         }
     }
 
