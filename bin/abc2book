@@ -170,6 +170,7 @@ sub make-latex-name($full-name) {
     my $name = $full-name;
     $name.=subst(/ "&" /, "\\&", :global);
     $name.=subst(/ "#" /, "\\#", :global);
+    $name.=subst(/ "＃" /, "\\#", :global); # Unicode full width number sign
     $name;
 }
 
