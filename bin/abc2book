@@ -240,6 +240,34 @@ sub make-external-index($pdf-file, %tunes-hash) {
     run "qpdf", "--empty", $pdf-file, "--pages", "temp.pdf", "1-{$N-1}", "index.pdf", "--";
 }
 
+sub get-tonic-from-first-stem(@events) {
+    for @events -> $event {
+        if $event.key eq "stem" {
+            given $event.value {
+                when ABC::Note {
+                    return $event.value.basenote.uc;
+                }
+                when ABC::Stem {
+                    return $event.value.notes.map(*.basenote.uc).join('/');
+                }
+                die "What is this?!";
+            }
+        }
+    }
+    
+    die "Unable to find stem";
+}
+
+sub get-tonic($abc) {
+    for $abc.music.kv -> $i, $event {
+        if $event.key eq "gracing" && $event.value eq "fine" {
+            return get-tonic-from-first-stem($abc.music[$i..*]);
+        }
+    }
+    
+    get-tonic-from-first-stem($abc.music.reverse);
+}
+
 multi sub MAIN($abc-file, $book-file) {
     my $ly-file;
     $ly-file = $book-file ~ ".ly";
