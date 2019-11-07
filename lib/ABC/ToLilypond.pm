@@ -31,13 +31,14 @@ my %substitutes;
 
 my $spacing-comment = '%{ spacing %}';
                 
-sub sanitize-quotation-marks($string) is export {
+sub sanitize-quotation-marks($string, :$escape-number-sign?) is export {
     my $s = $string;
     $s.=subst(/^^ '"' (\S)/, {"“$0"}, :global);
     $s.=subst(/<?after \s> '"' (\S)/, {"“$0"}, :global);
     $s.=subst(/'"'/, "”", :global);
     $s.=subst(/<!wb>"'"(\S)/, {"‘$0"}, :global);
     $s.=subst(/"'"/, "’", :global);
+    $s.=subst(/ "#" /, "＃", :global) if $escape-number-sign;
     
     my @subs = %substitutes.keys;
     $s.=subst(/ (@subs) /, { %substitutes{$0} }, :global);
@@ -517,7 +518,7 @@ sub tune-to-score($tune, $out) is export {
                     \center-column \wordwrap-lines {
                 END
                 
-            $out.say: "        " ~ sanitize-quotation-marks($note.value);
+            $out.say: "        " ~ sanitize-quotation-marks($note.value, :escape-number-sign);
 
             $out.say: q:to/END/;
                     }
