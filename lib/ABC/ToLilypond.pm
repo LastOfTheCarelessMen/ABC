@@ -93,6 +93,7 @@ class LilypondContext {
             when "none" { "" }
             when "C" { "\\time 4/4" }
             when "C|" { "\\time 2/2" }
+            when "3/4" { "\\time 3/4 \\set Timing.beamExceptions = #'()"}
             when "6/4" { "\\time 6/4 \\set Timing.beatStructure = 2,2,2"}
             "\\time { $.context.meter } ";
         }
