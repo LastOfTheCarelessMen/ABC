@@ -36,6 +36,8 @@ sub sanitize-quotation-marks($string, :$escape-number-sign?) is export {
     $s.=subst(/^^ '"' (\S)/, {"“$0"}, :global);
     $s.=subst(/<?after \s> '"' (\S)/, {"“$0"}, :global);
     $s.=subst(/'"'/, "”", :global);
+    $s.=subst(/"'s" $/, {"’s"}, :global);
+    $s.=subst(/"'s" <?before \s>/, {"’s"}, :global);
     $s.=subst(/<!wb>"'"(\S)/, {"‘$0"}, :global);
     $s.=subst(/"'"/, "’", :global);
     $s.=subst(/ "#" /, "＃", :global) if $escape-number-sign;
