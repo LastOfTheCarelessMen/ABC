@@ -235,7 +235,11 @@ sub make-external-index($pdf-file, %tunes-hash) {
     $out.close;
 
     run "latex", "index.tex";
-    run "dvipdf", "index.dvi";
+
+    # run "dvipdf", "index.dvi";  # this used to work, but update broke dvidpf?
+    run "dvips", "index.dvi";
+    run "ps2pdf", "index.ps";
+
     $pdf-file.IO.move("temp.pdf");
     run "qpdf", "--empty", $pdf-file, "--pages", "temp.pdf", "1-{$N-1}", "index.pdf", "--";
 }
