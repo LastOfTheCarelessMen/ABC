@@ -136,8 +136,8 @@ sub read-block(@book) {
 
 sub write-lyric($out, @lines) {
     $out.say: "\\noPageBreak";
-    $out.say: "\\markuplist \{";
-    $out.say: "    \\column-lines \{";
+    $out.say: "\\markup \\fill-line \{";
+    $out.say: "    \\column \\column-lines \{";
     for @lines -> $line {
         $out.say: "         \\italic \\line \{ { sanitize-quotation-marks($line) } \}";
     }
