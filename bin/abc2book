@@ -295,7 +295,43 @@ multi sub MAIN($abc-file, $book-file) {
     
     $out.say: '\\version "2.19.83"';
     $out.say: "#(set-default-paper-size \"{$paper-size}\")";
-    $out.say: "\\paper \{ print-all-headers = ##t \}";
+    
+    # Basic structure of this bit borrowed from Ralph Palmer
+    # This should keep post-tune text close to its tune,
+    # while making most blank space between tunes.
+    $out.say: q:to/END/;
+        \paper {
+          print-all-headers = ##t
+
+          %%%%% paper size %%%%%
+          top-margin = 0.5\in
+
+          %%%%% print both sides of paper %%%%%
+          two-sided = ##t
+
+          %%%%% margins %%%%%
+          inner-margin = 0.56\in     % larger margin for binder holes
+          outer-margin = 0.25\in
+
+          NonMusicalPaperColumn.page-break-permission = ##f
+          ragged-last-bottom = ##t
+
+          %%%%% spacing commands - I had to play with these, esp. stretchability %%%%%
+
+          system-system-spacing = #'((basic-distance . 12)
+                                     (minimum-distance . 8)
+                                     (padding . 1)
+                                     (stretchability . 5))
+
+          markup-markup-spacing = #'((basic-distance . 1)
+                                     (padding . 0.5)
+                                     (stretchability . 60))
+
+          score-markup-spacing = #'((basic-distance . 2)
+                                    (padding . 1)
+                                    (stretchability . 1))
+        }
+        END
     
     $out.say: "\\markuplist \\table-of-contents";
     $out.say: "\\pageBreak";
