@@ -145,9 +145,14 @@ sub write-lyric($out, @lines) {
     $out.say: "}";
 }
 
-sub write-text($out, @lines) {
-    $out.say: "\\markuplist \{";
-    $out.say: "    \\wordwrap-lines \{";
+sub write-text($out, @lines, :$centered) {
+    if $centered {
+        $out.say: "\\markup \\fill-line \{";
+        $out.say: "    \\center-column \\wordwrap-lines \{";
+    } else {
+        $out.say: "\\markuplist \{";
+        $out.say: "    \\wordwrap-lines \{";
+    }
     for @lines -> $line {
         $out.say: "         { sanitize-quotation-marks($line) }";
     }
@@ -378,6 +383,10 @@ multi sub MAIN($abc-file, $book-file) {
 
             when /^ "Text:" / {
                 write-text($out, read-block(@book));
+            }
+            
+            when /^ "Center:" / {
+                write-text($out, read-block(@book), :centered);
             }
             
             when /^ "Substitute:" \s+ (\S+) \s+ (\S+)/ {
