@@ -118,7 +118,7 @@ multi sub MAIN($first-abc-file, *@other-abc-files, :x($index)?, :$o?, :$mc?, :$f
         $out.close;
         $in.close;
         
-        qqx/lilypond $ly-file/;
+        run "lilypond", $ly-file;
     }
     
     $*ERR.say: "Unrecognized gracings: " ~ GetUnrecognizedGracings().keys.join(", ") if GetUnrecognizedGracings();
