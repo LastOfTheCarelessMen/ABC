@@ -124,15 +124,22 @@ multi sub MAIN($first-abc-file, *@other-abc-files, :x($index)?, :$o?, :$mc?, :$f
     $*ERR.say: "Unrecognized gracings: " ~ GetUnrecognizedGracings().keys.join(", ") if GetUnrecognizedGracings();
 }
 
-# multi sub MAIN($abc-file, :$split, :$fancy?) {
-#     my $in = open $abc-file, :r or die "Unable to open $abc-file";
-#     my @tunes = TuneStreamToTunes($in);
-#
-#     for @tunes -> $tune {
-#         my $title = $_.header.get-first-value("T");
-# #        TunesToLilypondStream([$tune], $out, :$fancy);
-#     }
-#
-#     $*ERR.say: "Unrecognized gracings: " ~ %unrecognized_gracings.keys.join(", ") if %unrecognized_gracings;
-# }
+sub good-filename-base($name) {
+    $name.subst(/\s/, '_', :global).subst(/\W/, '', :global);
+}
 
+multi sub MAIN($abc-file, :$split, :$fancy?) {
+    my $abc-in = open $abc-file, :r or die "Unable to open $abc-file";
+    my @tunes = TuneStreamToTunes($abc-in);
+    $abc-in.close;
+
+    for @tunes -> $tune {
+        my $title = $tune.header.get-first-value("T");
+        my $filename-base = good-filename-base($title);
+        my $ly-filename = ($filename-base ~ ".ly").IO;
+        my $out = open $ly-filename, :w or die "Unable to open $ly-filename";
+        TunesToLilypondStream([$tune], $out, :$fancy);
+    }
+
+    $*ERR.say: "Unrecognized gracings: " ~ GetUnrecognizedGracings().keys.join(", ") if GetUnrecognizedGracings();
+}
