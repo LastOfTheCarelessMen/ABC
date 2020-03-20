@@ -128,7 +128,7 @@ sub good-filename-base($name) {
     $name.subst(/\s/, '_', :global).subst(/\W/, '', :global);
 }
 
-multi sub MAIN($abc-file, :$split, :$fancy?) {
+multi sub MAIN($abc-file, :$split!, :$fancy?) {
     my $abc-in = open $abc-file, :r or die "Unable to open $abc-file";
     my @tunes = TuneStreamToTunes($abc-in);
     $abc-in.close;
