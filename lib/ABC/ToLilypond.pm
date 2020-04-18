@@ -273,6 +273,8 @@ class TuneConvertor {
                         when "." { $suffix ~= "\\staccato"; }
                         when "T" { $suffix ~= "\\trill"; }
                         when "P" { $suffix ~= "\\prall"; }
+                        when "+" { $suffix ~= "-+"; }
+                        when "!+!" { $suffix ~= "-+"; }
                         when "segno"  { $lilypond ~= '\\mark \\markup { \\musicglyph #"scripts.segno" }'; }
                         when "coda"   { $lilypond ~= '\\mark \\markup { \\musicglyph #"scripts.coda" }'; }
                         when "D.C."   { $lilypond ~= '\\mark "D.C."'; }
