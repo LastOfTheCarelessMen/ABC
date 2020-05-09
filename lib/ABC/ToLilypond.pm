@@ -28,6 +28,7 @@ my %octave-map = ( -3 => ",,",
 
 my %unrecognized_gracings;
 my %substitutes;
+my %title-skips;
 
 my $spacing-comment = '%{ spacing %}';
                 
@@ -479,9 +480,13 @@ sub TuneBodyToLilypondStream($tune, $out, :$prefix?) is export {
 sub HeaderToLilypond(ABC::Header $header, $out, :$title?) is export {
     dd $title;
     $out.say: "\\header \{";
-    
+
     my $working-title = $title // $header.get-first-value("T") // "Unworking-titled";
     dd $working-title;
+
+    my @skips = %title-skips.keys;
+    $working-title.=subst(/ (@skips) /, "", :global);
+
     $working-title = sanitize-quotation-marks($working-title);
     $out.say: "    title = \" $working-title \"";
     my $composer = sanitize-quotation-marks(get-field-if-there($header, "C"));
@@ -542,5 +547,9 @@ sub GetUnrecognizedGracings() is export {
 
 sub add-substitute($look-for, $replace-with) is export {
     %substitutes{$look-for} = $replace-with;
+}
+
+sub add-title-skip($look-for) is export {
+    %title-skips{$look-for} = 1;
 }
 

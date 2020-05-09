@@ -392,7 +392,15 @@ multi sub MAIN($abc-file, $book-file) {
             when /^ "Substitute:" \s+ (\S+) \s+ (\S+)/ {
                 add-substitute(~$0, ~$1);
             }
-            
+
+            when /^ "Substitute:" \s+ (\S+)/ {
+                add-substitute(~$0, "");
+            }
+
+            when /^ "TitleSkip:" \s+ (\S+)/ {
+                add-title-skip(~$0);
+            }
+
             when / ^ "Command:" \s+ (\S.*) $ / {
                 $out.say: ~$0;
             }
@@ -400,19 +408,19 @@ multi sub MAIN($abc-file, $book-file) {
     }
 
     $out.say: "}" if $in-part;
-    
+
     $out.say: qq{\\tocItem \\markup \\bold "Index of Tunes by Name"};
-    
+
     $out.say: q{        \markuplist \index};
     if !$index-external {
         for %index-first-letters.keys -> $letter {
             $out.say: qq{        \\indexSection #"$letter" \\markup { "$letter" }}
         }
     }
-    
+
     $out.close;
     $book-in.close;
-    
+
     qqx/lilypond $ly-file/;
 
     my $pdf-file = $ly-file.subst(/ ".ly" /, ".pdf");
@@ -420,7 +428,7 @@ multi sub MAIN($abc-file, $book-file) {
     if $index-external {
         make-external-index($pdf-file, %tunes-hash);
     }
-    
+
     $*ERR.say: "Unrecognized gracings: " ~ GetUnrecognizedGracings().keys.join(", ") if GetUnrecognizedGracings();
 }
 
