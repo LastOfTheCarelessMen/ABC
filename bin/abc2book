@@ -298,8 +298,7 @@ multi sub MAIN($abc-file, $book-file) {
     my $book-in = open $book-file, :r or die "Unable to open $book-file";
     my $out = open $ly-file, :w or die "Unable to open $ly-file";
     
-    $out.say: '\\version "2.19.83"';
-    $out.say: "#(set-default-paper-size \"{$paper-size}\")";
+    start-lilypond($out, $paper-size);
     
     # Basic structure of this bit borrowed from Ralph Palmer
     # This should keep post-tune text close to its tune,

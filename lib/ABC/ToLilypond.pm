@@ -30,7 +30,13 @@ my %unrecognized_gracings;
 my %substitutes;
 my %title-skips;
 
-my $spacing-comment = '%{ spacing %}';
+my $spacing-comment = ''; # '%{ spacing %}';
+
+sub start-lilypond($out, $paper-size) is export {
+    $out.say: '\\version "2.19.83"';
+    $out.say: "#(set-default-paper-size \"{$paper-size}\")";
+    $out.say: '#(define-bar-line ".|:-|." "|." ".|:" ".|")';
+}
                 
 sub sanitize-quotation-marks($string, :$escape-number-sign?) is export {
     my $s = $string;

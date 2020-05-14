@@ -8,8 +8,7 @@ use ABC::ToLilypond;
 my $paper-size = "letter"; # or switch to "a4" for European paper
 
 sub TunesToLilypondStream(@tunes, $out, :$fancy?) {
-    $out.say: '\\version "2.12.3"';
-    $out.say: "#(set-default-paper-size \"{$paper-size}\")";
+    start-lilypond($out, $paper-size);
     if $fancy {
         $out.say: Q:to/END/;
             \paper { 
@@ -60,8 +59,7 @@ sub TunesStreamToScore($in, $out) {
     @names .= map(-> $full-name { $full-name.substr($name.chars).trim });
     dd @names;
 
-    $out.say: '\\version "2.12.3"';
-    $out.say: "#(set-default-paper-size \"{$paper-size}\")";
+    start-lilypond($out, $paper-size);
     $out.say: "\\paper \{ print-all-headers = ##t \}";
 
     $out.say: "\\score \{";
