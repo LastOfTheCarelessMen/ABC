@@ -233,7 +233,7 @@ class TuneConvertor {
         $result; 
     }
     
-    method SectionToLilypond(@elements, $out, :$beginning?) {
+    method SectionToLilypond(@elements, $out, :$beginning?, :$next-section-is-repeated?) {
         my $first-time = $beginning // False;
         my $notes = "";
         my $lilypond = "";
@@ -301,10 +301,10 @@ class TuneConvertor {
                 when "barline" {
                     $notes ~= self.WrapBar($lilypond, $duration, :beginning($first-time));
                     $first-time = False;
-                    if $element.value eq "||" {
-                        $notes ~= ' \\bar "||"';
-                    } else {
-                        $notes ~= ' \\bar "|"';
+                    given $element.value {
+                        when "||" { $notes ~= $next-section-is-repeated ?? ' \\bar ".|:-||"' !! ' \\bar "||"'; }
+                        when "|]" { $notes ~= $next-section-is-repeated ?? ' \\bar ".|:-|."' !! ' \\bar "|."'; }
+                        default   { $notes ~= ' \\bar "|"'; }
                     }
                     $notes ~= "\n";
                     $lilypond = "";
@@ -404,70 +404,142 @@ class TuneConvertor {
         $out.print: $.context.clef-to-string;
         $out.print: $.context.meter-to-string;
         
-        my $first-time = True;
-    
-        my $start-of-section = 0;
-        loop (my $i = 0; $i < +@elements; $i++) {
-            # say @elements[$i].WHAT;
-            if @elements[$i].key eq "nth_repeat"
-               || ($i > $start-of-section 
-                   && @elements[$i].key eq "barline" 
-                   && @elements[$i].value ne "|") {
-                if @elements[$i].key eq "nth_repeat" 
-                   || @elements[$i].value eq ':|:' | ':|' | '::' {
-                    $out.print: "\\repeat volta 2 "; # 2 is abitrarily chosen here!
-                }
-                self.SectionToLilypond(@elements[$start-of-section ..^ $i], $out, :beginning($first-time));
-                $first-time = False;
-                $start-of-section = $i + 1;
-                given @elements[$i].value {
-                    when '||' { $out.say: '\\bar "||"'; }
-                    when '|]' { $out.say: '\\bar "|."'; }
-                }
-            }
-
-            if @elements[$i].key eq "nth_repeat" {
-                my $final-bar = "";
-                $out.say: "\\alternative \{";
-                my $endings = 0;
-                loop (; $i < +@elements; $i++) {
-                    # say @elements[$i].WHAT;
-                    if @elements[$i].key eq "barline" 
-                       && @elements[$i].value ne "|" {
-                           self.SectionToLilypond(@elements[$start-of-section ..^ $i], $out);
-                           $start-of-section = $i + 1;
-                           $final-bar = True if @elements[$i].value eq '|]';
-                           last if ++$endings == 2;
+        sub element-to-marker($element) {
+            given $element.key {
+                when "nth_repeat" { $element.value; }
+                when "barline" {
+                    if $element.value ne "|" {
+                        $element.value;
+                    } else {
+                        "";
                     }
                 }
-                if $endings == 1 {
-                    self.SectionToLilypond(@elements[$start-of-section ..^ $i], $out);
-                    $start-of-section = $i + 1;
-                    $final-bar = @elements[$i].value if $i < +@elements && @elements[$i].value eq '|]' | '||';
-                }
-                $out.say: "\}";
-                
-                given $final-bar {
-                    when '||' { $out.say: '\\bar "||"'; }
-                    when '|]' { $out.say: '\\bar "|."'; }
-                }
-                
+                default { ""; }
             }
         }
-    
-        if $start-of-section + 1 < @elements.elems {
-            if @elements[*-1].value eq ':|:' | ':|' | '::' {
-                $out.print: "\\repeat volta 2 "; # 2 is abitrarily chosen here!
+        
+        my $outer-self = self;
+        my $first = True;
+        
+        class SectionInfo {
+            has $.start-index;
+            has $.end-index;
+            
+            method is-ending { @elements[self.start-index].key eq "nth_repeat"; }
+            method is-space { 
+                @elements[self.start-index..self.end-index].grep({ $_.key eq "spacing" | "endline" })
+                    == @elements[self.start-index..self.end-index] 
             }
-            self.SectionToLilypond(@elements[$start-of-section ..^ +@elements], $out, :beginning($first-time));
-            $first-time = False;
-            if @elements[*-1].value eq '|]' {
-                $out.say: '\\bar "|."';
+            method starts-with-repeat {
+                element-to-marker(@elements[self.start-index]) eq "|:" | "::" | ":|:";
+            }
+            method ends-with-repeat {
+                element-to-marker(@elements[self.end-index]) eq ":|" | "::" | ":|:";
             }
         }
+        
+        sub sections-to-lilypond(@sections, :$next-section-is-repeated?) {
+            my $start = @sections[0].start-index;
+            ++$start if @elements[$start].key eq "barline";
+            say "outputing $start to {@sections[*-1].end-index}";
+            self.SectionToLilypond(@elements[$start .. @sections[*-1].end-index], 
+                                   $out, :beginning($first), :$next-section-is-repeated);
+            $first = False;
+        }
+        
+        my $start-of-section = 0;
+        my @sections;
+        for @elements.kv -> $i, $element {
+            given element-to-marker($element) {
+                when /\d/ { 
+                    @sections.push(SectionInfo.new(start-index => $start-of-section,
+                                                   end-index => $i-1));
+                    $start-of-section = $i;
+                }
+                when '|:' { 
+                    @sections.push(SectionInfo.new(start-index => $start-of-section,
+                                                   end-index => $i-1));
+                    $start-of-section = $i;
+                }                
+                when '::' | ':|:' { 
+                    @sections.push(SectionInfo.new(start-index => $start-of-section,
+                                                   end-index => $i));
+                    $start-of-section = $i;
+                }                
+                when '|]' | '||' | ':|' { 
+                    @sections.push(SectionInfo.new(start-index => $start-of-section,
+                                                   end-index => $i));
+                    $start-of-section = $i+1;
+                }                
+            }
+        }
+        @sections.push(SectionInfo.new(start-index => $start-of-section,
+                                       end-index => @elements - 1));
 
-        if @elements.grep({ $_.key eq "barline" })[*-1].value eq '|]' {
-            $out.say: '\\bar "|."';
+        write-sections(@sections);
+        
+        sub write-sections(@sections) {
+            for @sections -> $section {
+                say "{$section.start-index} => {$section.end-index}" 
+                    ~ " {@elements[$section.start-index]} / {@elements[$section.end-index]}"
+                    ~ " {$section.is-space ?? "SPACING" !! ""}";
+            }
+        }
+        
+        sub output-sections(@sections, :$next-section-is-repeated?) {
+            say "******************************** start cluster of sections";
+            write-sections(@sections);
+            return unless @sections;
+            my @endings;
+            for @sections.kv -> $i, $section {
+                @endings.push($i) if $section.is-ending;
+            }
+            if @endings {
+                my $volta-count = 2;
+                # SHOULD: use endings to figure out right volta count
+                $out.print: "\\repeat volta $volta-count ";
+                sections-to-lilypond(@sections[0..^@endings[0]], :$next-section-is-repeated);
+                $out.say: "\\alternative \{";
+                for @endings.rotor(2=>-1) -> ($a, $b) {
+                    say "ending is $a => $b";
+                    sections-to-lilypond(@sections[$a..^$b], :$next-section-is-repeated);
+                }
+                sections-to-lilypond(@sections[@endings[*-1]..(*-1)], :$next-section-is-repeated);
+                $out.say: "\}";
+            } elsif @sections[*-1].ends-with-repeat {
+                $out.print: "\\repeat volta 2 ";
+                sections-to-lilypond(@sections, :$next-section-is-repeated);
+            } else {
+                sections-to-lilypond(@sections, :$next-section-is-repeated);
+            }
+        }
+        
+        my $in-endings = False;
+        my @section-cluster;
+        for @sections -> $section {
+            if $in-endings {
+                if $section.is-ending || $section.is-space {
+                    @section-cluster.push($section);
+                } else {
+                    output-sections(@section-cluster, :next-section-is-repeated(True));
+                    @section-cluster = ();
+                    @section-cluster.push($section);
+                    $in-endings = False;
+                }
+            } else {
+                @section-cluster.push($section);
+                if $section.is-ending {
+                    $in-endings = True;
+                } else {
+                    if $section.ends-with-repeat {
+                        output-sections(@section-cluster, :next-section-is-repeated(True));
+                        @section-cluster = ();
+                    }
+                }
+            }
+        }
+        if @section-cluster {
+            output-sections(@section-cluster);
         }
     
         $out.say: "\}";
