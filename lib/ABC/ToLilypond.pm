@@ -431,10 +431,10 @@ class TuneConvertor {
                     == @elements[self.start-index..self.end-index] 
             }
             method starts-with-repeat {
-                element-to-marker(@elements[self.start-index]) eq "|:" | "::" | ":|:";
+                so element-to-marker(@elements[self.start-index]) eq "|:" | "::" | ":|:";
             }
             method ends-with-repeat {
-                element-to-marker(@elements[self.end-index]) eq ":|" | "::" | ":|:";
+                so element-to-marker(@elements[self.end-index]) eq ":|" | "::" | ":|:";
             }
         }
         
