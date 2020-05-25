@@ -450,13 +450,14 @@ class TuneConvertor {
         my $start-of-section = 0;
         my @sections;
         for @elements.kv -> $i, $element {
+            next if $i == $start-of-section;
             given element-to-marker($element) {
-                when /\d/ { 
+                when /\d/ {
                     @sections.push(SectionInfo.new(start-index => $start-of-section,
                                                    end-index => $i-1));
                     $start-of-section = $i;
                 }
-                when '|:' { 
+                when '|:' {
                     @sections.push(SectionInfo.new(start-index => $start-of-section,
                                                    end-index => $i-1));
                     $start-of-section = $i;
@@ -521,13 +522,21 @@ class TuneConvertor {
                 if $section.is-ending || $section.is-space {
                     @section-cluster.push($section);
                 } else {
-                    output-sections(@section-cluster, :next-section-is-repeated(True));
+                    output-sections(@section-cluster,
+                                    :next-section-is-repeated($section.starts-with-repeat));
                     @section-cluster = ();
                     @section-cluster.push($section);
                     $in-endings = False;
                 }
             } else {
+                if @section-cluster && $section.starts-with-repeat {
+                    # output everything up to the current section
+                    output-sections(@section-cluster, :next-section-is-repeated(True));
+                    @section-cluster = ();
+                }
+                
                 @section-cluster.push($section);
+                
                 if $section.is-ending {
                     $in-endings = True;
                 } else {
