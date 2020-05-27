@@ -241,7 +241,7 @@ class TuneConvertor {
         my $chord-duration = 0;
         my $suffix = "";
         my $in-slur = False;
-        for @elements -> $element {
+        for @elements.kv -> $i, $element {
             $duration += self.Duration($element);
             $chord-duration += self.Duration($element);
             given $element.key {
@@ -301,9 +301,16 @@ class TuneConvertor {
                 when "barline" {
                     $notes ~= self.WrapBar($lilypond, $duration, :beginning($first-time));
                     $first-time = False;
+                    
+                    my $need-special = $next-section-is-repeated;
+                    if $need-special && $i + 1 < @elements 
+                       && @elements[$i+1..*-1].grep({ not $_.key eq "spacing" | "endline" }) {
+                           $need-special = False;
+                    }
+                    
                     given $element.value {
-                        when "||" { $notes ~= $next-section-is-repeated ?? ' \\bar ".|:-||"' !! ' \\bar "||"'; }
-                        when "|]" { $notes ~= $next-section-is-repeated ?? ' \\bar ".|:-|."' !! ' \\bar "|."'; }
+                        when "||" { $notes ~= $need-special ?? ' \\bar ".|:-||"' !! ' \\bar "||"'; }
+                        when "|]" { $notes ~= $need-special ?? ' \\bar ".|:-|."' !! ' \\bar "|."'; }
                         default   { $notes ~= ' \\bar "|"'; }
                     }
                     $notes ~= "\n";
@@ -427,7 +434,7 @@ class TuneConvertor {
             
             method is-ending { @elements[self.start-index].key eq "nth_repeat"; }
             method is-space { 
-                @elements[self.start-index..self.end-index].grep({ $_.key eq "spacing" | "endline" })
+                @elements[self.start-index..self.end-index].grep({ $_.key eq "spacing" | "endline" | "barline" })
                     == @elements[self.start-index..self.end-index] 
             }
             method starts-with-repeat {
@@ -507,7 +514,7 @@ class TuneConvertor {
                 }
                 sections-to-lilypond(@sections[@endings[*-1]..(*-1)], :$next-section-is-repeated);
                 $out.say: "\}";
-            } elsif @sections[*-1].ends-with-repeat {
+            } elsif @sections.grep(*.ends-with-repeat) {
                 $out.print: "\\repeat volta 2 ";
                 sections-to-lilypond(@sections, :$next-section-is-repeated);
             } else {
