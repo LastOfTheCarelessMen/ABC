@@ -433,10 +433,16 @@ class TuneConvertor {
             has $.end-index;
             
             method is-ending { @elements[self.start-index].key eq "nth_repeat"; }
+
+            sub token-is-space($token) {
+                # this probably needs to get smarter about barline
+                so $token.key eq "spacing" | "endline" | "barline" | "end_nth_repeat";
+            }
             method is-space { 
-                @elements[self.start-index..self.end-index].grep({ $_.key eq "spacing" | "endline" | "barline" })
+                @elements[self.start-index..self.end-index].grep({ token-is-space($_) })
                     == @elements[self.start-index..self.end-index] 
             }
+
             method starts-with-repeat {
                 so element-to-marker(@elements[self.start-index]) eq "|:" | "::" | ":|:";
             }
