@@ -232,7 +232,12 @@ class TuneConvertor {
 
         $result; 
     }
-    
+
+    sub token-is-space($token) {
+        # this probably needs to get smarter about barline
+        so $token.key eq "spacing" | "endline" | "barline" | "end_nth_repeat" | "inline_field";
+    }
+
     method SectionToLilypond(@elements, $out, :$beginning?, :$next-section-is-repeated?) {
         my $first-time = $beginning // False;
         my $notes = "";
@@ -304,7 +309,7 @@ class TuneConvertor {
                     
                     my $need-special = $next-section-is-repeated;
                     if $need-special && $i + 1 < @elements 
-                       && @elements[$i+1..*-1].grep({ not $_.key eq "spacing" | "endline" }) {
+                       && @elements[$i+1..*-1].grep({ !token-is-space($_) }) {
                            $need-special = False;
                     }
                     
@@ -434,10 +439,6 @@ class TuneConvertor {
             
             method is-ending { @elements[self.start-index].key eq "nth_repeat"; }
 
-            sub token-is-space($token) {
-                # this probably needs to get smarter about barline
-                so $token.key eq "spacing" | "endline" | "barline" | "end_nth_repeat";
-            }
             method is-space { 
                 @elements[self.start-index..self.end-index].grep({ token-is-space($_) })
                     == @elements[self.start-index..self.end-index] 
