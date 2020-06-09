@@ -162,9 +162,10 @@ sub get-field-if-there($header, $field) {
 
 class TuneConvertor {
     has $.context;
+    has $.log;
 
-    method new($key, $meter, $length) {
-        self.bless(:context(LilypondContext.new($key, $meter, $length)));
+    method new($key, $meter, $length, $log) {
+        self.bless(:context(LilypondContext.new($key, $meter, $length)), :$log);
     }
 
     # MUST: this is context dependent too
@@ -455,7 +456,7 @@ class TuneConvertor {
         sub sections-to-lilypond(@sections, :$next-section-is-repeated?) {
             my $start = @sections[0].start-index;
             ++$start if @elements[$start].key eq "barline";
-            say "outputing $start to {@sections[*-1].end-index}";
+            $.log.say: "outputing $start to {@sections[*-1].end-index} { $next-section-is-repeated ?? 'Next section repeated' !! '' }";
             self.SectionToLilypond(@elements[$start .. @sections[*-1].end-index], 
                                    $out, :beginning($first), :$next-section-is-repeated);
             $first = False;
@@ -495,14 +496,14 @@ class TuneConvertor {
         
         sub write-sections(@sections) {
             for @sections -> $section {
-                say "{$section.start-index} => {$section.end-index}" 
-                    ~ " {@elements[$section.start-index]} / {@elements[$section.end-index]}"
-                    ~ " {$section.is-space ?? "SPACING" !! ""}";
+                $.log.say: "{$section.start-index} => {$section.end-index}" 
+                           ~ " {@elements[$section.start-index]} / {@elements[$section.end-index]}"
+                           ~ " {$section.is-space ?? "SPACING" !! ""}";
             }
         }
         
         sub output-sections(@sections, :$next-section-is-repeated?) {
-            say "******************************** start cluster of sections";
+            $.log.say: "******************************** start cluster of sections";
             write-sections(@sections);
             return unless @sections;
             my @endings;
@@ -516,7 +517,7 @@ class TuneConvertor {
                 sections-to-lilypond(@sections[0..^@endings[0]], :$next-section-is-repeated);
                 $out.say: "\\alternative \{";
                 for @endings.rotor(2=>-1) -> ($a, $b) {
-                    say "ending is $a => $b";
+                    $.log.say: "ending is $a => $b";
                     sections-to-lilypond(@sections[$a..^$b], :$next-section-is-repeated);
                 }
                 sections-to-lilypond(@sections[@endings[*-1]..(*-1)], :$next-section-is-repeated);
@@ -570,20 +571,18 @@ class TuneConvertor {
     
 }
 
-sub TuneBodyToLilypondStream($tune, $out, :$prefix?) is export {
+sub TuneBodyToLilypondStream($tune, $out, :$prefix?, :$log?) is export {
     my $key = $tune.header.get-first-value("K");
     my $meter = $tune.header.get-first-value("M");
     my $length = $tune.header.get-first-value("L") // default-length-from-meter($meter);
-    my $convertor = TuneConvertor.new($key, $meter, $length);
+    my $convertor = TuneConvertor.new($key, $meter, $length, $log // (open :w, $*SPEC.devnull));
     $convertor.BodyToLilypond($tune.music, $out, :$prefix);
 }
 
 sub HeaderToLilypond(ABC::Header $header, $out, :$title?) is export {
-    dd $title;
     $out.say: "\\header \{";
 
     my $working-title = $title // $header.get-first-value("T") // "Unworking-titled";
-    dd $working-title;
 
     my @skips = %title-skips.keys;
     $working-title.=subst(/ (@skips) /, "", :global);
@@ -609,11 +608,12 @@ sub HeaderToLilypond(ABC::Header $header, $out, :$title?) is export {
     $out.say: "}";
 }
 
-sub tune-to-score($tune, $out) is export {
+sub tune-to-score($tune, $out, $log) is export {
     $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
+    $log.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
     $out.say: "\\score \{";
 
-        TuneBodyToLilypondStream($tune, $out);
+        TuneBodyToLilypondStream($tune, $out, :$log);
         HeaderToLilypond($tune.header, $out);
 
     $out.say: "}\n\n";

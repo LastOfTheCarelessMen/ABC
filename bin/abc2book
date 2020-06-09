@@ -342,6 +342,9 @@ multi sub MAIN($abc-file, $book-file) {
 
     write-index-snippet($out);
     
+    #    my $log = open :w, $*SPEC.devnull;
+    my $log = open :w, "abc2ly.log";
+    
     my %index-first-letters;
     
     my @book = $book-in.lines;
@@ -367,7 +370,7 @@ multi sub MAIN($abc-file, $book-file) {
                     last if $index-external; # no need to write more than one name
                 }
                 
-                tune-to-score($abc, $out);
+                tune-to-score($abc, $out, $log);
             }
             
             when /^ "Part:" (.*) / {

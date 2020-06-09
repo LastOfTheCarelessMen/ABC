@@ -24,8 +24,10 @@ sub TunesToLilypondStream(@tunes, $out, :$fancy?) {
         $out.say: "\\paper \{ print-all-headers = ##t \}";
     }
     
+#    my $log = open :w, $*SPEC.devnull;
+    my $log = open :w, "abc2ly.log";
     for @tunes -> $tune {
-        tune-to-score($tune, $out);
+        tune-to-score($tune, $out, $log);
     }
 }
 
