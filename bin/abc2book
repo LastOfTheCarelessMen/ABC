@@ -349,6 +349,7 @@ multi sub MAIN($abc-file, $book-file) {
     my %index-first-letters;
     my $front-cover-file;
     my $back-cover-file;
+    my $intro-file;
     
     my @book = $book-in.lines;
     my $in-part = False;
@@ -417,6 +418,10 @@ multi sub MAIN($abc-file, $book-file) {
             when / ^ "BackCover:" \s+ (\S.*) $ / {
                 $back-cover-file = ~$0;
             }
+
+            when / ^ "Intro:" \s+ (\S.*) $ / {
+                $intro-file = ~$0;
+            }
         }
     }
 
@@ -450,6 +455,20 @@ multi sub MAIN($abc-file, $book-file) {
                     "--pages", |@pdfs, "--",
                     ~$temp-file;
         $temp-file.move($result-file);
+    }
+    
+    if $intro-file {
+        my $tempdir = tempdir();
+        dd $tempdir;
+        my $temp-file = IO::Path.new(basename => "temp.pdf", dirname => $tempdir);
+        run "qpdf", "--empty", 
+                    "--pages", 
+                        $pdf-file, "1", 
+                        $intro-file,
+                        $pdf-file, "2-z", 
+                    "--",
+                    ~$temp-file;
+        $temp-file.move($pdf-file);
     }
     
     if $front-cover-file || $back-cover-file {
