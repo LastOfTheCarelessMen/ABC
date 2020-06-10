@@ -1,9 +1,9 @@
 {
     "perl"        : "6.*",
     "name"        : "ABC",
-    "version"     : "0.6.9",
+    "version"     : "0.6.10",
     "description" : "Toolkit for dealing with ABC music notation",
-    "depends"     : [],
+    "depends"     : [ "File::Temp" ],
     "provides" : {
         "abc2ly"            : "bin/abc2ly",
         "abc2book"          : "bin/abc2book",

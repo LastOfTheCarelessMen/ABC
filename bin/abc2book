@@ -4,6 +4,7 @@ use v6;
 use ABC::Grammar;
 use ABC::Actions;
 use ABC::ToLilypond;
+use File::Temp;
 
 my $paper-size = "letter"; # or switch to "a4" for European paper
 my $index-external = True;
@@ -346,6 +347,8 @@ multi sub MAIN($abc-file, $book-file) {
     my $log = open :w, "abc2ly.log";
     
     my %index-first-letters;
+    my $front-cover-file;
+    my $back-cover-file;
     
     my @book = $book-in.lines;
     my $in-part = False;
@@ -406,6 +409,14 @@ multi sub MAIN($abc-file, $book-file) {
             when / ^ "Command:" \s+ (\S.*) $ / {
                 $out.say: ~$0;
             }
+            
+            when / ^ "FrontCover:" \s+ (\S.*) $ / {
+                $front-cover-file = ~$0;
+            }
+
+            when / ^ "BackCover:" \s+ (\S.*) $ / {
+                $back-cover-file = ~$0;
+            }
         }
     }
 
@@ -429,6 +440,24 @@ multi sub MAIN($abc-file, $book-file) {
 
     if $index-external {
         make-external-index($pdf-file, %tunes-hash);
+    }
+    
+    sub merge-pdfs(@pdfs, $result-file) {
+        my $tempdir = tempdir();
+        dd $tempdir;
+        my $temp-file = IO::Path.new(basename => "temp.pdf", dirname => $tempdir);
+        run "qpdf", "--empty", 
+                    "--pages", |@pdfs, "--",
+                    ~$temp-file;
+        $temp-file.move($result-file);
+    }
+    
+    if $front-cover-file || $back-cover-file {
+        my @pdfs;
+        @pdfs.push($front-cover-file) if $front-cover-file;
+        @pdfs.push($pdf-file);
+        @pdfs.push($back-cover-file) if $back-cover-file;
+        merge-pdfs(@pdfs, $pdf-file);
     }
 
     $*ERR.say: "Unrecognized gracings: " ~ GetUnrecognizedGracings().keys.join(", ") if GetUnrecognizedGracings();
