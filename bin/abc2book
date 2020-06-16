@@ -316,9 +316,9 @@ multi sub MAIN($abc-file, $book-file) {
           two-sided = ##t
 
           %%%%% margins %%%%%
-          inner-margin = 0.56\in     % larger margin for binder holes
-          outer-margin = 0.25\in
-
+          inner-margin = 1.06\in     % larger margin for binder holes
+          outer-margin = 0.5\in
+          
           NonMusicalPaperColumn.page-break-permission = ##f
           ragged-last-bottom = ##t
 
