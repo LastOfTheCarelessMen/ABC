@@ -300,6 +300,7 @@ multi sub MAIN($abc-file, $book-file) {
     my $out = open $ly-file, :w or die "Unable to open $ly-file";
     
     start-lilypond($out, $paper-size);
+    $out.say: '#(set-global-staff-size 17)';
     
     # Basic structure of this bit borrowed from Ralph Palmer
     # This should keep post-tune text close to its tune,
