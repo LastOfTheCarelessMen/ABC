@@ -336,6 +336,8 @@ multi sub MAIN($abc-file, $book-file) {
           score-markup-spacing = #'((basic-distance . 2)
                                     (padding . 1)
                                     (stretchability . 1))
+                                    
+          first-page-number = 0
         }
         END
     
