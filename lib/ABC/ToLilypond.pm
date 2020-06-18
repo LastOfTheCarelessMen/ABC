@@ -494,11 +494,15 @@ class TuneConvertor {
 
         write-sections(@sections);
         
+        sub write-section($section) {
+            $.log.say: "{$section.start-index} => {$section.end-index}" 
+                       ~ " {@elements[$section.start-index]} / {@elements[$section.end-index]}"
+                       ~ " {$section.is-space ?? "SPACING" !! ""}";
+        }
+        
         sub write-sections(@sections) {
             for @sections -> $section {
-                $.log.say: "{$section.start-index} => {$section.end-index}" 
-                           ~ " {@elements[$section.start-index]} / {@elements[$section.end-index]}"
-                           ~ " {$section.is-space ?? "SPACING" !! ""}";
+                write-section($section);
             }
         }
         
