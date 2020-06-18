@@ -552,10 +552,12 @@ class TuneConvertor {
                     # output everything up to the current section
                     output-sections(@section-cluster, :next-section-is-repeated(True));
                     @section-cluster = ();
-                }
-                
+                } 
+
                 @section-cluster.push($section);
-                
+            }
+
+            if !$in-endings {
                 if $section.is-ending {
                     $in-endings = True;
                 } else {
