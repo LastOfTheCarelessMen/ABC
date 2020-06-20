@@ -9,9 +9,9 @@ use File::Temp;
 my $paper-size = "letter"; # or switch to "a4" for European paper
 my $index-external = True;
 
-# This program always uses the external program lilypond for 
+# This program always uses the external programs lilypond and qpdf for 
 # generating music notation.
-# If $index-external is True, then it also uses pdftotext, latex, dvipdf, & qpdf.
+# If $index-external is True, then it also uses pdftotext, latex, & dvipdf.
 
 # The index code that follows is incorporated from the Lilypond
 # Snippet Repository, http://lsr.di.unimi.it/LSR/Item?id=763
@@ -278,7 +278,7 @@ sub get-tonic($abc) {
     get-tonic-from-first-stem($abc.music.reverse);
 }
 
-multi sub MAIN($abc-file, $book-file) {
+multi sub MAIN($abc-file, $book-file, :$no-cover?) {
     my $ly-file;
     $ly-file = $book-file ~ ".ly";
     if $book-file ~~ /^(.*) ".book"/ {
@@ -351,8 +351,9 @@ multi sub MAIN($abc-file, $book-file) {
     
     my %index-first-letters;
     my $front-cover-file;
-    my $back-cover-file;
+    my $title-page-file;
     my $intro-file;
+    my $back-cover-file;
     
     my @book = $book-in.lines;
     my $in-part = False;
@@ -425,6 +426,10 @@ multi sub MAIN($abc-file, $book-file) {
             when / ^ "Intro:" \s+ (\S.*) $ / {
                 $intro-file = ~$0;
             }
+
+            when / ^ "TitlePage:" \s+ (\S.*) $ / {
+                $title-page-file = ~$0;
+            }
         }
     }
 
@@ -476,9 +481,10 @@ multi sub MAIN($abc-file, $book-file) {
     
     if $front-cover-file || $back-cover-file {
         my @pdfs;
-        @pdfs.push($front-cover-file) if $front-cover-file;
+        @pdfs.push($front-cover-file) if $front-cover-file && !$no-cover;
+        @pdfs.push($title-page-file) if $title-page-file;
         @pdfs.push($pdf-file);
-        @pdfs.push($back-cover-file) if $back-cover-file;
+        @pdfs.push($back-cover-file) if $back-cover-file && !$no-cover;
         merge-pdfs(@pdfs, $pdf-file);
     }
 
