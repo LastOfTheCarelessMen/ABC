@@ -180,6 +180,86 @@ sub make-latex-name($full-name) {
     $name;
 }
 
+sub number-pages($pdf-file) {
+    my $proc = run "qpdf", "--show-npages", $pdf-file.Str, :out;
+    $proc.out.slurp(:close).comb(/ \d+ /).first;
+}
+
+sub latex-to-pdf(IO::Path $tex-file) {
+    run "latex", '-output-directory=' ~ $tex-file.dirname.Str,
+                 '-output-format=pdf',
+                 $tex-file.Str;
+    # run "dvips", $tex-file.extension("dvi").Str;
+    # run "ps2pdf", $tex-file.extension("ps").Str;
+    $tex-file.extension("pdf");
+}
+
+sub make-blank-page($tempdir) {
+    my $blank-tex = IO::Path.new(basename => "blank.tex", dirname => $tempdir);
+    my $out = $blank-tex.open(:w);
+    $out.say: q:to/END/;
+        \documentclass[letterpaper]{article}
+        \usepackage[pass]{geometry}
+        \begin{document}
+            \shipout\hbox{}
+        \end{document}
+        END
+
+    return latex-to-pdf($blank-tex);
+}
+
+sub make-external-toc($tempdir, $pdf-file, @toc-extra-items) {
+    # Following assumes one-page TOC, if more something more complicated
+    # will be needed.
+
+    my @toc-items = @toc-extra-items;
+
+    my $text = qqx/pdftotext -layout -f 1 -l 1 $pdf-file -/;
+    my @unsorted-index;
+    for $text.comb(/ ^^ \h* (\V+) \h+ (\d+) $$ /, :match) -> $match {
+        @toc-items.push($match[0].Str.trim => ~$match[1]);
+    }
+
+    my $toc-tex = IO::Path.new(basename => "toc.tex", dirname => $tempdir);
+    my $out = $toc-tex.open(:w);
+    $out.say: q:to/END/;
+        \documentclass{book}
+        \renewcommand{\familydefault}{\sfdefault}
+        \pagestyle{empty}
+        \usepackage[letterpaper, margin=1in, bindingoffset=.5in]{geometry}
+        \begin{document}
+        \center{\bfseries{\huge Contents}}
+        \vspace{.5in}
+        END
+
+    my $grouping = "";
+    for @toc-items -> $toc-item {
+        my ($line-grouping, $section) = $toc-item.key.split(/ ':' \s+/);
+        if $section {
+            if $grouping ne $line-grouping {
+                $grouping = $line-grouping;
+                $out.say: '\contentsline {chapter}{' ~ $grouping ~ '}{' ~ $toc-item.value ~ '}';
+            }
+            $out.say: '\contentsline {section}{' ~ $section ~ '}{' ~ $toc-item.value ~ '}';
+        } else {
+            $out.say: '\contentsline {chapter}{' ~ $toc-item.key ~ '}{' ~ $toc-item.value ~ '}';
+        }
+    }
+
+    $out.say: '\end{document}';
+    $out.close;
+
+    my $temp-file = IO::Path.new(basename => "temp.pdf", dirname => $tempdir);
+    run "qpdf", "--empty",
+                "--pages",
+                    $pdf-file, "2-z",
+                "--",
+                ~$temp-file;
+    $temp-file.move($pdf-file);
+
+    return latex-to-pdf($toc-tex);
+}
+
 sub make-external-index($pdf-file, %tunes-hash) {
     my $N = 0;
     for 1..* -> $n {
@@ -208,7 +288,7 @@ sub make-external-index($pdf-file, %tunes-hash) {
         \documentclass[11pt]{article}
         \usepackage{multicol}
         
-        \usepackage[letterpaper, margin=1in]{geometry}
+        \usepackage[letterpaper, margin=1in, bindingoffset=.5in]{geometry}
 
         \begin{document}
 
@@ -298,10 +378,10 @@ multi sub MAIN($abc-file, $book-file, :$no-cover?) {
 
     my $book-in = open $book-file, :r or die "Unable to open $book-file";
     my $out = open $ly-file, :w or die "Unable to open $ly-file";
-    
+
     start-lilypond($out, $paper-size);
     $out.say: '#(set-global-staff-size 17)';
-    
+
     # Basic structure of this bit borrowed from Ralph Palmer
     # This should keep post-tune text close to its tune,
     # while making most blank space between tunes.
@@ -354,6 +434,7 @@ multi sub MAIN($abc-file, $book-file, :$no-cover?) {
     my $title-page-file;
     my $intro-file;
     my $back-cover-file;
+    my @toc-extra-items;
     
     my @book = $book-in.lines;
     my $in-part = False;
@@ -430,6 +511,10 @@ multi sub MAIN($abc-file, $book-file, :$no-cover?) {
             when / ^ "TitlePage:" \s+ (\S.*) $ / {
                 $title-page-file = ~$0;
             }
+
+            when / ^ "TOC:" \s+ (.+) \s+ (\S+) \s* $ / {
+                 @toc-extra-items.push(~$0 => ~$1);
+            }
         }
     }
 
@@ -451,42 +536,52 @@ multi sub MAIN($abc-file, $book-file, :$no-cover?) {
 
     my $pdf-file = $ly-file.subst(/ ".ly" /, ".pdf");
 
+    my $tempdir = tempdir();
+    dd $tempdir;
+
+    my $blank-pdf = make-blank-page($tempdir);
+
+    my $toc-file = make-external-toc($tempdir, $pdf-file, @toc-extra-items);
+
     if $index-external {
         make-external-index($pdf-file, %tunes-hash);
     }
-    
+
     sub merge-pdfs(@pdfs, $result-file) {
-        my $tempdir = tempdir();
-        dd $tempdir;
         my $temp-file = IO::Path.new(basename => "temp.pdf", dirname => $tempdir);
         run "qpdf", "--empty", 
-                    "--pages", |@pdfs, "--",
+                    "--pages", |@pdfs.map(*.Str), "--",
                     ~$temp-file;
         $temp-file.move($result-file);
     }
     
-    if $intro-file {
-        my $tempdir = tempdir();
-        dd $tempdir;
-        my $temp-file = IO::Path.new(basename => "temp.pdf", dirname => $tempdir);
-        run "qpdf", "--empty", 
-                    "--pages", 
-                        $pdf-file, "1", 
-                        $intro-file,
-                        $pdf-file, "2-z", 
-                    "--",
-                    ~$temp-file;
-        $temp-file.move($pdf-file);
-    }
+    # if $intro-file {
+    #     my $temp-file = IO::Path.new(basename => "temp.pdf", dirname => $tempdir);
+    #     run "qpdf", "--empty",
+    #                 "--pages",
+    #                     $pdf-file, "1",
+    #                     $intro-file,
+    #                     $pdf-file, "2-z",
+    #                 "--",
+    #                 ~$temp-file;
+    #     $temp-file.move($pdf-file);
+    # }
     
-    if $front-cover-file || $back-cover-file {
-        my @pdfs;
-        @pdfs.push($front-cover-file) if $front-cover-file && !$no-cover;
-        @pdfs.push($title-page-file) if $title-page-file;
-        @pdfs.push($pdf-file);
-        @pdfs.push($back-cover-file) if $back-cover-file && !$no-cover;
-        merge-pdfs(@pdfs, $pdf-file);
+    my @pdfs;
+    @pdfs.push($front-cover-file) if $front-cover-file && !$no-cover;
+    if $title-page-file {
+        @pdfs.push($title-page-file);
+        @pdfs.push($blank-pdf) unless number-pages($title-page-file) %% 2;
     }
+    @pdfs.push($toc-file);
+    @pdfs.push($blank-pdf) unless number-pages($toc-file) %% 2;
+    if $intro-file {
+        @pdfs.push($intro-file);
+        @pdfs.push($blank-pdf) unless number-pages($intro-file) %% 2;
+    }
+    @pdfs.push($pdf-file);
+    @pdfs.push($back-cover-file) if $back-cover-file && !$no-cover;
+    merge-pdfs(@pdfs, $pdf-file) if @pdfs > 1;
 
     $*ERR.say: "Unrecognized gracings: " ~ GetUnrecognizedGracings().keys.join(", ") if GetUnrecognizedGracings();
 }
