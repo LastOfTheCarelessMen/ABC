@@ -293,10 +293,11 @@ sub make-external-index($pdf-file, %tunes-hash) {
         \begin{document}
 
         \begin{multicols}{2}
-        
+        [
         \begin{center}
         { \large \textbf{ Index of Tune Names } }
         \end{center}
+        ]
 
         END
         
