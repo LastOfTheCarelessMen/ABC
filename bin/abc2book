@@ -223,7 +223,7 @@ sub make-external-toc($tempdir, $pdf-file, @toc-extra-items) {
     my $toc-tex = IO::Path.new(basename => "toc.tex", dirname => $tempdir);
     my $out = $toc-tex.open(:w);
     $out.say: q:to/END/;
-        \documentclass{book}
+        \documentclass[12pt]{book}
         \renewcommand{\familydefault}{\sfdefault}
         \pagestyle{empty}
         \usepackage[letterpaper, margin=1in, bindingoffset=.5in]{geometry}
@@ -285,7 +285,7 @@ sub make-external-index($pdf-file, %tunes-hash) {
     
     my $out = "index.tex".IO.open(:w);
     $out.say: q:to/END/;
-        \documentclass[11pt]{article}
+        \documentclass[10pt]{article}
         \usepackage{multicol}
         
         \usepackage[letterpaper, margin=1in, bindingoffset=.5in]{geometry}
