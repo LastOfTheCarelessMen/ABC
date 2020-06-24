@@ -228,6 +228,8 @@ sub make-external-toc($tempdir, $pdf-file, @toc-extra-items) {
         \pagestyle{empty}
         \usepackage[letterpaper, margin=1in, bindingoffset=.5in]{geometry}
         \begin{document}
+        \hspace{0pt}
+        \vfill
         \center{\bfseries{\huge Contents}}
         \vspace{.5in}
         END
@@ -246,7 +248,11 @@ sub make-external-toc($tempdir, $pdf-file, @toc-extra-items) {
         }
     }
 
-    $out.say: '\end{document}';
+    $out.say: q:to/END/;
+        \vfill
+        \hspace{0pt}
+        \end{document}
+        END
     $out.close;
 
     my $temp-file = IO::Path.new(basename => "temp.pdf", dirname => $tempdir);
