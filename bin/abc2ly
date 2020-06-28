@@ -21,7 +21,7 @@ sub TunesToLilypondStream(@tunes, $out, :$fancy?) {
             }
         END
     } else {
-        $out.say: "\\paper \{ print-all-headers = ##t \}";
+        $out.say: "\\paper \{ print-all-headers = ##t  ragged-bottom = ##t \}";
     }
     
 #    my $log = open :w, $*SPEC.devnull;
@@ -62,7 +62,7 @@ sub TunesStreamToScore($in, $out) {
     dd @names;
 
     start-lilypond($out, $paper-size);
-    $out.say: "\\paper \{ print-all-headers = ##t \}";
+    $out.say: "\\paper \{ print-all-headers = ##t ragged-bottom = ##t \}";
 
     $out.say: "\\score \{";
     $out.say: '<<';
