@@ -643,8 +643,11 @@ sub tune-to-score($tune, $out, $log) is export {
                 
                 END
         }
+    } else {
+        $out.say: q:to/END/;
+            \markup \fill-line { }
+            END
         
-#         $out.say: "    \\vspace #2";
     }
 }
 
