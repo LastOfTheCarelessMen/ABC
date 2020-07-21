@@ -197,7 +197,7 @@ class TuneConvertor {
             ~ " ";
     }
     
-    method WrapBar($lilypond-bar, $duration, :$beginning?) {
+    method WrapBar($lilypond-bar, $duration, :$might-be-parital?) {
         my $ticks-in-measure = $.context.ticks-in-measure;
         my $result = "";
 
@@ -215,7 +215,7 @@ class TuneConvertor {
             
             $result ~= " \\cadenzaOff";
         } else {
-            if $beginning && $duration % $ticks-in-measure != 0 {
+            if $might-be-parital && $duration % $ticks-in-measure != 0 {
                 my $note-length = 1 / $.context.context.length;
                 my $count = $duration % $ticks-in-measure;
                 if $count ~~ Rat {
@@ -239,8 +239,8 @@ class TuneConvertor {
         so $token.key eq "spacing" | "endline" | "barline" | "end_nth_repeat" | "inline_field";
     }
 
-    method SectionToLilypond(@elements, $out, :$beginning?, :$next-section-is-repeated?) {
-        my $first-time = $beginning // False;
+    method SectionToLilypond(@elements, $out, :$first-bar-might-need-partial?, :$next-section-is-repeated?) {
+        my $first-bar = True;
         my $notes = "";
         my $lilypond = "";
         my $duration = 0;
@@ -305,8 +305,9 @@ class TuneConvertor {
                     }
                 }
                 when "barline" {
-                    $notes ~= self.WrapBar($lilypond, $duration, :beginning($first-time));
-                    $first-time = False;
+                    $notes ~= self.WrapBar($lilypond, $duration,
+                                           :might-be-parital($first-bar && $first-bar-might-need-partial));
+                    $first-bar = False;
                     
                     my $need-special = $next-section-is-repeated;
                     if $need-special && $i + 1 < @elements 
@@ -397,8 +398,9 @@ class TuneConvertor {
         }
     
         $out.say: "\{";
-        $notes ~= self.WrapBar($lilypond, $duration, :beginning($first-time));
-        $first-time = False;
+        $notes ~= self.WrapBar($lilypond, $duration,
+                               :might-be-parital($first-bar && $first-bar-might-need-partial));
+        $first-bar = False;
         $out.say: $notes;
         $out.say: " \}";
     }
@@ -432,7 +434,6 @@ class TuneConvertor {
         }
         
         my $outer-self = self;
-        my $first = True;
         
         class SectionInfo {
             has $.start-index;
@@ -451,17 +452,31 @@ class TuneConvertor {
             method ends-with-repeat {
                 so element-to-marker(@elements[self.end-index]) eq ":|" | "::" | ":|:";
             }
+
+            method total-duration {
+                [+] (self.start-index..self.end-index).map(-> $i { $outer-self.Duration(@elements[$i])});
+            }
+
+            method first-bar-duration {
+                my $i = self.starts-with-repeat ?? self.start-index + 1 !! self.start-index;
+                my $duration = 0;
+                while $i < +@elements {
+                    last if @elements[$i].key eq "barline";
+                    $duration += $outer-self.Duration(@elements[$i++]);
+                }
+                $duration;
+            }
         }
         
-        sub sections-to-lilypond(@sections, :$next-section-is-repeated?) {
+        sub sections-to-lilypond(@sections, :$next-section-is-repeated?, :$first-bar-might-need-partial?) {
             my $start = @sections[0].start-index;
+            $.log.say: "start = $start, +elements = { +@elements }";
             ++$start if @elements[$start].key eq "barline";
             $.log.say: "outputing $start to {@sections[*-1].end-index} { $next-section-is-repeated ?? 'Next section repeated' !! '' }";
             self.SectionToLilypond(@elements[$start .. @sections[*-1].end-index], 
-                                   $out, :beginning($first), :$next-section-is-repeated);
-            $first = False;
+                                   $out, :$next-section-is-repeated, :$first-bar-might-need-partial);
         }
-        
+
         my $start-of-section = 0;
         my @sections;
         for @elements.kv -> $i, $element {
@@ -493,20 +508,20 @@ class TuneConvertor {
                                        end-index => @elements - 1));
 
         write-sections(@sections);
-        
+
         sub write-section($section) {
             $.log.say: "{$section.start-index} => {$section.end-index}" 
                        ~ " {@elements[$section.start-index]} / {@elements[$section.end-index]}"
                        ~ " {$section.is-space ?? "SPACING" !! ""}";
         }
-        
+
         sub write-sections(@sections) {
             for @sections -> $section {
                 write-section($section);
             }
         }
-        
-        sub output-sections(@sections, :$next-section-is-repeated?) {
+
+        sub output-sections(@sections, :$next-section-is-repeated?, :$first-bar-might-need-partial?) {
             $.log.say: "******************************** start cluster of sections";
             write-sections(@sections);
             return unless @sections;
@@ -518,7 +533,8 @@ class TuneConvertor {
                 my $volta-count = 2;
                 # SHOULD: use endings to figure out right volta count
                 $out.print: "\\repeat volta $volta-count ";
-                sections-to-lilypond(@sections[0..^@endings[0]], :$next-section-is-repeated);
+                sections-to-lilypond(@sections[0..^@endings[0]], :$next-section-is-repeated,
+                                     :$first-bar-might-need-partial);
                 $out.say: "\\alternative \{";
                 for @endings.rotor(2=>-1) -> ($a, $b) {
                     $.log.say: "ending is $a => $b";
@@ -528,12 +544,22 @@ class TuneConvertor {
                 $out.say: "\}";
             } elsif @sections.grep(*.ends-with-repeat) {
                 $out.print: "\\repeat volta 2 ";
-                sections-to-lilypond(@sections, :$next-section-is-repeated);
+                sections-to-lilypond(@sections, :$next-section-is-repeated,
+                                     :$first-bar-might-need-partial);
             } else {
-                sections-to-lilypond(@sections, :$next-section-is-repeated);
+                sections-to-lilypond(@sections, :$next-section-is-repeated,
+                                     :$first-bar-might-need-partial);
             }
         }
-        
+
+        my $first-bar-might-need-partial = @sections
+                                           && 0 < @sections[0].first-bar-duration < $.context.ticks-in-measure;
+        if $first-bar-might-need-partial && +@sections > 1 {
+            if @sections[0].total-duration + @sections[1].first-bar-duration == $.context.ticks-in-measure {
+                $first-bar-might-need-partial = False;
+            }
+        }
+
         my $in-endings = False;
         my @section-cluster;
         for @sections -> $section {
@@ -542,7 +568,9 @@ class TuneConvertor {
                     @section-cluster.push($section);
                 } else {
                     output-sections(@section-cluster,
-                                    :next-section-is-repeated($section.starts-with-repeat));
+                                    :next-section-is-repeated($section.starts-with-repeat),
+                                    :$first-bar-might-need-partial);
+                    $first-bar-might-need-partial = False;
                     @section-cluster = ();
                     @section-cluster.push($section);
                     $in-endings = False;
@@ -550,7 +578,9 @@ class TuneConvertor {
             } else {
                 if @section-cluster && $section.starts-with-repeat {
                     # output everything up to the current section
-                    output-sections(@section-cluster, :next-section-is-repeated(True));
+                    output-sections(@section-cluster, :next-section-is-repeated(True),
+                                    :$first-bar-might-need-partial);
+                    $first-bar-might-need-partial = False;
                     @section-cluster = ();
                 } 
 
@@ -562,14 +592,17 @@ class TuneConvertor {
                     $in-endings = True;
                 } else {
                     if $section.ends-with-repeat {
-                        output-sections(@section-cluster, :next-section-is-repeated(True));
+                        output-sections(@section-cluster, :next-section-is-repeated(True),
+                                        :$first-bar-might-need-partial);
+                        $first-bar-might-need-partial = False;
                         @section-cluster = ();
                     }
                 }
             }
         }
         if @section-cluster {
-            output-sections(@section-cluster);
+            output-sections(@section-cluster, :$first-bar-might-need-partial);
+            $first-bar-might-need-partial = False;
         }
     
         $out.say: "\}";
