@@ -562,6 +562,11 @@ class TuneConvertor {
             }
         }
 
+        # delete empty sections from the end of the tune
+        while @sections && @sections[*-1].is-space {
+            @sections.pop;
+        }
+
         my $in-endings = False;
         my @section-cluster;
         for @sections -> $section {
@@ -679,10 +684,13 @@ sub tune-to-score($tune, $out, $log) is export {
                 END
         }
     } else {
-        $out.say: q:to/END/;
-            \markup \fill-line { }
-            END
-        
+        # This was to allow breaks between tunes even if the tune
+        # ended with a linebreak and didn't have a note.  Now
+        # trying to just avoid ending on a linebreak!
+
+        # $out.say: q:to/END/;
+        #     \markup \fill-line { }
+        #     END
     }
 }
 
