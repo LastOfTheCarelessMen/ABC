@@ -292,6 +292,8 @@ class TuneConvertor {
                         when "coda"   { $lilypond ~= '\\mark \\markup { \\musicglyph #"scripts.coda" }'; }
                         when "D.C."   { $lilypond ~= '\\mark "D.C."'; }
                         when "D.S."   { $lilypond ~= '\\mark "D.S."'; }
+                        # when "D.C."   { $suffix ~= '^\\markup { \\bold "  D.C." } '; }
+                        # when "D.S."   { $suffix ~= '^\\markup { \\bold "  D.S." } '; }
                         when "fine"   { $suffix ~= '^\\markup { \\center-align { Fine } } '; }
                         when "breath" { $lilypond ~= '\\breathe'; }
                         when "crescendo(" | "<("  { $suffix ~= "\\<"; }
