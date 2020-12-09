@@ -527,8 +527,8 @@ multi sub MAIN($abc-file, $book-file, :$no-cover?) {
 
     $out.say: "}" if $in-part;
 
+    $out.say: qq{\\pageBreak};
     $out.say: qq{\\tocItem \\markup \\bold "Index of Tunes by Name"};
-
     $out.say: q{        \markuplist \index};
     if !$index-external {
         for %index-first-letters.keys -> $letter {
