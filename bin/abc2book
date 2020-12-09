@@ -208,7 +208,7 @@ sub make-blank-page($tempdir) {
     return latex-to-pdf($blank-tex);
 }
 
-sub make-external-toc($tempdir, $pdf-file, @toc-extra-items) {
+sub make-external-toc($tempdir, $pdf-file, @toc-extra-items, $toc-copyright, $toc-tools) {
     # Following assumes one-page TOC, if more something more complicated
     # will be needed.
 
@@ -250,6 +250,26 @@ sub make-external-toc($tempdir, $pdf-file, @toc-extra-items) {
 
     $out.say: q:to/END/;
         \vfill
+        END
+
+    if $toc-copyright {
+        $out.say: qq:!c:!f:to/END/;
+            \\begin{center}
+                \\copyright \\ $toc-copyright
+            \\end{center}
+            END
+    }
+    
+    if $toc-tools {
+        $out.say: qq:!c:!f:to/END/;
+            \\begin{center}
+                $toc-tools
+
+                Typesetting by abc2book, Lilypond, and \\LaTeX
+            \\end{center}
+            END
+    }
+    $out.say: q:to/END/;
         \hspace{0pt}
         \end{document}
         END
@@ -365,7 +385,7 @@ sub get-tonic($abc) {
     get-tonic-from-first-stem($abc.music.reverse);
 }
 
-multi sub MAIN($abc-file, $book-file, :$no-cover?) {
+multi sub MAIN($abc-file, $book-file, :$no-cover?, :$tunes-in-toc?) {
     my $ly-file;
     $ly-file = $book-file ~ ".ly";
     if $book-file ~~ /^(.*) ".book"/ {
@@ -442,6 +462,8 @@ multi sub MAIN($abc-file, $book-file, :$no-cover?) {
     my $intro-file;
     my $back-cover-file;
     my @toc-extra-items;
+    my $toc-copyright;
+    my $toc-tools;
     
     my @book = $book-in.lines;
     my $in-part = False;
@@ -454,9 +476,7 @@ multi sub MAIN($abc-file, $book-file, :$no-cover?) {
                 my @names = $abc.header.get("T").map({ sanitize-quotation-marks($_.value) });
                 $out.say: "\\markup \{ \\vspace #2 \}";
                 
-                # If you uncomment the next line, every tune will have
-                # a spot in the table of contents.
-#                $out.say: qq{\\tocItem \\markup "@names[0]"} if @names;
+                $out.say: qq{\\tocItem \\markup "@names[0]"} if $tunes-in-toc && @names;
                 
                 for @names -> $name {
                     my $index-sorting-name = make-index-sorting-name($name);
@@ -522,6 +542,14 @@ multi sub MAIN($abc-file, $book-file, :$no-cover?) {
             when / ^ "TOC:" \s+ (.+) \s+ (\S+) \s* $ / {
                  @toc-extra-items.push(~$0 => ~$1);
             }
+
+            when / ^ "TOC-Copyright:" \s+ (.*) $ / {
+                $toc-copyright = ~$0;
+            }
+
+            when / ^ "TOC-Tools:" \s+ (.*) $ / {
+                $toc-tools = ~$0;
+            }
         }
     }
 
@@ -548,7 +576,7 @@ multi sub MAIN($abc-file, $book-file, :$no-cover?) {
 
     my $blank-pdf = make-blank-page($tempdir);
 
-    my $toc-file = make-external-toc($tempdir, $pdf-file, @toc-extra-items);
+    my $toc-file = make-external-toc($tempdir, $pdf-file, @toc-extra-items, $toc-copyright, $toc-tools);
 
     if $index-external {
         make-external-index($pdf-file, %tunes-hash);
