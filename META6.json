@@ -2,7 +2,7 @@
     "perl"        : "6.*",
     "name"        : "ABC",
     "version"     : "0.6.12",
-    "auth"        : "github:colomon",
+    "auth"        : "zef:colomon",
     "description" : "Toolkit for dealing with ABC music notation",
     "depends"     : [ "File::Temp" ],
     "provides" : {
