@@ -286,6 +286,8 @@ class TuneConvertor {
                         when "." { $suffix ~= "\\staccato"; }
                         when "T" { $suffix ~= "\\trill"; }
                         when "P" { $suffix ~= "\\prall"; }
+                        when "L" { $suffix ~= "\\accent"; }
+                        when "!>!" { $suffix ~= "\\accent"; }
                         when "+" { $suffix ~= "-+"; }
                         when "!+!" { $suffix ~= "-+"; }
                         when "segno"  { $lilypond ~= '\\mark \\markup { \\musicglyph #"scripts.segno" }'; }
