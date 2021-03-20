@@ -304,6 +304,7 @@ class TuneConvertor {
                         when "diminuendo)" | ">)" { $suffix ~= "\\!"; }
                         when /^p+$/ | "mp" | "mf" | /^f+$/ | "fermata" | "accent" | "trill" | "sfz" | "marcato"
                                  { $suffix ~= "\\" ~ $element.value; }
+                        when "tenuto" { $suffix ~= "--"; }
                         $*ERR.say: "Unrecognized gracing: " ~ $element.value.perl;
                         %unrecognized_gracings{~$element.value} = 1;
                     }
