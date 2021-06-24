@@ -1,6 +1,6 @@
 use v6;
 
-BEGIN { push @*INC, "lib" }
+use lib 'lib';
 use ABC;
 
 my $abc = q«X:64
@@ -24,8 +24,8 @@ my @notes = gather for $match<ABC::tune><music><line_of_music> -> $line
     {
         for $bar<element>
         {
-            when .<broken_rhythm> { take .<broken_rhythm><note>[0]; take .<broken_rhythm><note>[1]; }
-            when .<note>          { take .<note>; }
+            when .<broken_rhythm> { take .<broken_rhythm><mnote>[0]; take .<broken_rhythm><mnote>[1]; }
+            when .<mnote>          { take .<mnote>; }
         }
     }
 }
@@ -33,4 +33,6 @@ my @notes = gather for $match<ABC::tune><music><line_of_music> -> $line
 my %header = header_hash($match<ABC::tune><header>);
 my %key_signature = key_signature(%header<K>);
 
-@notes.map({say .<pitch> ~ " => " ~ apply_key_signature(%key_signature, .<pitch>)});
+for @notes {
+    say .<pitch> ~ " => " ~ apply_key_signature(%key_signature, .<pitch>);
+}
