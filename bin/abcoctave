@@ -21,6 +21,12 @@ sub print-music($out, @music, &shifter) {
         given $element.key {
             when 'endline' { say ""; }
             when 'inline_field' { print "[{$element.value.key}:{$element.value.value}]"; }
+            when 'chord_or_text' {
+                my $chord = $element.value.Str();
+                $chord = '"' ~ $chord ~ '"' unless $chord ~~ / '"' /;
+                print $chord;
+                #$element.value ~~ ABC::Chord ?? $element.value !! '"' ~ $element.value ~ '"'
+            }
             print $element.value ~~ ABC::Pitched ?? ~$element.value.transpose(&shifter) !! $element.value;
         }
     }
