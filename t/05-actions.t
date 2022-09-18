@@ -285,18 +285,19 @@ BAB G2G|G2g gdB|c2a B2g|A2=f fcA:|
 }
 
 {
-    my $music = q«X:044
-T:Elsie Marley
-B:Robin Williamson, "Fiddle Tunes" (New York 1976)
-N:"printed by Robert Petrie in 1796 and is
-N:"described by him as a 'bumpkin'."
-Z:Nigel Gatherer
-M:6/8
-L:1/8
-K:G
-BAB G2G|G2g gdc|BAB G2G|=F2f fcA|
-BAB G2G|G2g gdB|c2a B2g|A2=f fcA:|
-»;
+    my $music = q:to<ABC-end>;
+        X:044
+        T:Elsie Marley
+        B:Robin Williamson, "Fiddle Tunes" (New York 1976)
+        N:"printed by Robert Petrie in 1796 and is
+        N:"described by him as a 'bumpkin'."
+        Z:Nigel Gatherer
+        M:6/8
+        L:1/8
+        K:G
+        BAB G2G|G2g gdc|BAB G2G|=F2f fcA|
+        BAB G2G|G2g gdB|c2a B2g|A2=f fcA:|
+        ABC-end
 
     my $match = ABC::Grammar.parse($music, :rule<tune>, :actions(ABC::Actions.new));
     ok $match, 'tune recognized';
