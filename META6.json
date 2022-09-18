@@ -1,10 +1,11 @@
 {
     "perl"        : "6.*",
     "name"        : "ABC",
-    "version"     : "0.6.13",
+    "version"     : "0.6.14",
     "auth"        : "zef:colomon",
     "description" : "Toolkit for dealing with ABC music notation",
     "depends"     : [ "File::Temp" ],
+    "license"     : "Artistic-2.0",
     "provides" : {
         "abc2ly"            : "bin/abc2ly",
         "abc2book"          : "bin/abc2book",
