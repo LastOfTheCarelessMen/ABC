@@ -1,0 +1,24 @@
+#!/usr/bin/env raku
+
+use v6;
+use ABC::Header;
+use ABC::Tune;
+use ABC::Grammar;
+use ABC::Actions;
+use ABC::Duration; #OK
+use ABC::Note;
+use ABC::LongRest;
+use ABC::Utils;
+use ABC::KeyInfo;
+
+sub MAIN() {
+    my $actions = ABC::Actions.new;
+    my $match = ABC::Grammar.parse($*IN.slurp-rest, :rule<tune_file>, :$actions);
+    die "Did not match ABC grammar: last tune understood:\n { $actions.current-tune }" unless $match;
+    my @tunes = @( $match.ast );
+    for @tunes -> $tune {
+        my $index-number = $tune.header.get-first-value("X");
+        my $title = $tune.header.get-first-value("T");
+        say "$index-number $title";
+    }
+}
