@@ -385,12 +385,37 @@ sub get-tonic($abc) {
     get-tonic-from-first-stem($abc.music.reverse);
 }
 
-multi sub MAIN($abc-file, $book-file, :$no-cover?, :$tunes-in-toc?) {
+multi sub MAIN($abc-file, $book-file, :$no-cover?, :$tunes-in-toc?, :$notes-file?) {
     my $ly-file;
     $ly-file = $book-file ~ ".ly";
     if $book-file ~~ /^(.*) ".book"/ {
         $ly-file = $0 ~ ".ly";
     }
+
+    my %notes;
+    if $notes-file {
+        my $note;
+        my $index;
+        for $notes-file.IO.lines() {
+            when / ^ 'X:' \s* (\d+) / {
+                if $note {
+                    %notes{$index}.push: $note;
+                    $note = Nil;
+                }
+                $index = $0;
+            }
+            when / \S / {
+                $note ~= $_ ~ " ";
+            }
+            default {
+                if $note {
+                    %notes{$index}.push: $note;
+                    $note = Nil;
+                }
+            }
+        }
+    }
+
     $*ERR.say: "Reading $abc-file / $book-file, writing $ly-file";
 
     my $abc-in = open $abc-file, :r or die "Unable to open $abc-file";
@@ -485,8 +510,12 @@ multi sub MAIN($abc-file, $book-file, :$no-cover?, :$tunes-in-toc?) {
                     %index-first-letters{substr($index-sorting-name, 0, 1)} = 1;
                     last if $index-external; # no need to write more than one name
                 }
-                
-                tune-to-score($abc, $out, $log);
+
+                if %notes{$X} {
+                    tune-to-score($abc, $out, $log, %notes{$X});
+                } else {
+                    tune-to-score($abc, $out, $log);
+                }
             }
             
             when /^ "Part:" (.*) / {
