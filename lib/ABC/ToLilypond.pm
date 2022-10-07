@@ -657,7 +657,7 @@ sub HeaderToLilypond(ABC::Header $header, $out, :$title?) is export {
     $out.say: "}";
 }
 
-sub tune-to-score($tune, $out, $log) is export {
+sub tune-to-score($tune, $out, $log, @notes = $tune.header.get("N").map(*.value)) is export {
     $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
     $log.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
     $out.say: "\\score \{";
@@ -667,10 +667,9 @@ sub tune-to-score($tune, $out, $log) is export {
 
     $out.say: "}\n\n";
     
-    if $tune.header.get-first-value("N") {
-        
-        for $tune.header.get("N") -> $note {
-            next if $note.value ~~ / ^ \s* $ /;
+    if @notes {
+        for @notes -> $note {
+            next if $note ~~ / ^ \s* $ /;
             
             $out.say: q:to/END/;
                 \noPageBreak
@@ -678,7 +677,7 @@ sub tune-to-score($tune, $out, $log) is export {
                     \center-column \wordwrap-lines {
                 END
                 
-            $out.say: "        " ~ sanitize-quotation-marks($note.value, :escape-number-sign);
+            $out.say: "        " ~ sanitize-quotation-marks($note, :escape-number-sign);
 
             $out.say: q:to/END/;
                     }
