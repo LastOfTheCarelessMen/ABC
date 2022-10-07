@@ -240,11 +240,11 @@ sub make-external-toc($tempdir, $pdf-file, @toc-extra-items, $toc-copyright, $to
         if $section {
             if $grouping ne $line-grouping {
                 $grouping = $line-grouping;
-                $out.say: '\contentsline {chapter}{' ~ $grouping ~ '}{' ~ $toc-item.value ~ '}';
+                $out.say: '\contentsline {chapter}{' ~ $grouping ~ '}{' ~ $toc-item.value ~ '}\endgraf';
             }
-            $out.say: '\contentsline {section}{' ~ $section ~ '}{' ~ $toc-item.value ~ '}';
+            $out.say: '\contentsline {section}{' ~ $section ~ '}{' ~ $toc-item.value ~ '}\endgraf';
         } else {
-            $out.say: '\contentsline {chapter}{' ~ $toc-item.key ~ '}{' ~ $toc-item.value ~ '}';
+            $out.say: '\contentsline {chapter}{' ~ $toc-item.key ~ '}{' ~ $toc-item.value ~ '}\endgraf';
         }
     }
 
