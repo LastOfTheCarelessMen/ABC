@@ -628,7 +628,7 @@ sub TuneBodyToLilypondStream($tune, $out, :$prefix?, :$log?) is export {
     $convertor.BodyToLilypond($tune.music, $out, :$prefix);
 }
 
-sub HeaderToLilypond(ABC::Header $header, $out, :$title?) is export {
+sub HeaderToLilypond(ABC::Header $header, $out, :$title?, :$subtitle?) is export {
     $out.say: "\\header \{";
 
     my $working-title = $title // $header.get-first-value("T") // "Unworking-titled";
@@ -652,18 +652,22 @@ sub HeaderToLilypond(ABC::Header $header, $out, :$title?) is export {
         }
     }
     $out.say: qq/    composer = "{ sanitize-quotation-marks($composer) }"/ if $composer;
-    $out.say: "    subtitle = ##f";
+    if $subtitle {
+        $out.say: "    subtitle = " ~ '"' ~ $subtitle ~ '"';
+    } else {
+        $out.say: "    subtitle = ##f";
+    }
 
     $out.say: "}";
 }
 
-sub tune-to-score($tune, $out, $log, @notes = $tune.header.get("N").map(*.value)) is export {
+sub tune-to-score($tune, $out, $log, @notes = $tune.header.get("N").map(*.value), :$subtitle?) is export {
     $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
     $log.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
     $out.say: "\\score \{";
 
         TuneBodyToLilypondStream($tune, $out, :$log);
-        HeaderToLilypond($tune.header, $out);
+        HeaderToLilypond($tune.header, $out, :$subtitle);
 
     $out.say: "}\n\n";
     

@@ -393,6 +393,7 @@ multi sub MAIN($abc-file, $book-file, :$no-cover?, :$tunes-in-toc?, :$notes-file
     }
 
     my %notes;
+    my %dates;
     if $notes-file {
         my $note;
         my $index;
@@ -403,6 +404,10 @@ multi sub MAIN($abc-file, $book-file, :$no-cover?, :$tunes-in-toc?, :$notes-file
                     $note = Nil;
                 }
                 $index = $0;
+            }
+            when / ^ 'DATE:' \s* / {
+                say $/.postmatch;
+                %dates{$index}.push: $/.postmatch.trim;
             }
             when / \S / {
                 $note ~= $_ ~ " ";
@@ -512,7 +517,11 @@ multi sub MAIN($abc-file, $book-file, :$no-cover?, :$tunes-in-toc?, :$notes-file
                 }
 
                 if %notes{$X} {
-                    tune-to-score($abc, $out, $log, %notes{$X});
+                    if %dates{$X} {
+                        tune-to-score($abc, $out, $log, %notes{$X}, subtitle => %dates{$X});
+                    } else {
+                        tune-to-score($abc, $out, $log, %notes{$X});
+                    }
                 } else {
                     tune-to-score($abc, $out, $log);
                 }
