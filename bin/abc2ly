@@ -1,0 +1,170 @@
+#!/usr/bin/env perl6
+
+use v6;
+use ABC::Grammar;
+use ABC::Actions;
+use ABC::ToLilypond;
+
+my $paper-size = "letter"; # or switch to "a4" for European paper
+
+sub TunesToLilypondStream(@tunes, $out, :$fancy?) {
+    start-lilypond($out, $paper-size);
+    if $fancy {
+        $out.say: Q:to/END/;
+            \paper { 
+                print-all-headers = ##t
+                top-margin = 1\in
+                left-margin = 1\in
+                right-margin = 1\in
+                indent = 0
+                tagline = #ff
+            }
+        END
+    } else {
+        $out.say: "\\paper \{ print-all-headers = ##t  ragged-bottom = ##t \}";
+    }
+    
+#    my $log = open :w, $*SPEC.devnull;
+    my $log = open :w, "abc2ly.log";
+    for @tunes -> $tune {
+        tune-to-score($tune, $out, $log);
+    }
+}
+
+sub TuneStreamToTunes($in) {
+    my $actions = ABC::Actions.new;
+    my $match = ABC::Grammar.parse($in.slurp-rest, :rule<tune_file>, :$actions);
+    die "Did not match ABC grammar: last tune understood:\n { $actions.current-tune }" unless $match;
+    @( $match.ast );
+}
+
+sub TuneStreamToLilypondStream($in, $out, $filter = *, :$fancy?) {
+    my @tunes = TuneStreamToTunes($in);
+    TunesToLilypondStream(@tunes.grep($filter), $out, :$fancy);
+}
+
+# This is from https://rosettacode.org/wiki/Longest_common_prefix#Perl_6
+# Bit wonky looking but seems to work!
+sub longest-common-prefix(@s) { 
+    substr @s[0], 0, [+] [\and] [Zeqv] |@s».ords 
+}
+
+sub TunesStreamToScore($in, $out) {
+    my $actions = ABC::Actions.new;
+    my $match = ABC::Grammar.parse($in.slurp-rest, :rule<tune_file>, :$actions);
+    die "Did not match ABC grammar: last tune understood:\n { $actions.current-tune }" unless $match;
+    my @tunes = @( $match.ast );
+
+    my @names = @tunes.map({ $_.header.get-first-value("T") });
+    my $name = longest-common-prefix(@names).trim;
+    dd $name;
+    @names .= map(-> $full-name { $full-name.substr($name.chars).trim });
+    dd @names;
+
+    start-lilypond($out, $paper-size);
+    $out.say: "\\paper \{ print-all-headers = ##t ragged-bottom = ##t \}";
+
+    $out.say: "\\score \{";
+    $out.say: '<<';
+
+    for @tunes Z, @names -> ($tune, $name) {
+        dd $name;
+        $*ERR.say: "Working on { $tune.header.get-first-value("T") // $tune.header.get-first-value("X") }";
+
+        $out.say: "\\new Staff ";
+        TuneBodyToLilypondStream($tune, $out, prefix => qq[\\set Staff.instrumentName = "$name"]);
+    }
+
+    $out.say: '>>';
+    HeaderToLilypond(@tunes[0].header, $out, title => $name);
+    $out.say: "}\n\n";
+}
+
+multi sub MAIN() {
+    TuneStreamToLilypondStream($*IN, $*OUT);
+}
+
+multi sub MAIN($first-abc-file, *@other-abc-files, :x($index)?, :$o?, :$mc?, :$fancy?, :$score?) {
+    my @abc-files = $first-abc-file, |@other-abc-files;
+    for @abc-files -> $abc-file {
+        my $ly-file;
+        if $o {
+            $ly-file = $o;
+        } else {
+            $ly-file = $abc-file ~ ".ly";
+            if $abc-file ~~ /^(.*) ".abc"/ {
+                $ly-file = $0 ~ ".ly";
+            }
+        }
+        $*ERR.say: "Reading $abc-file, writing $ly-file";
+    
+        my $in = open $abc-file, :r or die "Unable to open $abc-file";
+        my $out = open $ly-file, :w or die "Unable to open $ly-file";
+    
+        if $score {
+            TunesStreamToScore($in, $out);
+        } elsif $index {
+            TuneStreamToLilypondStream($in, $out, -> $tune { $tune.header.get-first-value("X") == $index }, :$fancy);
+        } else {
+            TuneStreamToLilypondStream($in, $out, :$fancy);
+        }
+    
+        if $mc {
+            $out.say: '\markup {';
+            $out.say: '    \fill-line { "For more information on these tunes, please see http://midlandceltic.org/ws2011/" }';
+            $out.say: '}';
+        }
+    
+        $out.close;
+        $in.close;
+        
+        run "lilypond", $ly-file;
+    }
+    
+    $*ERR.say: "Unrecognized gracings: " ~ GetUnrecognizedGracings().keys.join(", ") if GetUnrecognizedGracings();
+}
+
+sub good-filename-base($name) {
+    my $title = $name;
+    $title .= subst(/ \s | '?' | '!' | "'" | '*' | '^' | '(' | ')' | '"' | '#' | '[' | ']' /, "_", :global);
+
+    $title .= subst(/<[àáâäaãåā]>/, "a", :global);
+    $title .= subst(/<[èéêëēėę]>/, "e", :global);
+    $title .= subst(/<[îïíīįì]>/, "i", :global);
+    $title .= subst(/<[ôöòóøōõ]>/, "o", :global);
+    $title .= subst(/<[ûüùúū]>/, "u", :global);
+    $title .= subst(/<[ÀÁÂÄAÃÅĀ]>/, "A", :global);
+    $title .= subst(/<[ÈÉÊËĒĖĘ]>/, "E", :global);
+    $title .= subst(/<[ÎÏÍĪĮÌ]>/, "I", :global);
+    $title .= subst(/<[ÔÖÒÓØŌÕ]>/, "O", :global);
+    $title .= subst(/<[ÛÜÙÚŪ]>/, "U", :global);
+
+    $title .= subst(/'æ'/, "ae", :global);
+    $title .= subst(/'Æ'/, "AE", :global);
+    $title .= subst(/'œ'/, "oe", :global);
+    $title .= subst(/'Œ'/, "OE", :global);
+    $title .= subst(/"&"/, "and", :global);
+    $title .= subst(rx{'/'}, "-", :global);
+    $title .= subst(/ <:!ASCII> /, "_", :global);
+    $title .= subst(":", "_-", :global);
+    $title .= subst(";", "_-", :global);
+    $title .= subst(",", "_-", :global);
+
+    $title;
+}
+
+multi sub MAIN($abc-file, :$split!, :$fancy?) {
+    my $abc-in = open $abc-file, :r or die "Unable to open $abc-file";
+    my @tunes = TuneStreamToTunes($abc-in);
+    $abc-in.close;
+
+    for @tunes -> $tune {
+        my $title = $tune.header.get-first-value("T");
+        my $filename-base = good-filename-base($title);
+        my $ly-filename = ($filename-base ~ ".ly").IO;
+        my $out = open $ly-filename, :w or die "Unable to open $ly-filename";
+        TunesToLilypondStream([$tune], $out, :$fancy);
+    }
+
+    $*ERR.say: "Unrecognized gracings: " ~ GetUnrecognizedGracings().keys.join(", ") if GetUnrecognizedGracings();
+}

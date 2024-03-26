@@ -1,6 +1,6 @@
 use v6;
 
-BEGIN { push @*INC, "lib" }
+use lib 'lib';
 use ABC;
 
 my @matches = $*IN.slurp.comb(m/ <ABC::tune> /, :match);
@@ -33,6 +33,6 @@ for @matches {
 
     my %key_signature = key_signature(%header<K>);
 
-    my @trouble = @notes.map({apply_key_signature(%key_signature, .<pitch>)}).grep({!%dg_notes.exists(lc($_))});
+    my @trouble = @notes.map({apply_key_signature(%key_signature, .<pitch>)}).grep({!%dg_notes{lc($_)}:exists});
     say @trouble.perl;
 }
